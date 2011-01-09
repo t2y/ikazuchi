@@ -1,6 +1,9 @@
 # xxx.py:yy
-msgid "forest book"
+msgid ""
 msgstr ""
+
+msgid "forest book"
+msgstr "もりのほん"
 
 # xxx.py:yy
 msgid "Python Module Of The Week"
@@ -8,4 +11,4 @@ msgstr ""
 
 # xxx.py:yy
 msgid "ikazuchi translation"
-msgstr ""
+msgstr "雷の翻訳"

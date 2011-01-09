@@ -1,0 +1,15 @@
+Todos
+======
+
+Functionals
+------------
+* Another translating API
+* Glossary and fuzzy match functions
+* Merge other po file into po file
+* Shortcut key
+* Stop translating work
+* Support i18n 
+
+Known Issues
+-------------
+* No error handling
