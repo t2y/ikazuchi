@@ -5,8 +5,7 @@ import optparse
 import os
 import sys
 
-# ikazuchi functions
-from translator import *
+from izuchi.translator import *
 from utils import *
 
 VERSION = "0.1"

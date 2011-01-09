@@ -2,8 +2,7 @@
 
 import sys
 
-# ikazuchi functions
-from handler import *
+from izuchi.handler import *
 
 def dispatch_handler(opts):
     if opts.po_file:
