@@ -23,7 +23,7 @@ def get_args():
                       default="en", metavar="LANG",
                       help=u"original language(msgid)")
     parser.add_option("-t", "--to", dest="lang_to",
-                      default="ja", metavar="LANG",
+                      default=get_lang(), metavar="LANG",
                       help=u"target language(msgstr)")
     parser.add_option("-p", "--pofile", dest="po_file",
                       default=None, metavar="POFILE",
@@ -36,6 +36,8 @@ def get_args():
                       help=u"print debug messages to stdout")
 
     opts, args = parser.parse_args()
+    if not opts.lang_to:
+        opts.lang_to = raw_input(u"Type language code: ")
     if (opts.po_file and os.access(opts.po_file, os.R_OK)) or opts.sentence:
         return opts, args
     else:
