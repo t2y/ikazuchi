@@ -12,9 +12,11 @@ def dispatch_handler(opts):
         h = SingleSentenceHandler(opts.sentence)
     return h
 
+_UNSUPPORTED_VERSION = "Unsuporrted Python version, use 2.6 above"
+
 
 def check_python_version():
     ver = sys.version_info
     if ver[0] == 2 and ver[1] < 6:
-        print "unsuporrted Python version, use 2.6 above"
+        print _UNSUPPORTED_VERSION
         sys.exit(0)
