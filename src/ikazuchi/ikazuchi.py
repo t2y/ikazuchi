@@ -11,6 +11,7 @@ from utils import *
 VERSION = "0.1"
 TRANSLATE_API = ["google", "yahoo"]
 
+
 def get_args():
     usage = "usage: %prog [options]"
     ver = "%prog {0}".format(VERSION)
@@ -30,7 +31,7 @@ def get_args():
     parser.add_option("-s", "--sentence", dest="sentence",
                       default=None, metavar="SENTENCE",
                       help=u"target sentence")
-    parser.add_option("-v", "--verbose", dest="verbose", 
+    parser.add_option("-v", "--verbose", dest="verbose",
                       action="store_true", default=False,
                       help=u"print debug messages to stdout")
 
@@ -40,6 +41,7 @@ def get_args():
     else:
         parser.print_help()
         sys.exit(0)
+
 
 def main():
     opts, args = get_args()

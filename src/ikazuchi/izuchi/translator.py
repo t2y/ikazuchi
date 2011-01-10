@@ -10,6 +10,7 @@ __all__ = [
     "TranslatingGoogle",
 ]
 
+
 class Translator(object):
     """Base class for Translator"""
 
@@ -22,11 +23,13 @@ class Translator(object):
         """
 
     @abc.abstractmethod
-    def translate(self, msgid): pass
+    def translate(self, msgid):
+        pass
 
     def translate_with_handler(self):
         """handler must be implement _translate method"""
         self.handler._translate(self.translate)
+
 
 class GoogleTranslator(object):
     """
@@ -60,5 +63,7 @@ class GoogleTranslator(object):
                 raise RuntimeError(res_json)
         return msgstr
 
+
 # MixIn each implemented Translator
-class TranslatingGoogle(GoogleTranslator, Translator): pass
+class TranslatingGoogle(GoogleTranslator, Translator):
+    pass

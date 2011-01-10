@@ -47,13 +47,13 @@ setup(
      ],
      extras_require=dict(
          test=[
-             "pikzie",
+             "Nose",
              "minimock",
              "pep8",
          ],
      ),
-     #test_suite="nose.collector",
-     tests_require=["pikzie","minimock","pep8"],
+     test_suite='nose.collector',
+     tests_require=['Nose','minimock','pep8'],
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
