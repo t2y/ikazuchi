@@ -3,6 +3,7 @@
 import sys
 
 from izuchi.handler import *
+from locale import _
 
 
 def get_lang():
@@ -25,4 +26,4 @@ def check_python_version():
         print _UNSUPPORTED_VERSION
         sys.exit(0)
 
-_UNSUPPORTED_VERSION = "Unsuporrted Python version, use 2.6 above"
+_UNSUPPORTED_VERSION = _("Unsuporrted Python version, use 2.6 above")

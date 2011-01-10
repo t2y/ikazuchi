@@ -4,6 +4,8 @@ import abc
 import locale
 import polib
 
+from ikazuchi.locale import _
+
 __all__ = [
     "InteractiveHandler",
     "SingleSentenceHandler",
@@ -28,6 +30,7 @@ class InteractiveHandler(BaseHandler):
     """
     def __init__(self, po_file):
         self.po = polib.pofile(po_file)
+        self.po.metadata["Content-Type"] = "text/plain; charset=utf-8"
         self.encoding = locale.getdefaultlocale()[1]
         if not self.encoding:
             self.encoding = DEFAULT_ENCODING
@@ -43,16 +46,18 @@ class InteractiveHandler(BaseHandler):
 
     def _translate(self, translate):
         """translate msgid in po file"""
+        _prompt = _(u"Input: ").encode(self.encoding)
         for p in self.po:
             for_ref = translate(p.msgid)
-            print u"msgid:\t\t{0}".format(p.msgid)
+            print _(u"msgid:\t\t{0}").format(p.msgid)
             if p.msgstr:
-                print u"current msgstr:\t{0}".format(p.msgstr)
-            print u"for reference:\t{0}".format(for_ref)
-            entered = unicode(raw_input("Input: "), self.encoding)
+                print _(u"current msgstr:\t{0}").format(p.msgstr)
+            print _(u"for reference:\t{0}").format(for_ref)
+            entered = unicode(raw_input(_prompt), self.encoding)
             p.msgstr = self._select_translation(for_ref, p.msgstr, entered)
             self.po.save()
-            print u"updated msgstr:\t{0}\n".format(p.msgstr)
+            print _(u"updated msgstr:\t{0}").format(p.msgstr)
+            print ""
 
 
 class SingleSentenceHandler(BaseHandler):
@@ -63,5 +68,5 @@ class SingleSentenceHandler(BaseHandler):
         self.sentence = sentence
 
     def _translate(self, translate):
-        print u"sentence:\t{0}".format(self.sentence)
-        print u"translated:\t{0}".format(translate(self.sentence))
+        print _(u"sentence:\t{0}").format(self.sentence)
+        print _(u"translated:\t{0}").format(translate(self.sentence))

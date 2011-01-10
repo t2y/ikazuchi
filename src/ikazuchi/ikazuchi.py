@@ -6,34 +6,35 @@ import os
 import sys
 
 from izuchi.translator import *
+from locale import _
 from utils import *
 
-VERSION = "0.1"
+__version__ = "0.1"
 TRANSLATE_API = ["google", "yahoo"]
 
 
 def get_args():
-    usage = "usage: %prog [options]"
-    ver = "%prog {0}".format(VERSION)
+    usage = _(u"%prog [options]")
+    ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
     parser.add_option("-a", "--api", dest="api",
                       default=TRANSLATE_API[0], metavar="API",
-                      help=u"translation api are {0}".format(TRANSLATE_API))
+                      help=_(u"translation api are {0}").format(TRANSLATE_API))
     parser.add_option("-f", "--from", dest="lang_from",
                       default="en", metavar="LANG",
-                      help=u"original language(msgid)")
+                      help=_(u"original language(msgid)"))
     parser.add_option("-t", "--to", dest="lang_to",
                       default=get_lang(), metavar="LANG",
-                      help=u"target language(msgstr)")
+                      help=_(u"target language(msgstr)"))
     parser.add_option("-p", "--pofile", dest="po_file",
                       default=None, metavar="POFILE",
-                      help=u"target po file")
+                      help=_(u"target po file"))
     parser.add_option("-s", "--sentence", dest="sentence",
                       default=None, metavar="SENTENCE",
-                      help=u"target sentence")
+                      help=_(u"target sentence"))
     parser.add_option("-v", "--verbose", dest="verbose",
                       action="store_true", default=False,
-                      help=u"print debug messages to stdout")
+                      help=_(u"print debug messages to stdout"))
 
     opts, args = parser.parse_args()
     if not opts.lang_to:

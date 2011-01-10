@@ -1,0 +1,78 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-01-10 21:01+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/ikazuchi/ikazuchi.py:17
+msgid "%prog [options]"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:22
+msgid "translation api are {0}"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:25
+msgid "original language(msgid)"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:28
+msgid "target language(msgstr)"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:31
+msgid "target po file"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:34
+msgid "target sentence"
+msgstr ""
+
+#: src/ikazuchi/ikazuchi.py:37
+msgid "print debug messages to stdout"
+msgstr ""
+
+#: src/ikazuchi/utils.py:29
+msgid "Unsuporrted Python version, use 2.6 above"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:49
+msgid "Input: "
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:52
+msgid "msgid:\t\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:54
+msgid "current msgstr:\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:55
+msgid "for reference:\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:59
+msgid "updated msgstr:\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:71
+msgid "sentence:\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:72
+msgid "translated:\t{0}"
+msgstr ""
