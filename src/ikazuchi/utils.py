@@ -3,6 +3,7 @@
 import sys
 
 from izuchi.handler import *
+from izuchi.translator import *
 from locale import _
 
 
@@ -12,12 +13,25 @@ def get_lang():
     return lang
 
 
-def dispatch_handler(opts):
+def get_handler(opts):
+    h = None
     if opts.po_file:
         h = InteractiveHandler(opts.po_file)
     elif opts.sentence:
         h = SingleSentenceHandler(opts.sentence)
     return h
+
+
+def get_translator(opts, handler):
+    from ikazuchi import TRANSLATE_API
+    t = None
+    if opts.comparison:
+        t = TranslatingComparison
+    elif opts.api == TRANSLATE_API[0]:
+        t = TranslatingGoogle
+    elif opts.api == TRANSLATE_API[1]:
+        t = TranslatingMicrosoft
+    return t(opts.lang_from, opts.lang_to, handler)
 
 
 def check_python_version():

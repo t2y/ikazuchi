@@ -68,5 +68,6 @@ class SingleSentenceHandler(BaseHandler):
         self.sentence = sentence
 
     def _translate(self, translate):
-        print _(u"sentence:\t{0}").format(self.sentence)
-        print _(u"translated:\t{0}").format(translate(self.sentence))
+        print _(u"sentence:\t\t{0}").format(self.sentence)
+        for api, text in translate(self.sentence):
+            print _(u"translated({0}):\t{1}").format(api, text)

@@ -8,7 +8,6 @@ Functionals
 * Merge other po file into po file
 * Shortcut key
 * Stop translating work
-* Support i18n 
 
 Known Issues
 -------------
