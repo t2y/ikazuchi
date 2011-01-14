@@ -14,6 +14,7 @@ def test_pep8():
         "--show-source",
         "--repeat",
         "--exclude=SVGdraw.py",
+        "--ignore=E302,E701",
         #"--show-pep8",
         #"-qq",
         #"-v",

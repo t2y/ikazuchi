@@ -13,7 +13,6 @@ __all__ = [
     "TranslatingComparison",
 ]
 
-
 class Translator(object):
     """Base class for Translator"""
 
@@ -33,7 +32,6 @@ class Translator(object):
     def translate_with_handler(self):
         """handler must be implement _translate method"""
         self.handler._translate(self.translate)
-
 
 class GoogleTranslator(object):
     """
@@ -98,7 +96,6 @@ class MicrosoftTranslator(object):
             translated = element.getroot().text
         yield self.api(), translated
 
-
 class ComparisonTranslator(object):
     """Comparison class for all translator"""
     def __init__(self, lang_from, lang_to, handler):
@@ -114,13 +111,6 @@ class ComparisonTranslator(object):
 
 
 # MixIn each implemented Translator
-class TranslatingGoogle(GoogleTranslator, Translator):
-    pass
-
-
-class TranslatingMicrosoft(MicrosoftTranslator, Translator):
-    pass
-
-
-class TranslatingComparison(ComparisonTranslator, Translator):
-    pass
+class TranslatingGoogle(GoogleTranslator, Translator): pass
+class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
+class TranslatingComparison(ComparisonTranslator, Translator): pass

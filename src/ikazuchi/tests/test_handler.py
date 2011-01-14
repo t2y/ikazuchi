@@ -22,12 +22,12 @@ class TestInteractiveHandler(object):
 
     def test_select_translation(self):
         data = [
-            (["ref", "",    "y"],   "ref"),
-            (["ref", "cur", "y"],   "ref"),
-            (["ref", "cur", ""],    "cur"),
-            (["ref", "",    ""],    ""),
+            (["ref", "", "y"], "ref"),
+            (["ref", "cur", "y"], "ref"),
+            (["ref", "cur", ""], "cur"),
+            (["ref", "", ""], ""),
             (["ref", "cur", "ent"], "ent"),
-            (["ref", "",    "ent"], "ent"),
+            (["ref", "", "ent"], "ent"),
         ]
         h = InteractiveHandler(self.po_file.name)
         for d in data:

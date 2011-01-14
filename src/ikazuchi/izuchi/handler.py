@@ -13,16 +13,13 @@ __all__ = [
 
 DEFAULT_ENCODING = "utf-8"
 
-
 class BaseHandler(object):
     """Base class for handler"""
 
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def _translate(self, msgid):
-        pass
-
+    def _translate(self, msgid): pass
 
 class InteractiveHandler(BaseHandler):
     """
@@ -58,7 +55,6 @@ class InteractiveHandler(BaseHandler):
             self.po.save()
             print _(u"updated msgstr:\t{0}").format(p.msgstr)
             print ""
-
 
 class SingleSentenceHandler(BaseHandler):
     """

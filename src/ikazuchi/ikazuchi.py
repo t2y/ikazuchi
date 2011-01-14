@@ -11,7 +11,6 @@ from utils import *
 __version__ = "0.1"
 TRANSLATE_API = ["google", "microsoft"]
 
-
 def get_args():
     usage = _(u"%prog [options]")
     ver = "%prog {0}".format(__version__)
@@ -47,7 +46,6 @@ def get_args():
     else:
         parser.print_help()
         sys.exit(0)
-
 
 def main():
     opts, args = get_args()
