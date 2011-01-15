@@ -5,25 +5,30 @@ import optparse
 import os
 import sys
 
+from izuchi.translator import *
 from locale import _
 from utils import *
 
 __version__ = "0.1"
-TRANSLATE_API = ["google", "microsoft"]
+TRANSLATE_API = {
+    "google": TranslatingGoogle,
+    "microsoft": TranslatingMicrosoft,
+    "yahoo": TranslatingYahoo,
+}
 
 def get_args():
     usage = _(u"%prog [options]")
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
-    parser.set_defaults(api=TRANSLATE_API[0], lang_from="en",
+    parser.set_defaults(api="google", lang_from="en",
                         lang_to=get_lang(), po_file=None, sentence=None,
                         comparison=False, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
-                      help=u"translation api are {0}".format(TRANSLATE_API))
+                      help=u"APIs are {0}".format(TRANSLATE_API.keys()))
     parser.add_option("-f", "--from", dest="lang_from", metavar="LANG",
-                      help=u"original language(msgid)")
+                      help=u"original language")
     parser.add_option("-t", "--to", dest="lang_to", metavar="LANG",
-                      help=u"target language(msgstr)")
+                      help=u"target language to translate")
     parser.add_option("-p", "--pofile", dest="po_file",
                       metavar="POFILE", help=u"target po file")
     parser.add_option("-s", "--sentence", dest="sentence",
@@ -39,13 +44,24 @@ def get_args():
     opts, args = parser.parse_args()
     if not opts.lang_to:
         opts.lang_to = raw_input(u"Type language code: ")
-    if opts.api in TRANSLATE_API and (
-        opts.comparison and not opts.po_file) and (
-        (opts.po_file and os.access(opts.po_file, os.R_OK)) or opts.sentence):
-        return opts, args
-    else:
+
+    err_msg = None
+    if opts.api not in TRANSLATE_API.keys():
+        err_msg = _(u"Unsupported API: {0}").format(opts.api)
+    elif opts.comparison and opts.po_file:
+        err_msg = _(u"Unsupport to compare translation with po file")
+    elif opts.po_file and not os.access(opts.po_file, os.R_OK):
+        err_msg = _(u"Cannot access po file: {0}").format(opts.po_file)
+    elif not (opts.po_file or opts.sentence):
+        err_msg = _(u"Set argument either '-p po_file' or '-s sentence'")
+
+    if err_msg:
         parser.print_help()
+        print err_msg
         sys.exit(0)
+
+    convrt_str_to_unicode(opts)
+    return opts, args
 
 def main():
     opts, args = get_args()

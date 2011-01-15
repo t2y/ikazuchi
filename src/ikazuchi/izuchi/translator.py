@@ -10,6 +10,7 @@ from xml.etree import ElementTree as ET
 __all__ = [
     "TranslatingGoogle",
     "TranslatingMicrosoft",
+    "TranslatingYahoo",
     "TranslatingComparison",
 ]
 
@@ -32,6 +33,7 @@ class Translator(object):
         """handler must be implement _translate method"""
         self.handler._translate(self.translate)
 
+
 class GoogleTranslator(object):
     """
     Translator with Google Translate API
@@ -52,7 +54,7 @@ class GoogleTranslator(object):
 
     def translate(self, text):
         translated = ""
-        self.query.update(q=text)
+        self.query.update(q=text.encode("utf-8"))
         url = "{0}{1}".format(self._url, urlencode(self.query))
         req = urllib2.Request(url)
         with closing(urllib2.urlopen(req)) as res:
@@ -87,13 +89,53 @@ class MicrosoftTranslator(object):
 
     def translate(self, text):
         translated = ""
-        self.query.update(text=text)
+        self.query.update(text=text.encode("utf-8"))
         url = "{0}{1}".format(self._url, urlencode(self.query))
         req = urllib2.Request(url)
         with closing(urllib2.urlopen(req)) as res:
             element = ET.parse(res)
             translated = element.getroot().text
         yield self.api(), translated
+
+
+class YahooTranslator(object):
+    """
+    Translator with Yahoo! Pipes
+    http://pipes.yahoo.com/pipes/
+    see also
+    Yahoo! Pipes Terms of Use
+    http://info.yahoo.com/legal/us/yahoo/pipes/pipes-4396.html
+    """
+    def __init__(self, lang_from, lang_to, handler):
+        self.handler = handler
+        self.query = {
+            "_render": "json",
+        }
+        domain = "pipes.yahoo.com"
+        path = "/t2y1979/{0}?".format(self._get_api(lang_from, lang_to))
+        self._url = "http://{0}{1}".format(domain, path)
+
+    def _get_api(self, lang_from, lang_to):
+        # convert for for arbitrary api name
+        api = "{0}2{1}".format(lang_from, lang_to)
+        if lang_from == "ja" and lang_to == "en":
+            api = "ja2en_"
+        elif lang_from == "en" and lang_to.lower() == "zh-cn":
+            api = "en2zhcn"
+        elif lang_from == "en" and lang_to.lower() == "zh-tw":
+            api = "en2zhtw"
+        return api
+
+    def translate(self, text):
+        translated = ""
+        self.query.update(text=text.encode("utf-8"))
+        url = "{0}{1}".format(self._url, urlencode(self.query))
+        req = urllib2.Request(url)
+        with closing(urllib2.urlopen(req)) as res:
+            res_json = json.loads(res.read())
+            translated = res_json["value"]["items"][0]["description"]
+        yield self.api(), translated
+
 
 class ComparisonTranslator(object):
     """Comparison class for all translator"""
@@ -102,6 +144,7 @@ class ComparisonTranslator(object):
         self.translators = [
             TranslatingGoogle(lang_from, lang_to, handler),
             TranslatingMicrosoft(lang_from, lang_to, handler),
+            TranslatingYahoo(lang_from, lang_to, handler),
         ]
 
     def translate(self, text):
@@ -112,4 +155,5 @@ class ComparisonTranslator(object):
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
+class TranslatingYahoo(YahooTranslator, Translator): pass
 class TranslatingComparison(ComparisonTranslator, Translator): pass

@@ -3,7 +3,6 @@
 import sys
 
 from izuchi.handler import *
-from izuchi.translator import *
 from locale import _
 
 def get_lang():
@@ -24,11 +23,14 @@ def get_translator(opts, handler):
     t = None
     if opts.comparison:
         t = TranslatingComparison
-    elif opts.api == TRANSLATE_API[0]:
-        t = TranslatingGoogle
-    elif opts.api == TRANSLATE_API[1]:
-        t = TranslatingMicrosoft
+    else:
+        t = TRANSLATE_API[opts.api]
     return t(opts.lang_from, opts.lang_to, handler)
+
+def convrt_str_to_unicode(opts):
+    from locale import getdefaultlocale
+    if opts.sentence:
+        opts.sentence = unicode(opts.sentence, getdefaultlocale()[1])
 
 _UNSUPPORTED_VERSION = _("Unsuporrted Python version, use 2.6 above")
 
