@@ -3,6 +3,7 @@
 import sys
 
 from izuchi.handler import *
+from izuchi.translator import *
 from locale import _
 
 def get_lang():
