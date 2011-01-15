@@ -19,7 +19,7 @@ class BaseHandler(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def _translate(self, msgid): pass
+    def _translate(self, translate_method): pass
 
 class InteractiveHandler(BaseHandler):
     """

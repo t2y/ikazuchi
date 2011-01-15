@@ -26,8 +26,7 @@ class Translator(object):
         """
 
     @abc.abstractmethod
-    def translate(self, msgid):
-        pass
+    def translate(self, text): pass
 
     def translate_with_handler(self):
         """handler must be implement _translate method"""
@@ -51,9 +50,9 @@ class GoogleTranslator(object):
         path = "/ajax/services/language/translate?"
         self._url = "http://{0}{1}".format(domain, path)
 
-    def translate(self, msgid):
+    def translate(self, text):
         translated = ""
-        self.query.update(q=msgid)
+        self.query.update(q=text)
         url = "{0}{1}".format(self._url, urlencode(self.query))
         req = urllib2.Request(url)
         with closing(urllib2.urlopen(req)) as res:
@@ -86,9 +85,9 @@ class MicrosoftTranslator(object):
         path = "/V2/Http.svc/Translate?"
         self._url = "http://{0}{1}".format(domain, path)
 
-    def translate(self, msgid):
+    def translate(self, text):
         translated = ""
-        self.query.update(text=msgid)
+        self.query.update(text=text)
         url = "{0}{1}".format(self._url, urlencode(self.query))
         req = urllib2.Request(url)
         with closing(urllib2.urlopen(req)) as res:
@@ -105,9 +104,9 @@ class ComparisonTranslator(object):
             TranslatingMicrosoft(lang_from, lang_to, handler),
         ]
 
-    def translate(self, msgid):
+    def translate(self, text):
         for t in self.translators:
-            yield t.translate(msgid).next()
+            yield t.translate(text).next()
 
 
 # MixIn each implemented Translator
