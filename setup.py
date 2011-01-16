@@ -57,5 +57,6 @@ setup(
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
+        raimei = ikazuchi.raimei:main
      """,
 )
