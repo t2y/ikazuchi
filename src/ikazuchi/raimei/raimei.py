@@ -41,7 +41,7 @@ def translate_with_range(translator, encoding):
         for info in translator.translate(line):
             apis.append(info[0])
             vim.current.range.append(info[1].encode(encoding))
-    print "Translated by {0}".format(apis)
+    print "Translated by {0}".format(apis[::-1])
 
 def translate(api_name, lang_from, lang_to, encoding, comp):
     if comp:
