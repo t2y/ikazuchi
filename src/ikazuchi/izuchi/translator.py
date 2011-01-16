@@ -149,7 +149,8 @@ class ComparisonTranslator(object):
 
     def translate(self, text):
         for t in self.translators:
-            yield t.translate(text).next()
+            for translated in t.translate(text):
+                yield translated
 
 
 # MixIn each implemented Translator

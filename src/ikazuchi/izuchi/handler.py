@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import abc
-import locale
 import polib
 
-from ikazuchi.locale import _
+try:
+    from ikazuchi.locale import _
+except ImportError:
+    def _(s): return s
 
 __all__ = [
     "InteractiveHandler",
@@ -26,9 +28,10 @@ class InteractiveHandler(BaseHandler):
     Handler class for translating interactively
     """
     def __init__(self, po_file):
+        from locale import getdefaultlocale
         self.po = polib.pofile(po_file)
         self.po.metadata["Content-Type"] = "text/plain; charset=utf-8"
-        self.encoding = locale.getdefaultlocale()[1]
+        self.encoding = getdefaultlocale()[1]
         if not self.encoding:
             self.encoding = DEFAULT_ENCODING
 
