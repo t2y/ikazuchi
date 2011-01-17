@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-10 21:01+0900\n"
+"POT-Creation-Date: 2011-01-17 22:56+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,62 +17,50 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/ikazuchi/ikazuchi.py:17
-msgid "%prog [options]"
+#: src/ikazuchi/ikazuchi.py:41
+msgid "Unsupported API: {0}"
 msgstr ""
 
-#: src/ikazuchi/ikazuchi.py:22
-msgid "translation api are {0}"
+#: src/ikazuchi/ikazuchi.py:43
+msgid "Unsupport to translate po file with all translators"
 msgstr ""
 
-#: src/ikazuchi/ikazuchi.py:25
-msgid "original language(msgid)"
+#: src/ikazuchi/ikazuchi.py:45
+msgid "Cannot access po file: {0}"
 msgstr ""
 
-#: src/ikazuchi/ikazuchi.py:28
-msgid "target language(msgstr)"
+#: src/ikazuchi/ikazuchi.py:47
+msgid "Set argument either '-p po_file' or '-s sentence'"
 msgstr ""
 
-#: src/ikazuchi/ikazuchi.py:31
-msgid "target po file"
+#: src/ikazuchi/utils.py:26
+msgid "Unsupported Python version, use 2.6 above"
 msgstr ""
 
-#: src/ikazuchi/ikazuchi.py:34
-msgid "target sentence"
-msgstr ""
-
-#: src/ikazuchi/ikazuchi.py:37
-msgid "print debug messages to stdout"
-msgstr ""
-
-#: src/ikazuchi/utils.py:29
-msgid "Unsuporrted Python version, use 2.6 above"
-msgstr ""
-
-#: src/ikazuchi/izuchi/handler.py:49
+#: src/ikazuchi/izuchi/handler.py:56
 msgid "Input: "
 msgstr ""
 
-#: src/ikazuchi/izuchi/handler.py:52
-msgid "msgid:\t\t{0}"
-msgstr ""
-
-#: src/ikazuchi/izuchi/handler.py:54
-msgid "current msgstr:\t{0}"
-msgstr ""
-
-#: src/ikazuchi/izuchi/handler.py:55
-msgid "for reference:\t{0}"
-msgstr ""
-
 #: src/ikazuchi/izuchi/handler.py:59
-msgid "updated msgstr:\t{0}"
+msgid "msgid:\t\t\t{0}"
 msgstr ""
 
-#: src/ikazuchi/izuchi/handler.py:71
-msgid "sentence:\t{0}"
+#: src/ikazuchi/izuchi/handler.py:61
+msgid "current msgstr:\t\t{0}"
 msgstr ""
 
-#: src/ikazuchi/izuchi/handler.py:72
-msgid "translated:\t{0}"
+#: src/ikazuchi/izuchi/handler.py:62
+msgid "reference({0}):\t{1}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:66
+msgid "updated msgstr:\t\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:77
+msgid "sentence:\t\t{0}"
+msgstr ""
+
+#: src/ikazuchi/izuchi/handler.py:79
+msgid "translated({0}):\t{1}"
 msgstr ""

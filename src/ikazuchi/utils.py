@@ -23,7 +23,7 @@ def convrt_str_to_unicode(opts):
     if opts.sentence:
         opts.sentence = unicode(opts.sentence, getdefaultlocale()[1])
 
-_UNSUPPORTED_VERSION = _("Unsuporrted Python version, use 2.6 above")
+_UNSUPPORTED_VERSION = _("Unsupported Python version, use 2.6 above")
 
 def check_python_version():
     ver = sys.version_info

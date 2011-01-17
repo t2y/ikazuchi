@@ -12,7 +12,7 @@ from utils import *
 __version__ = "0.1"
 
 def get_args():
-    usage = _(u"%prog [options]")
+    usage = u"%prog [options]"
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
     parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
