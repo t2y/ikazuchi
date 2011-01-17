@@ -8,10 +8,7 @@ from urllib import urlencode
 from xml.etree import ElementTree as ET
 
 __all__ = [
-    "TranslatingGoogle",
-    "TranslatingMicrosoft",
-    "TranslatingYahoo",
-    "TranslatingComparison",
+    "TRANSLATE_API",
 ]
 
 class Translator(object):
@@ -137,8 +134,8 @@ class YahooTranslator(object):
         yield self.api(), translated
 
 
-class ComparisonTranslator(object):
-    """Comparison class for all translator"""
+class AllTranslator(object):
+    """Class included in all translators for comparison"""
     def __init__(self, lang_from, lang_to, handler):
         self.handler = handler
         self.translators = [
@@ -157,4 +154,11 @@ class ComparisonTranslator(object):
 class TranslatingGoogle(GoogleTranslator, Translator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
 class TranslatingYahoo(YahooTranslator, Translator): pass
-class TranslatingComparison(ComparisonTranslator, Translator): pass
+class TranslatingAll(AllTranslator, Translator): pass
+
+TRANSLATE_API = {
+    "google": TranslatingGoogle,
+    "microsoft": TranslatingMicrosoft,
+    "yahoo": TranslatingYahoo,
+    "all": TranslatingAll,
+}

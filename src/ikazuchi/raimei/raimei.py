@@ -4,17 +4,11 @@ try:
     import vim
 except ImportError:
     print "call ':pyfile raimei' from vim"
-    sys.exit(0)
 
 import sys
 from ikazuchi import izuchi
 from locale import getdefaultlocale
 
-TRANSLATE_API = {
-    "google": izuchi.TranslatingGoogle,
-    "microsoft": izuchi.TranslatingMicrosoft,
-    "yahoo": izuchi.TranslatingYahoo,
-}
 
 def eval_or_default(param, default):
     try:
@@ -31,8 +25,7 @@ def get_vim_variables():
     lang_from = eval_or_default("raimei_from", "en")
     lang_to = eval_or_default("raimei_to", _envvar[0].split("_")[0])
     encoding = eval_or_default("&enc", _envvar[1])
-    comp = eval_or_default("raimei_comp", None)
-    return api_name, lang_from, lang_to, encoding, comp
+    return api_name, lang_from, lang_to, encoding
 
 def translate_with_range(translator, encoding):
     apis = []
@@ -43,15 +36,15 @@ def translate_with_range(translator, encoding):
             vim.current.range.append(info[1].encode(encoding))
     print "Translated by {0}".format(apis[::-1])
 
-def translate(api_name, lang_from, lang_to, encoding, comp):
-    if comp:
-        t = izuchi.TranslatingComparison
-    else:
-        t = TRANSLATE_API[api_name]
-    translator = t(lang_from, lang_to, None)
+def translate(api_name, lang_from, lang_to, encoding):
+    translator = izuchi.TRANSLATE_API[api_name](lang_from, lang_to, None)
     return translate_with_range(translator, encoding)
 
 def main():
+    try:
+        vim
+    except NameError:
+        return
     vim_vars = get_vim_variables()
     translate(*vim_vars)
 

@@ -7,7 +7,7 @@ from nose.tools import *
 from ikazuchi.izuchi.handler import *
 
 
-class TestInteractiveHandler(object):
+class TestPOFileHandler(object):
 
     def setup(self):
         def make_po_file(path):
@@ -29,6 +29,6 @@ class TestInteractiveHandler(object):
             (["ref", "cur", "ent"], "ent"),
             (["ref", "", "ent"], "ent"),
         ]
-        h = InteractiveHandler(self.po_file.name)
+        h = POFileHandler(self.po_file.name)
         for d in data:
             assert_equals(d[1], h._select_translation(*d[0]))

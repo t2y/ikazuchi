@@ -5,26 +5,21 @@ import optparse
 import os
 import sys
 
-from izuchi.translator import *
+from izuchi.translator import TRANSLATE_API
 from locale import _
 from utils import *
 
 __version__ = "0.1"
-TRANSLATE_API = {
-    "google": TranslatingGoogle,
-    "microsoft": TranslatingMicrosoft,
-    "yahoo": TranslatingYahoo,
-}
 
 def get_args():
     usage = _(u"%prog [options]")
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
-    parser.set_defaults(api="google", lang_from="en",
-                        lang_to=get_lang(), po_file=None, sentence=None,
-                        comparison=False, verbose=False)
+    parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
+                        po_file=None, sentence=None, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
-                      help=u"APIs are {0}".format(TRANSLATE_API.keys()))
+                      help=u"APIs are {0}, cannot use with '-p po_file'"
+                            "option".format(TRANSLATE_API.keys()))
     parser.add_option("-f", "--from", dest="lang_from", metavar="LANG",
                       help=u"original language")
     parser.add_option("-t", "--to", dest="lang_to", metavar="LANG",
@@ -33,10 +28,6 @@ def get_args():
                       metavar="POFILE", help=u"target po file")
     parser.add_option("-s", "--sentence", dest="sentence",
                       metavar="SENTENCE", help=u"target sentence")
-    parser.add_option("-c", "--comparison", dest="comparison",
-                      action="store_true",
-                      help=u"compare traslation between multi-api, "\
-                            "cannot use with '-p po_file' option")
     parser.add_option("-v", "--verbose", dest="verbose",
                       action="store_true",
                       help=u"print debug messages to stdout")
@@ -48,8 +39,8 @@ def get_args():
     err_msg = None
     if opts.api not in TRANSLATE_API.keys():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
-    elif opts.comparison and opts.po_file:
-        err_msg = _(u"Unsupport to compare translation with po file")
+    elif opts.api == "all" and opts.po_file:
+        err_msg = _(u"Unsupport to translate po file with all translators")
     elif opts.po_file and not os.access(opts.po_file, os.R_OK):
         err_msg = _(u"Cannot access po file: {0}").format(opts.po_file)
     elif not (opts.po_file or opts.sentence):
@@ -66,7 +57,7 @@ def get_args():
 def main():
     opts, args = get_args()
     handler = get_handler(opts)
-    t = get_translator(opts, handler)
+    t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
     t.translate_with_handler()
 
 if __name__ == "__main__":

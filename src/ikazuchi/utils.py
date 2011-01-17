@@ -3,7 +3,6 @@
 import sys
 
 from izuchi.handler import *
-from izuchi.translator import *
 from locale import _
 
 def get_lang():
@@ -14,19 +13,10 @@ def get_lang():
 def get_handler(opts):
     h = None
     if opts.po_file:
-        h = InteractiveHandler(opts.po_file)
+        h = POFileHandler(opts.po_file)
     elif opts.sentence:
         h = SingleSentenceHandler(opts.sentence)
     return h
-
-def get_translator(opts, handler):
-    from ikazuchi import TRANSLATE_API
-    t = None
-    if opts.comparison:
-        t = TranslatingComparison
-    else:
-        t = TRANSLATE_API[opts.api]
-    return t(opts.lang_from, opts.lang_to, handler)
 
 def convrt_str_to_unicode(opts):
     from locale import getdefaultlocale
