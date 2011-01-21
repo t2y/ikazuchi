@@ -1,9 +1,16 @@
-`ikazuchi` helps to translate po file efficiently.
+`ikazuchi <https://bitbucket.org/t2y/ikazuchi>`_
+helps to translate document using web translate APIs efficiently.
+`ikazuchi` is intended to work with other tools since it's a CUI tool.
+
+See the project `documentation <http://t2y.bitbucket.org/ikazuchi/build/html/index.html>`_ for more detail.
+
 
 Features
 ========
 
-* Translate GNU gettext catalog called PO file with good reference from Web API
+* Translate GNU gettext catalog named PO file with good reference from web API
+* Translate any string passed from command line argument
+* Translate any string in Vim using ":pyfile" command
 
 
 Setup
@@ -11,12 +18,14 @@ Setup
 
 by easy_install
 ----------------
+
 Make environment::
 
    $ easy_install ikazuchi
 
 by buildout
-------------
+-----------
+
 Make environment::
 
    $ hg clone https://t2y@bitbucket.org/t2y/ikazuchi
@@ -30,35 +39,22 @@ Usage
 
 Execute ikazuchi command::
 
-   $ ikazuchi -t ja -p examples/short_test.po 
-   msgid:           forest book
-   for reference:   森林の本
-   Input: もりのほん
-
-   msgid:       Python Module Of The Week
-   for reference:   今週のPythonモジュール
-   Input:  
-   updated msgstr:  
-
-   msgid:       ikazuchi translation
-   for reference:   雷の翻訳
-   Input: y
-   updated msgstr:  雷の翻訳
-
-You can entered translation string for msgid after "Input: ".
-Or just type "y" if you want to select reffrence string.
+    $ ikazuchi -s "i can translate"
+    sentence:           i can translate
+    translated(Google): 私は翻訳することができます
 
 All command option are::
 
-    $ python src/ikazuchi/ikazuchi.py -h
-    Usage: ikazuchi.py [options]
+    $ ikazuchi -h
+    Usage: ikazuchi [options]
 
     Options:
       --version             show program's version number and exit
       -h, --help            show this help message and exit
-      -a API, --api=API     translation api are ['google', 'yahoo']
-      -f LANG, --from=LANG  original language(msgid)
-      -t LANG, --to=LANG    target language(msgstr)
+      -a API, --api=API     APIs are ['all', 'google', 'microsoft', 'yahoo'],
+                            cannot use with '-p po_file'option
+      -f LANG, --from=LANG  original language
+      -t LANG, --to=LANG    target language to translate
       -p POFILE, --pofile=POFILE
                             target po file
       -s SENTENCE, --sentence=SENTENCE
@@ -82,7 +78,6 @@ Python Software Foundation License.
 History
 =======
 
-0.1 (2011-01-10)
+0.1.0 (2011-01-22)
 -----------------
-* first version
-* use Google Translate API as reference
+* first release

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
+import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
-import sys
 
-VERSION = '0.1'
+VERSION = '0.1.0'
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
 
 CLASSIFIERS = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Environment :: Web Environment",
     "Intended Audience :: End User/Desktop",
