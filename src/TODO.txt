@@ -3,11 +3,10 @@ Todos
 
 Functionals
 ------------
-* Another translating API
 * Glossary and fuzzy match functions
 * Merge other po file into po file
 * Shortcut key
-* Stop translating work
+* Stop translating process
 
 Known Issues
 -------------
