@@ -28,16 +28,16 @@ def get_vim_variables():
     return api_name, lang_from, lang_to, encoding
 
 def translate_with_range(translator, encoding):
-    apis, translated = [], []
+    apis, translated = set(), []
     vim.current.range.append("")
     for line in vim.current.range:
         for info in translator.translate(line):
-            apis.append(info[0])
+            apis.add(info[0])
             translated.append(info[1].encode(encoding))
     # append translated text into vim in reverse
     for text in reversed(translated):
         vim.current.range.append(text)
-    print "Translated by {0}".format(apis)
+    print "Translated by {0}".format(list(apis))
 
 def translate(api_name, lang_from, lang_to, encoding):
     translator = izuchi.TRANSLATE_API[api_name](lang_from, lang_to, None)
