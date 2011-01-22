@@ -31,7 +31,7 @@ def translate_with_range(translator, encoding):
     apis, translated = set(), []
     vim.current.range.append("")
     for line in vim.current.range:
-        for info in translator.translate(line):
+        for info in translator.translate(unicode(line, "utf-8")):
             apis.add(info[0])
             translated.append(info[1].encode(encoding))
     # append translated text into vim in reverse
