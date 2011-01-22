@@ -18,8 +18,8 @@ def get_args():
     parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
                         po_file=None, sentence=None, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
-                      help=u"APIs are {0}, cannot use with '-p po_file'"
-                            "option".format(TRANSLATE_API.keys()))
+                      help=u"APIs are {0}, 'all' cannot use with '-p po_file'"
+                            " option".format(TRANSLATE_API.keys()))
     parser.add_option("-f", "--from", dest="lang_from", metavar="LANG",
                       help=u"original language")
     parser.add_option("-t", "--to", dest="lang_to", metavar="LANG",
