@@ -26,7 +26,7 @@ CLASSIFIERS = [
 setup(
      name="ikazuchi",
      version=VERSION,
-     description="ikazuchi helps to translate po file efficiently",
+     description="ikazuchi helps to translate document using web translate APIs efficiently",
      long_description=LONG_DESCRIPTION,
      classifiers=CLASSIFIERS,
      keywords=["po-file", "translate", "i18n", "internationalization"],
