@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import tempfile
 from nose.tools import *
+from StringIO import StringIO
 
 # functions for test
 from ikazuchi.izuchi.handler import *
@@ -32,3 +34,24 @@ class TestPOFileHandler(object):
         h = POFileHandler(self.po_file.name)
         for d in data:
             assert_equals(d[1], h._select_translation(*d[0]))
+
+
+class TestSingleSentenceHandler(object):
+
+    def setup(self):
+        sys.stdout = StringIO()
+
+    def _dummy_translate(self, sentence):
+        yield "", sentence
+
+    def test_with_quiet_option(self):
+        h = SingleSentenceHandler("", True)
+        h._translate(self._dummy_translate)
+        first_line = sys.stdout.getvalue().split('\n')[0]
+        assert_equal(u'translated():\t', first_line)
+
+    def test_without_quiet_option(self):
+        h = SingleSentenceHandler("", False)
+        h._translate(self._dummy_translate)
+        first_line = sys.stdout.getvalue().split('\n')[0]
+        assert_equal(u'sentence:\t\t', first_line)

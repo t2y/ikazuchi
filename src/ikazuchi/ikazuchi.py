@@ -16,7 +16,8 @@ def get_args():
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
     parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
-                        po_file=None, sentence=None, verbose=False)
+                        po_file=None, sentence=None,
+                        quiet=False, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
                       help=u"APIs are {0}, 'all' cannot use with '-p po_file'"
                             " option".format(TRANSLATE_API.keys()))
@@ -28,6 +29,9 @@ def get_args():
                       metavar="POFILE", help=u"target po file")
     parser.add_option("-s", "--sentence", dest="sentence",
                       metavar="SENTENCE", help=u"target sentence")
+    parser.add_option("-q", "--quiet", dest="quiet",
+                      action="store_true",
+                      help=u"print original sentence to stdout")
     parser.add_option("-v", "--verbose", dest="verbose",
                       action="store_true",
                       help=u"print debug messages to stdout")

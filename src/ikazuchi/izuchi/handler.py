@@ -70,10 +70,12 @@ class SingleSentenceHandler(BaseHandler):
     """
     Handler class for translating single sentence
     """
-    def __init__(self, sentence):
+    def __init__(self, sentence, quiet):
         self.sentence = sentence
+        self.quiet = quiet
 
     def _translate(self, translate):
-        print _(u"sentence:\t\t{0}").format(self.sentence)
+        if not self.quiet:
+            print _(u"sentence:\t\t{0}").format(self.sentence)
         for api, text in translate(self.sentence):
             print _(u"translated({0}):\t{1}").format(api, text)

@@ -15,7 +15,7 @@ def get_handler(opts):
     if opts.po_file:
         h = POFileHandler(opts.po_file)
     elif opts.sentence:
-        h = SingleSentenceHandler(opts.sentence)
+        h = SingleSentenceHandler(opts.sentence, opts.quiet)
     return h
 
 def convrt_str_to_unicode(opts):
