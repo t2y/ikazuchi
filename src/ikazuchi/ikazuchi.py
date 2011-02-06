@@ -34,10 +34,10 @@ def get_args():
                       metavar="ENCODING", help=u"input/output encoding")
     parser.add_option("-q", "--quiet", dest="quiet",
                       action="store_true",
-                      help=u"print original sentence to stdout")
+                      help=u"not to show original sentence to stdout")
     parser.add_option("-v", "--verbose", dest="verbose",
                       action="store_true",
-                      help=u"print debug messages to stdout")
+                      help=u"show debug messages to stdout")
 
     opts, args = parser.parse_args()
     if not opts.lang_to:

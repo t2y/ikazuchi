@@ -61,8 +61,8 @@ All command option are::
                             target sentence
       -e ENCODING, --encoding=ENCODING
                             input/output encoding
-      -q, --quiet           print original sentence to stdout
-      -v, --verbose         print debug messages to stdout
+      -q, --quiet           not to show original sentence to stdout
+      -v, --verbose         show debug messages to stdout
 
 
 Requirements
