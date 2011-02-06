@@ -59,6 +59,9 @@ All command option are::
                             target po file
       -s SENTENCE, --sentence=SENTENCE
                             target sentence
+      -e ENCODING, --encoding=ENCODING
+                            input/output encoding
+      -q, --quiet           print original sentence to stdout
       -v, --verbose         print debug messages to stdout
 
 

@@ -13,7 +13,6 @@ __all__ = [
     "SingleSentenceHandler",
 ]
 
-DEFAULT_ENCODING = "utf-8"
 
 class BaseHandler(object):
     """Base class for handler"""
@@ -27,13 +26,12 @@ class POFileHandler(BaseHandler):
     """
     Handler class for translating interactively
     """
-    def __init__(self, po_file):
-        from locale import getdefaultlocale
-        self.po = polib.pofile(po_file)
-        self.po.metadata["Content-Type"] = "text/plain; charset=utf-8"
-        self.encoding = getdefaultlocale()[1]
-        if not self.encoding:
-            self.encoding = DEFAULT_ENCODING
+    def __init__(self, po_file, encoding):
+        self.encoding = encoding
+        self.po = polib.pofile(po_file, autodetect_encoding=False,
+                               encoding=self.encoding[1])
+        self.po.metadata["Content-Type"] = "text/plain; charset={0}".format(
+                                                self.encoding[1])
 
     def _select_translation(self, ref, current, entered):
         """define which translated string use"""
@@ -53,14 +51,14 @@ class POFileHandler(BaseHandler):
 
     def _translate(self, translate):
         """translate msgid in po file"""
-        _prompt = _(u"Input: ").encode(self.encoding)
+        _prompt = _(u"Input: ").encode(self.encoding[0])
         for p in self.po:
             api, ref = self._get_translated_text(p.msgid, translate)
             print _(u"msgid:\t\t\t{0}").format(p.msgid)
             if p.msgstr:
                 print _(u"current msgstr:\t\t{0}").format(p.msgstr)
             print _(u"reference({0}):\t{1}").format(api, ref)
-            entered = unicode(raw_input(_prompt), self.encoding)
+            entered = unicode(raw_input(_prompt), self.encoding[0])
             p.msgstr = self._select_translation(ref, p.msgstr, entered)
             self.po.save()
             print _(u"updated msgstr:\t\t{0}").format(p.msgstr)
@@ -70,12 +68,16 @@ class SingleSentenceHandler(BaseHandler):
     """
     Handler class for translating single sentence
     """
-    def __init__(self, sentence, quiet):
+    def __init__(self, sentence, encoding, quiet):
         self.sentence = sentence
+        self.encoding = encoding
         self.quiet = quiet
+
+    def _encode(self, text):
+        return text.encode(self.encoding[1])
 
     def _translate(self, translate):
         if not self.quiet:
-            print _(u"sentence:\t\t{0}").format(self.sentence)
+            print self._encode(_(u"sentence:\t\t{0}").format(self.sentence))
         for api, text in translate(self.sentence):
-            print _(u"translated({0}):\t{1}").format(api, text)
+            print self._encode(_(u"translated({0}):\t{1}").format(api, text))

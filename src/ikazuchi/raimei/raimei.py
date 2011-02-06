@@ -24,24 +24,24 @@ def get_vim_variables():
     api_name = eval_or_default("raimei_api", "google")
     lang_from = eval_or_default("raimei_from", "en")
     lang_to = eval_or_default("raimei_to", _envvar[0].split("_")[0])
-    encoding = eval_or_default("&enc", _envvar[1])
-    return api_name, lang_from, lang_to, encoding
+    enc = eval_or_default("&enc", _envvar[1])
+    return api_name, lang_from, lang_to, enc
 
-def translate_with_range(translator, encoding):
+def translate_with_range(translator, enc):
     apis, translated = set(), []
     vim.current.range.append("")
     for line in vim.current.range:
-        for info in translator.translate(unicode(line, "utf-8")):
+        for info in translator.translate(unicode(line, enc)):
             apis.add(info[0])
-            translated.append(info[1].encode(encoding))
+            translated.append(info[1].encode(enc))
     # append translated text into vim in reverse
     for text in reversed(translated):
         vim.current.range.append(text)
     print "Translated by {0}".format(list(apis))
 
-def translate(api_name, lang_from, lang_to, encoding):
+def translate(api_name, lang_from, lang_to, enc):
     translator = izuchi.TRANSLATE_API[api_name](lang_from, lang_to, None)
-    return translate_with_range(translator, encoding)
+    return translate_with_range(translator, enc)
 
 def main():
     try:

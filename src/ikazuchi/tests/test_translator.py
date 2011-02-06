@@ -10,8 +10,8 @@ class TestAllTranslator(object):
 
     def setup(self):
         t = TRANSLATE_API["all"]
-        self.apis = t("en", "ja", SingleSentenceHandler(None, False))
-        self.apis_rev = t("ja", "en", SingleSentenceHandler(None, False))
+        self.apis = t("en", "ja", SingleSentenceHandler(None, None, False))
+        self.apis_rev = t("ja", "en", SingleSentenceHandler(None, None, False))
 
     def test_is_exist_handler(self):
         for t in self.apis.translators:

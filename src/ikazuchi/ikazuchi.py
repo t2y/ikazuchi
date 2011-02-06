@@ -16,7 +16,7 @@ def get_args():
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
     parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
-                        po_file=None, sentence=None,
+                        po_file=None, sentence=None, encoding=None,
                         quiet=False, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
                       help=u"APIs are {0}, 'all' cannot use with '-p po_file'"
@@ -29,6 +29,9 @@ def get_args():
                       metavar="POFILE", help=u"target po file")
     parser.add_option("-s", "--sentence", dest="sentence",
                       metavar="SENTENCE", help=u"target sentence")
+    parser.add_option("-e", "--encoding", dest="encoding", type="string",
+                      action="callback", callback=get_encoding,
+                      metavar="ENCODING", help=u"input/output encoding")
     parser.add_option("-q", "--quiet", dest="quiet",
                       action="store_true",
                       help=u"print original sentence to stdout")
@@ -49,12 +52,18 @@ def get_args():
         err_msg = _(u"Cannot access po file: {0}").format(opts.po_file)
     elif not (opts.po_file or opts.sentence):
         err_msg = _(u"Set argument either '-p po_file' or '-s sentence'")
+    elif opts.encoding:
+        err_encoding = check_encoding(opts.encoding)
+        if err_encoding:
+            err_msg = _(u"unknown encodings: {0}").format(err_encoding)
 
     if err_msg:
         parser.print_help()
         print err_msg
         sys.exit(0)
 
+    if not opts.encoding:
+        set_default_encoding(opts)
     convrt_str_to_unicode(opts)
     return opts, args
 

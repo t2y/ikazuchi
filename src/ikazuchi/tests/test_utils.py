@@ -8,6 +8,27 @@ from StringIO import StringIO
 import ikazuchi.utils
 
 
+def test_get_encoding():
+    class Parser(object):
+        class Values(object):
+            encoding = None
+        values = Values()
+    parser = Parser()
+    ikazuchi.utils.get_encoding(None, None, "utf-8", parser)
+    assert_equal(["utf-8", "utf-8"], parser.values.encoding)
+    ikazuchi.utils.get_encoding(None, None, "utf-8, euc-jp", parser)
+    assert_equal(["utf-8", "euc-jp"], parser.values.encoding)
+
+def test_check_encoding():
+    errs = ikazuchi.utils.check_encoding(["euc-jp", "utf-8"])
+    assert_equals([], errs)
+    errs = ikazuchi.utils.check_encoding(["unknown", "utf-8"])
+    assert_equals(["unknown"], errs)
+    errs = ikazuchi.utils.check_encoding(["utf-8", "unknown"])
+    assert_equals(["unknown"], errs)
+    errs = ikazuchi.utils.check_encoding(["unknown", "notexist"])
+    assert_equals(["unknown", "notexist"], errs)
+
 def test_python_version():
     data = [(2, 6, 4, 'final', 0), (2, 5, 1, 'final', 0)]
     sys.stdout = StringIO()

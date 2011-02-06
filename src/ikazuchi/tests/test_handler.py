@@ -31,7 +31,7 @@ class TestPOFileHandler(object):
             (["ref", "cur", "ent"], "ent"),
             (["ref", "", "ent"], "ent"),
         ]
-        h = POFileHandler(self.po_file.name)
+        h = POFileHandler(self.po_file.name, ["utf-8", "utf-8"])
         for d in data:
             assert_equals(d[1], h._select_translation(*d[0]))
 
@@ -45,13 +45,13 @@ class TestSingleSentenceHandler(object):
         yield "", sentence
 
     def test_with_quiet_option(self):
-        h = SingleSentenceHandler("", True)
+        h = SingleSentenceHandler("", ["utf-8", "utf-8"], True)
         h._translate(self._dummy_translate)
         first_line = sys.stdout.getvalue().split('\n')[0]
         assert_equal(u'translated():\t', first_line)
 
     def test_without_quiet_option(self):
-        h = SingleSentenceHandler("", False)
+        h = SingleSentenceHandler("", ["utf-8", "utf-8"], False)
         h._translate(self._dummy_translate)
         first_line = sys.stdout.getvalue().split('\n')[0]
         assert_equal(u'sentence:\t\t', first_line)
