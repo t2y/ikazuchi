@@ -41,7 +41,7 @@ Execute ikazuchi command::
 
     $ ikazuchi -s "i can translate"
     sentence:           i can translate
-    translated(Google): 私は翻訳することができます
+    translated(Google): [Actually, translated sentence]
 
 All command option are::
 
@@ -68,7 +68,7 @@ All command option are::
 Requirements
 ============
 
-* Python 2.6 or later (not tested 3.x)
+* Python 2.6 or later
 * polib 0.5.5 or later
 * setuptools or distriubte.
 
@@ -80,6 +80,10 @@ Python Software Foundation License.
 
 History
 =======
+
+0.2.0 (2011-02-07)
+------------------
+* add -q(quiet) and -e(encoding) option
 
 0.1.0 (2011-01-22)
 ------------------

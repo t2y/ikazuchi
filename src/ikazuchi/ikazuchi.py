@@ -9,7 +9,7 @@ from izuchi.translator import TRANSLATE_API
 from locale import _
 from utils import *
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 def get_args():
     usage = u"%prog [options]"

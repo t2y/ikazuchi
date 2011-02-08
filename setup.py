@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+
 import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
