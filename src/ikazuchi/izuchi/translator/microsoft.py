@@ -21,6 +21,7 @@ class MicrosoftTranslator(object):
     domain = "api.microsofttranslator.com"
     common_path = "/V2/Http.svc/"
     app_id = "D9D0E326A70EA4E66218F43130890052808A0142"
+    max_trans = "5"
     schema = {
         "base": "http://schemas.microsoft.com/2003/10/Serialization/",
         "array": "http://schemas.microsoft.com/2003/10/Serialization/Arrays",
@@ -48,7 +49,9 @@ class MicrosoftTranslator(object):
     xml_type = {
         "int": ("ArrayOfint", "int"),
         "str": ("ArrayOfstring", "string"),
+        "opt": ("TranslateOptions", None),
         "req": ("TranslateArrayRequest", None),
+        "gettrans_req": ("GetTranslationsArrayRequest", None),
     }
     content_type = {
         "text": "text/plain",
@@ -113,6 +116,16 @@ class MicrosoftTranslator(object):
         else:
             # FIXME: consider later
             pass
+        ret = tree.end(array_type)
+        return ET.tostring(ret)
+
+    def serialize_option(self, items, array_type):
+        tree = ET.TreeBuilder()
+        tree.start(array_type, self.xml_attr["xmlns_mt"])
+        for key, value in items:
+            tree.start(key, {})
+            tree.data(value)
+            tree.end(key)
         ret = tree.end(array_type)
         return ET.tostring(ret)
 
@@ -206,21 +219,50 @@ class MicrosoftTranslator(object):
             "text": text.encode("utf-8"),
             "from": self.lang_from,
             "to": self.lang_to,
-            "contentType": self.content_type["text"],
-            "maxTranslations": 10,
-            "category": "general",
+            "maxTranslations": self.max_trans,
         }
-        # FIXME: consider later
-        options = {}
+        options = [
+            ("Category", "general"),
+            ("ContentType", self.content_type["text"]),
+            ("Uri", ""),
+            ("User", ""),
+            ("State", ""),
+        ]
         data = {
             "type": self.content_type["xml"],
-            "data": self.serialize_array(options, *self.xml_type["str"]),
+            "data": self.serialize_option(options, self.xml_type["opt"][0])
         }
         url = self.get_url(self.get_translations, query)
-        api, trans = self.request(url, self.xml_tag["base"]["str"], data)
+        api, trans = self.request(url, None, data)
         yield self.api(), trans
 
-    def get_translations_array(self, texts): pass
+    def get_translations_array(self, texts):
+        """ GetTranslationsArray Method
+        http://msdn.microsoft.com/en-us/library/ff512418.aspx
+        """
+        query = {"appId": self.app_id}
+        params = [
+            ("AppId", self.app_id),
+            ("From", self.lang_from),
+            ("Options", [
+                ("Category", "general"),
+                ("ContentType", self.content_type["text"]),
+                ("Uri", ""),
+                ("User", ""),
+                ("State", ""),
+            ]),
+            ("Texts", texts),
+            ("To", self.lang_to),
+            ("MaxTranslations", self.max_trans),
+        ]
+        data = {
+            "type": self.content_type["xml"],
+            "data": self.serialize_translate_array(
+                        params, self.xml_type["gettrans_req"][0]),
+        }
+        url = self.get_url(self.get_translations_array, query)
+        api, trans = self.request(url, None, data)
+        yield self.api(), trans
 
     def speak(self, text):
         """ Speak Method
@@ -261,15 +303,14 @@ class MicrosoftTranslator(object):
         http://msdn.microsoft.com/en-us/library/ff512422.aspx
         """
         query = {"appId": self.app_id}
-        url = self.get_url(self.translate_array, query)
-        param = [
+        params = [
             ("AppId", self.app_id),
             ("From", self.lang_from),
             ("Options", [
                 ("Category", "general"),
                 ("ContentType", self.content_type["text"]),
-                ("Uri", "all"),
-                ("User", "all"),
+                ("Uri", ""),
+                ("User", ""),
                 ("State", ""),
             ]),
             ("Texts", texts),
@@ -278,8 +319,9 @@ class MicrosoftTranslator(object):
         data = {
             "type": self.content_type["xml"],
             "data": self.serialize_translate_array(
-                        param, self.xml_type["req"][0]),
+                        params, self.xml_type["req"][0]),
         }
+        url = self.get_url(self.translate_array, query)
         api, items = self.request(url, None, data)
         _cycle = 7
         trans = [items[i] for i in range(5, _cycle * len(texts), _cycle)]
