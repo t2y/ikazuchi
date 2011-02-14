@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import abc
-import json
 import tempfile
 import urllib2
 from contextlib import closing, nested
@@ -9,60 +7,8 @@ from urllib import urlencode
 from xml.etree import ElementTree as ET
 
 __all__ = [
-    "TRANSLATE_API",
+    "MicrosoftTranslator"
 ]
-
-class Translator(object):
-    """Base class for Translator"""
-
-    __metaclass__ = abc.ABCMeta
-    api = lambda klass: klass.__class__.__name__.replace('Translating', '')
-
-    @abc.abstractmethod
-    def __init__(self, lang_from, lang_to, handler):
-        """Overridden by MixIn class
-        must be set "self.handler = handler"
-        """
-
-    @abc.abstractmethod
-    def translate(self, text): pass
-
-    def translate_with_handler(self):
-        """handler must be implement _translate method"""
-        self.handler._translate(self.translate)
-
-
-class GoogleTranslator(object):
-    """
-    Translator with Google Translate API
-    http://code.google.com/intl/ja/apis/language/translate/overview.html
-    see also
-    Google Translate API Terms of Use
-    http://code.google.com/intl/ja/apis/language/translate/terms.html
-    """
-    def __init__(self, lang_from, lang_to, handler):
-        self.handler = handler
-        self.query = {
-            "v": "1.0",
-            "langpair": "{0}|{1}".format(lang_from, lang_to),
-        }
-        domain = "ajax.googleapis.com"
-        path = "/ajax/services/language/translate?"
-        self._url = "http://{0}{1}".format(domain, path)
-
-    def translate(self, text):
-        translated = ""
-        self.query.update(q=text.encode("utf-8"))
-        url = "{0}{1}".format(self._url, urlencode(self.query))
-        req = urllib2.Request(url)
-        with closing(urllib2.urlopen(req)) as res:
-            res_json = json.loads(res.read())
-            if res_json["responseStatus"] == 200:
-                translated = res_json["responseData"]["translatedText"]
-            else:
-                raise RuntimeError(res_json)
-        yield self.api(), translated
-
 
 class MicrosoftTranslator(object):
     """
@@ -186,6 +132,9 @@ class MicrosoftTranslator(object):
         return ET.tostring(ret)
 
     def break_sentences(self, text):
+        """ BreakSentences Method
+        http://msdn.microsoft.com/en-us/library/ff512410.aspx
+        """
         query = {
             "appId": self.app_id,
             "text": text.encode("utf-8"),
@@ -196,12 +145,18 @@ class MicrosoftTranslator(object):
         yield api, lengths
 
     def detect(self, text):
+        """ Detect Method
+        http://msdn.microsoft.com/en-us/library/ff512411.aspx
+        """
         query = {"appId": self.app_id, "text": text.encode("utf-8")}
         url = self.get_url(self.detect, query)
         api, lang = self.request(url, self.xml_tag["base"]["str"])
         yield api, lang
 
     def detect_array(self, texts):
+        """ DetectArray Method
+        http://msdn.microsoft.com/en-us/library/ff512412.aspx
+        """
         query = {"appId": self.app_id}
         url = self.get_url(self.detect_array, query)
         data = {
@@ -212,6 +167,9 @@ class MicrosoftTranslator(object):
         yield api, langs
 
     def get_language_names(self, lang_codes):
+        """ GetLanguageNames Method
+        http://msdn.microsoft.com/en-us/library/ff512414.aspx
+        """
         query = {"appId": self.app_id, "locale": self.lang_to}
         url = self.get_url(self.get_language_names, query)
         data = {
@@ -222,18 +180,27 @@ class MicrosoftTranslator(object):
         yield api, langs
 
     def get_languages_for_speak(self):
+        """ GetLanguagesForSpeak Method
+        http://msdn.microsoft.com/en-us/library/ff512415.aspx
+        """
         query = {"appId": self.app_id}
         url = self.get_url(self.get_languages_for_speak, query)
         api, langs = self.request(url, self.xml_tag["array"]["str"])
         yield api, langs
 
     def get_languages_for_translate(self):
+        """ GetLanguagesForTranslate Method
+        http://msdn.microsoft.com/en-us/library/ff512416.aspx
+        """
         query = {"appId": self.app_id}
         url = self.get_url(self.get_languages_for_translate, query)
         api, langs = self.request(url, self.xml_tag["array"]["str"])
         yield api, langs
 
     def get_translations(self, text):
+        """ GetTranslations Method
+        http://msdn.microsoft.com/en-us/library/ff512417.aspx
+        """
         query = {
             "appId": self.app_id,
             "text": text.encode("utf-8"),
@@ -256,6 +223,9 @@ class MicrosoftTranslator(object):
     def get_translations_array(self, texts): pass
 
     def speak(self, text):
+        """ Speak Method
+        http://msdn.microsoft.com/en-us/library/ff512420.aspx
+        """
         # FIXME: consider later
         query = {
             "appId": self.app_id,
@@ -271,6 +241,9 @@ class MicrosoftTranslator(object):
             tmp.file.seek(0)
 
     def translate(self, text):
+        """ Translate Method
+        http://msdn.microsoft.com/en-us/library/ff512421.aspx
+        """
         query = {
             "appId": self.app_id,
             "text": text.encode("utf-8"),
@@ -284,6 +257,9 @@ class MicrosoftTranslator(object):
         yield self.api(), trans[0]
 
     def translate_array(self, texts):
+        """ TranslateArray Method
+        http://msdn.microsoft.com/en-us/library/ff512422.aspx
+        """
         query = {"appId": self.app_id}
         url = self.get_url(self.translate_array, query)
         param = [
@@ -308,71 +284,3 @@ class MicrosoftTranslator(object):
         _cycle = 7
         trans = [items[i] for i in range(5, _cycle * len(texts), _cycle)]
         yield self.api(), trans
-
-class YahooTranslator(object):
-    """
-    Translator with Yahoo! Pipes
-    http://pipes.yahoo.com/pipes/
-    see also
-    Yahoo! Pipes Terms of Use
-    http://info.yahoo.com/legal/us/yahoo/pipes/pipes-4396.html
-    """
-    def __init__(self, lang_from, lang_to, handler):
-        self.handler = handler
-        self.query = {
-            "_render": "json",
-        }
-        domain = "pipes.yahoo.com"
-        path = "/t2y1979/{0}?".format(self._get_api(lang_from, lang_to))
-        self._url = "http://{0}{1}".format(domain, path)
-
-    def _get_api(self, lang_from, lang_to):
-        # convert for for arbitrary api name
-        api = "{0}2{1}".format(lang_from, lang_to)
-        if lang_from == "ja" and lang_to == "en":
-            api = "ja2en_"
-        elif lang_from == "en" and lang_to.lower() == "zh-cn":
-            api = "en2zhcn"
-        elif lang_from == "en" and lang_to.lower() == "zh-tw":
-            api = "en2zhtw"
-        return api
-
-    def translate(self, text):
-        translated = ""
-        self.query.update(text=text.encode("utf-8"))
-        url = "{0}{1}".format(self._url, urlencode(self.query))
-        req = urllib2.Request(url)
-        with closing(urllib2.urlopen(req)) as res:
-            res_json = json.loads(res.read())
-            translated = res_json["value"]["items"][0]["description"]
-        yield self.api(), translated
-
-
-class AllTranslator(object):
-    """Class included in all translators for comparison"""
-    def __init__(self, lang_from, lang_to, handler):
-        self.handler = handler
-        self.translators = [
-            TranslatingGoogle(lang_from, lang_to, handler),
-            TranslatingMicrosoft(lang_from, lang_to, handler),
-            TranslatingYahoo(lang_from, lang_to, handler),
-        ]
-
-    def translate(self, text):
-        for t in self.translators:
-            for translated in t.translate(text):
-                yield translated
-
-
-# MixIn each implemented Translator
-class TranslatingGoogle(GoogleTranslator, Translator): pass
-class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
-class TranslatingYahoo(YahooTranslator, Translator): pass
-class TranslatingAll(AllTranslator, Translator): pass
-
-TRANSLATE_API = {
-    "google": TranslatingGoogle,
-    "microsoft": TranslatingMicrosoft,
-    "yahoo": TranslatingYahoo,
-    "all": TranslatingAll,
-}
