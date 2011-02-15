@@ -86,6 +86,12 @@ class MicrosoftTranslator(object):
             # FIXME: consider later
             err_msg = err.read()
             print err_msg
+        return items
+
+    def call_api(self, func, query, tag=None, post_data=None):
+        """high-level method to make url and request"""
+        url = self.get_url(func, query)
+        items = self.request(url, tag, post_data)
         return self.api(), items
 
     def _set_tree(self, tree, items, attr):
@@ -94,30 +100,18 @@ class MicrosoftTranslator(object):
             tree.data(value)
             tree.end(key)
 
-    def _set_tree_with_integers(self, tree, nums):
-        for num in nums:
-            tree.start("int", self.xml_attr["xmlns_array"])
-            tree.data(num)
-            tree.end("int")
-
-    def _set_tree_with_texts(self, tree, texts):
-        for text in texts:
-            tree.start("string", self.xml_attr["xmlns_array"])
-            tree.data(text.encode("utf-8"))
-            tree.end("string")
+    def _set_tree_with_array(self, tree, items, data_type):
+        for i in items:
+            tree.start(data_type, self.xml_attr["xmlns_array"])
+            tree.data(i.encode("utf-8"))
+            tree.end(data_type)
 
     def serialize_array(self, items, array_type, data_type):
         tree = ET.TreeBuilder()
         tree.start(array_type, self.xml_attr["xmlns_array"])
-        if data_type == "string":
-            self._set_tree_with_texts(tree, items)
-        elif data_type == "int":
-            self._set_tree_with_integers(tree, items)
-        else:
-            # FIXME: consider later
-            pass
-        ret = tree.end(array_type)
-        return ET.tostring(ret)
+        self._set_tree_with_array(tree, items, data_type)
+        tree.end(array_type)
+        return ET.tostring(tree.close())
 
     def serialize_option(self, items, array_type):
         tree = ET.TreeBuilder()
@@ -126,8 +120,8 @@ class MicrosoftTranslator(object):
             tree.start(key, {})
             tree.data(value)
             tree.end(key)
-        ret = tree.end(array_type)
-        return ET.tostring(ret)
+        tree.end(array_type)
+        return ET.tostring(tree.close())
 
     def serialize_translate_array(self, param, array_type):
         tree = ET.TreeBuilder()
@@ -137,12 +131,12 @@ class MicrosoftTranslator(object):
             if key == "Options":
                 self._set_tree(tree, value, self.xml_attr["xmlns_mt"])
             elif key == "Texts":
-                self._set_tree_with_texts(tree, value)
+                self._set_tree_with_array(tree, value, "string")
             else:
                 tree.data(value)
             tree.end(key)
-        ret = tree.end(array_type)
-        return ET.tostring(ret)
+        tree.end(array_type)
+        return ET.tostring(tree.close())
 
     def break_sentences(self, text):
         """ BreakSentences Method
@@ -153,62 +147,62 @@ class MicrosoftTranslator(object):
             "text": text.encode("utf-8"),
             "language": self.lang_from,
         }
-        url = self.get_url(self.break_sentences, query)
-        api, lengths = self.request(url, self.xml_tag["array"]["int"])
-        yield api, lengths
+        api, items = self.call_api(self.break_sentences, query,
+                                   self.xml_tag["array"]["int"])
+        yield api, items
 
     def detect(self, text):
         """ Detect Method
         http://msdn.microsoft.com/en-us/library/ff512411.aspx
         """
         query = {"appId": self.app_id, "text": text.encode("utf-8")}
-        url = self.get_url(self.detect, query)
-        api, lang = self.request(url, self.xml_tag["base"]["str"])
-        yield api, lang
+        api, items = self.call_api(self.detect, query,
+                                   self.xml_tag["base"]["str"])
+        yield api, items
 
     def detect_array(self, texts):
         """ DetectArray Method
         http://msdn.microsoft.com/en-us/library/ff512412.aspx
         """
         query = {"appId": self.app_id}
-        url = self.get_url(self.detect_array, query)
         data = {
             "type": self.content_type["xml"],
             "data": self.serialize_array(texts, *self.xml_type["str"]),
         }
-        api, langs = self.request(url, self.xml_tag["array"]["str"], data)
-        yield api, langs
+        api, items = self.call_api(self.detect_array, query,
+                                   self.xml_tag["array"]["str"], data)
+        yield api, items
 
     def get_language_names(self, lang_codes):
         """ GetLanguageNames Method
         http://msdn.microsoft.com/en-us/library/ff512414.aspx
         """
         query = {"appId": self.app_id, "locale": self.lang_to}
-        url = self.get_url(self.get_language_names, query)
         data = {
             "type": self.content_type["xml"],
             "data": self.serialize_array(lang_codes, *self.xml_type["str"]),
         }
-        api, langs = self.request(url, self.xml_tag["array"]["str"], data)
-        yield api, langs
+        api, items = self.call_api(self.get_language_names, query,
+                                   self.xml_tag["array"]["str"], data)
+        yield api, items
 
     def get_languages_for_speak(self):
         """ GetLanguagesForSpeak Method
         http://msdn.microsoft.com/en-us/library/ff512415.aspx
         """
         query = {"appId": self.app_id}
-        url = self.get_url(self.get_languages_for_speak, query)
-        api, langs = self.request(url, self.xml_tag["array"]["str"])
-        yield api, langs
+        api, items = self.call_api(self.get_languages_for_speak, query,
+                                   self.xml_tag["array"]["str"])
+        yield api, items
 
     def get_languages_for_translate(self):
         """ GetLanguagesForTranslate Method
         http://msdn.microsoft.com/en-us/library/ff512416.aspx
         """
         query = {"appId": self.app_id}
-        url = self.get_url(self.get_languages_for_translate, query)
-        api, langs = self.request(url, self.xml_tag["array"]["str"])
-        yield api, langs
+        api, items = self.call_api(self.get_languages_for_translate, query,
+                                   self.xml_tag["array"]["str"])
+        yield api, items
 
     def get_translations(self, text):
         """ GetTranslations Method
@@ -232,9 +226,8 @@ class MicrosoftTranslator(object):
             "type": self.content_type["xml"],
             "data": self.serialize_option(options, self.xml_type["opt"][0])
         }
-        url = self.get_url(self.get_translations, query)
-        api, trans = self.request(url, None, data)
-        yield self.api(), trans
+        api, items = self.call_api(self.get_translations, query, None, data)
+        yield api, items
 
     def get_translations_array(self, texts):
         """ GetTranslationsArray Method
@@ -260,9 +253,9 @@ class MicrosoftTranslator(object):
             "data": self.serialize_translate_array(
                         params, self.xml_type["gettrans_req"][0]),
         }
-        url = self.get_url(self.get_translations_array, query)
-        api, trans = self.request(url, None, data)
-        yield self.api(), trans
+        api, items = self.call_api(self.get_translations_array, query,
+                                   None, data)
+        yield api, items
 
     def speak(self, text):
         """ Speak Method
@@ -294,9 +287,9 @@ class MicrosoftTranslator(object):
             "contentType": self.content_type["text"],
             "category": "general",
         }
-        url = self.get_url(self.translate, query)
-        api, trans = self.request(url, self.xml_tag["base"]["str"])
-        yield self.api(), trans[0]
+        api, items = self.call_api(self.translate, query,
+                                   self.xml_tag["base"]["str"])
+        yield self.api(), items[0]
 
     def translate_array(self, texts):
         """ TranslateArray Method
@@ -321,8 +314,7 @@ class MicrosoftTranslator(object):
             "data": self.serialize_translate_array(
                         params, self.xml_type["req"][0]),
         }
-        url = self.get_url(self.translate_array, query)
-        api, items = self.request(url, None, data)
-        _cycle = 7
-        trans = [items[i] for i in range(5, _cycle * len(texts), _cycle)]
+        api, items = self.call_api(self.translate_array, query, None, data)
+        step = 7
+        trans = [items[i] for i in xrange(5, len(texts) * step, step)]
         yield self.api(), trans
