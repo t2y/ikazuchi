@@ -103,7 +103,7 @@ class MicrosoftTranslator(object):
     def _set_tree_with_array(self, tree, items, data_type):
         for i in items:
             tree.start(data_type, self.xml_attr["xmlns_array"])
-            tree.data(i.encode("utf-8"))
+            tree.data(i)
             tree.end(data_type)
 
     def serialize_array(self, items, array_type, data_type):
