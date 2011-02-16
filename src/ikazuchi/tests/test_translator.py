@@ -8,10 +8,17 @@ from ikazuchi.izuchi.translator import TRANSLATE_API
 
 class TestAllTranslator(object):
 
+    class Option(object):
+        sentence = None
+        encoding = None
+        quiet = False
+        detect = False
+
     def setup(self):
+        opts = TestAllTranslator.Option()
         t = TRANSLATE_API["all"]
-        self.apis = t("en", "ja", SingleSentenceHandler(None, None, False))
-        self.apis_rev = t("ja", "en", SingleSentenceHandler(None, None, False))
+        self.apis = t("en", "ja", SingleSentenceHandler(opts))
+        self.apis_rev = t("ja", "en", SingleSentenceHandler(opts))
 
     def test_is_exist_handler(self):
         for t in self.apis.translators:

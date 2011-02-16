@@ -22,13 +22,14 @@ class Translator(object):
         must be set "self.handler = handler"
         """
 
+    def detect(self, text): pass
+
     @abc.abstractmethod
     def translate(self, text): pass
 
-    def translate_with_handler(self):
-        """handler must be implement _translate method"""
-        self.handler._translate(self.translate)
-
+    def call_method_with_handler(self):
+        method = getattr(self, self.handler.method_name)
+        self.handler._call_method(method)
 
 class AllTranslator(object):
     """Class included in all translators for comparison"""
@@ -39,6 +40,11 @@ class AllTranslator(object):
             TranslatingMicrosoft(lang_from, lang_to, handler),
             TranslatingYahoo(lang_from, lang_to, handler),
         ]
+
+    def detect(self, text):
+        for t in self.translators:
+            for lang in t.detect(text):
+                yield lang
 
     def translate(self, text):
         for t in self.translators:

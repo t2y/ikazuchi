@@ -15,7 +15,7 @@ def get_handler(opts):
     if opts.po_file:
         h = POFileHandler(opts.po_file, opts.encoding)
     elif opts.sentence:
-        h = SingleSentenceHandler(opts.sentence, opts.encoding, opts.quiet)
+        h = SingleSentenceHandler(opts)
     return h
 
 def get_encoding(option, opt_str, value, parser):

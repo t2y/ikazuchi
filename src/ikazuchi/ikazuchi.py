@@ -15,12 +15,16 @@ def get_args():
     usage = u"%prog [options]"
     ver = "%prog {0}".format(__version__)
     parser = optparse.OptionParser(usage, version=ver)
-    parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
+    parser.set_defaults(api="google", detect=False,
+                        lang_from="en", lang_to=get_lang(),
                         po_file=None, sentence=None, encoding=None,
                         quiet=False, verbose=False)
     parser.add_option("-a", "--api", dest="api", metavar="API",
                       help=u"APIs are {0}, 'all' cannot use with '-p po_file'"
                             " option".format(TRANSLATE_API.keys()))
+    parser.add_option("-d", "--detect", dest="detect",
+                      action="store_true",
+                      help=u"detect language for target sentence")
     parser.add_option("-f", "--from", dest="lang_from", metavar="LANG",
                       help=u"original language")
     parser.add_option("-t", "--to", dest="lang_to", metavar="LANG",
@@ -71,7 +75,7 @@ def main():
     opts, args = get_args()
     handler = get_handler(opts)
     t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
-    t.translate_with_handler()
+    t.call_method_with_handler()
 
 if __name__ == "__main__":
     check_python_version()

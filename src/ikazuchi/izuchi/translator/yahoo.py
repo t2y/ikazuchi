@@ -37,6 +37,9 @@ class YahooTranslator(object):
             api = "en2zhtw"
         return api
 
+    def detect(self, text):
+        yield self.api(), "Not Implemented"
+
     def translate(self, text):
         translated = ""
         self.query.update(text=text.encode("utf-8"))

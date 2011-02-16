@@ -38,20 +38,36 @@ class TestPOFileHandler(object):
 
 class TestSingleSentenceHandler(object):
 
+    class Option(object):
+        sentence = ""
+        encoding = ["utf-8", "utf-8"]
+        quiet = False
+        detect = False
+
     def setup(self):
         sys.stdout = StringIO()
+        self.opts = TestSingleSentenceHandler.Option()
 
     def _dummy_translate(self, sentence):
         yield "", sentence
 
     def test_with_quiet_option(self):
-        h = SingleSentenceHandler("", ["utf-8", "utf-8"], True)
-        h._translate(self._dummy_translate)
+        self.opts.quiet = True
+        h = SingleSentenceHandler(self.opts)
+        h._call_method(self._dummy_translate)
         first_line = sys.stdout.getvalue().split('\n')[0]
-        assert_equal(u'translated():\t', first_line)
+        assert_equal("translate():             ", first_line)
+
+    def test_detect_with_quiet_option(self):
+        self.opts.quiet = True
+        self.opts.detect = True
+        h = SingleSentenceHandler(self.opts)
+        h._call_method(self._dummy_translate)
+        first_line = sys.stdout.getvalue().split('\n')[0]
+        assert_equal("detect():                ", first_line)
 
     def test_without_quiet_option(self):
-        h = SingleSentenceHandler("", ["utf-8", "utf-8"], False)
-        h._translate(self._dummy_translate)
+        h = SingleSentenceHandler(self.opts)
+        h._call_method(self._dummy_translate)
         first_line = sys.stdout.getvalue().split('\n')[0]
-        assert_equal(u'sentence:\t\t', first_line)
+        assert_equal("sentence:                ", first_line)

@@ -24,7 +24,7 @@ class TestMicrosoftTranslator(object):
                      list(self.t.break_sentences("ikazuchi. test.")))
 
     def test_detect(self):
-        assert_equal([('Microsoft', ['ja'])],
+        assert_equal([('Microsoft', 'ja')],
                      list(self.t.detect(unicode("テスト", "utf-8"))))
 
     def test_detect_array(self):

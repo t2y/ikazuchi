@@ -66,8 +66,8 @@ class GoogleTranslator(object):
             "key": self.key,
             "userip": self.userip,
         }
-        api, response = self.call_api(self.detect, query)
-        return self.api(), response
+        api, response = self.call_api(self.detect, query, "language")
+        yield api, response
 
     def translate(self, text):
         """ JSON Developer's Guide for Translate
@@ -81,5 +81,6 @@ class GoogleTranslator(object):
             "key": self.key,
             "userip": self.userip,
         }
-        api, response = self.call_api(self.translate, query, "translatedText")
+        _key = "translatedText"
+        api, response = self.call_api(self.translate, query, _key)
         yield api, response

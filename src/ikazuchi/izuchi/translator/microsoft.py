@@ -158,7 +158,7 @@ class MicrosoftTranslator(object):
         query = {"appId": self.app_id, "text": text.encode("utf-8")}
         api, items = self.call_api(self.detect, query,
                                    self.xml_tag["base"]["str"])
-        yield api, items
+        yield api, items[0]
 
     def detect_array(self, texts):
         """ DetectArray Method
