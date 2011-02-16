@@ -49,7 +49,6 @@ class YahooTranslator(object):
                 self.get_api_path(func), urlencode(query))
 
     def request(self, url):
-        print url
         req = urllib2.Request(url)
         with closing(urllib2.urlopen(req)) as res:
             res_json = json.loads(res.read())
