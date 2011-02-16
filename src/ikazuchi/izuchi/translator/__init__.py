@@ -22,6 +22,7 @@ class Translator(object):
         must be set "self.handler = handler"
         """
 
+    @abc.abstractmethod
     def detect(self, text): pass
 
     @abc.abstractmethod
