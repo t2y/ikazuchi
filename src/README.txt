@@ -11,6 +11,7 @@ Features
 * Translate GNU gettext catalog named PO file with good reference from web API
 * Translate any string passed from command line argument
 * Translate any string in Vim using ":pyfile" command
+* Detect language of any string passed from command line argument
 
 
 Setup
@@ -40,8 +41,12 @@ Usage
 Execute ikazuchi command::
 
     $ ikazuchi -s "i can translate"
-    sentence:           i can translate
-    translated(Google): [Actually, translated sentence]
+    sentence:                i can translate
+    translated(Google):      [Actually, translated sentence]
+
+    $ ikazuchi -d -s "hello"
+    sentence:                hello
+    detect(Google):          en
 
 All command option are::
 
@@ -53,6 +58,7 @@ All command option are::
       -h, --help            show this help message and exit
       -a API, --api=API     APIs are ['all', 'google', 'microsoft', 'yahoo'],
                             cannot use with '-p po_file'option
+      -d, --detect          detect language for target sentence
       -f LANG, --from=LANG  original language
       -t LANG, --to=LANG    target language to translate
       -p POFILE, --pofile=POFILE
@@ -80,6 +86,12 @@ Python Software Foundation License.
 
 History
 =======
+
+0.3.0 (2011-02-17)
+------------------
+* add -d(detect) option
+* add more api for Microsoft Translator
+* refactor translator architecture
 
 0.2.0 (2011-02-07)
 ------------------

@@ -11,4 +11,3 @@ Functionals
 Known Issues
 -------------
 * No error handling
-* Fail to run in virtualenv
