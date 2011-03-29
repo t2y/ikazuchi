@@ -24,6 +24,11 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Internationalization",
 ]
 
+INSTALL_REQUIRES = ["setuptools", "polib"]
+_ver = sys.version_info
+if _ver[0] == 2 and _ver[1] < 7:
+    INSTALL_REQUIRES.append("argparse")
+
 setup(
      name="ikazuchi",
      version=VERSION,
@@ -40,11 +45,7 @@ setup(
      package_dir={"": "src"},
      package_data = {"": ["buildout.cfg"]},
      include_package_data=True,
-     install_requires=[
-        "setuptools",
-        "polib",
-         # -*- Extra requirements: -*-
-     ],
+     install_requires=INSTALL_REQUIRES,
      extras_require=dict(
          test=[
              "Nose",

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import argparse
 import sys
 
 from izuchi.handler import *
@@ -18,10 +19,11 @@ def get_handler(opts):
         h = SingleSentenceHandler(opts)
     return h
 
-def get_encoding(option, opt_str, value, parser):
-    enc = "".join(value.split()).split(",")
-    enc_out = enc[1:] and enc[1] or enc[0]
-    parser.values.encoding = [enc[0], enc_out]
+class EncodingAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        enc = "".join(values.split()).split(",")
+        enc_out = enc[1:] and enc[1] or enc[0]
+        setattr(namespace, self.dest, [enc[0], enc_out])
 
 def check_encoding(encoding):
     ret = []

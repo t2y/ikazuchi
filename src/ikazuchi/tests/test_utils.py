@@ -8,16 +8,15 @@ from StringIO import StringIO
 import ikazuchi.utils
 
 
-def test_get_encoding():
-    class Parser(object):
-        class Values(object):
-            encoding = None
-        values = Values()
-    parser = Parser()
-    ikazuchi.utils.get_encoding(None, None, "utf-8", parser)
-    assert_equal(["utf-8", "utf-8"], parser.values.encoding)
-    ikazuchi.utils.get_encoding(None, None, "utf-8, euc-jp", parser)
-    assert_equal(["utf-8", "euc-jp"], parser.values.encoding)
+def test_encoding_action():
+    class Namespace(object):
+        encoding = None
+    namespace = Namespace()
+    a = ikazuchi.utils.EncodingAction(['-e', '--encoding'], dest='encoding')
+    a(None, namespace, "utf-8", None)
+    assert_equal(["utf-8", "utf-8"], namespace.encoding)
+    a(None, namespace, "utf-8, euc-jp", None)
+    assert_equal(["utf-8", "euc-jp"], namespace.encoding)
 
 def test_check_encoding():
     errs = ikazuchi.utils.check_encoding(["euc-jp", "utf-8"])
