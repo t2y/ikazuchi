@@ -10,6 +10,11 @@ import sys
 import izuchi
 
 
+_SENTENCE_PATTERN = {
+    "en": r"[\.|:][ |$]+",
+    "ja": r"。",
+}
+
 def get_vim_variables():
     # settings from VimScript(.vimrc)
     try:
@@ -32,7 +37,8 @@ def get_lines_with_sentence(start, end):
     # get lines each single sentence
     lines = []
     flags = re.MULTILINE
-    base_ptrn = r"[\.|:][ |$]+"
+    base_ptrn = _SENTENCE_PATTERN.get(vim.eval("raimei_from")) or \
+                _SENTENCE_PATTERN["en"]
     sentence_num = len(re.findall(base_ptrn, text, flags))
     if sentence_num > 0:
         ptrn = ""
