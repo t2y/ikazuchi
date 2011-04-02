@@ -44,18 +44,11 @@ class POFileHandler(BaseHandler):
             s = current
         return s
 
-    def _get_translated_text(self, msgid, translate):
-        """safe read since translate method is generator"""
-        text = u""
-        for api, ref in translate(msgid):
-            text += ref
-        return api, text
-
     def _call_method(self, translate):
         """translate msgid in po file"""
         _prompt = _(u"Input: ").encode(self.encoding[0])
         for p in self.po:
-            api, ref = self._get_translated_text(p.msgid, translate)
+            api, ref = translate(p.msgid)
             print _(u"msgid:\t\t\t{0}").format(p.msgid)
             if p.msgstr:
                 print _(u"current msgstr:\t\t{0}").format(p.msgstr)
@@ -83,6 +76,6 @@ class SingleSentenceHandler(BaseHandler):
     def _call_method(self, api_method):
         if not self.quiet:
             print self._encode(u"{0:25}{1}".format("sentence:", self.sentence))
-        for api, result in api_method(self.sentence):
-            _method = u"{0}({1}):".format(self.method_name, api)
-            print self._encode(u"{0:25}{1}".format(_method, result))
+        api, result = api_method(self.sentence)
+        _method = u"{0}({1}):".format(self.method_name, api)
+        print self._encode(u"{0:25}{1}".format(_method, result))

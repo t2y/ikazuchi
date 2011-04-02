@@ -29,7 +29,7 @@ def get_vim_variables():
     return api_name, lang_from, lang_to, enc
 
 def remove_imcomplete_line(lines, start):
-    prev = vim.current.buffer[start -1:start]
+    prev = vim.current.buffer[start - 1:start]
     if prev and prev[0]:
         if not re.search(r"[\.|:|。|．]$", prev[0].rstrip()):
             # remove first line if previous line is not end of a sentence
@@ -78,19 +78,19 @@ def get_index_of_range():
     return start, end
 
 def translate_with_range(translator, enc):
-    apis, translated = set(), ["", ]
+    api, translated = "", ["", ]
     start, end = get_index_of_range()
     target_lines = get_target_lines(start, end)
     # call translate API
     for line in target_lines:
-        for info in translator.translate(unicode(line, enc)):
-            apis.add(info[0])
-            translated.append(info[1].encode(enc))
+        #info = translator.translate(unicode(line, enc))
+        api, _translated = translator.translate(unicode(line, enc))
+        translated.append(_translated.encode(enc))
     # add translated text into vim
-    translated.extend(["", ])  # just for look and feel
+    translated.append("")  # just for look and feel
     vim.current.buffer.append(translated, end)
     vim.command("let raimei_target_lines={0}".format(target_lines))
-    print "Translated by {0}".format(list(apis))
+    print "Translated by {0}".format(api)
 
 def translate(api_name, lang_from, lang_to, enc):
     t = izuchi.translator.TRANSLATE_API[api_name](lang_from, lang_to, None)

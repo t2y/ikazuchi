@@ -61,9 +61,9 @@ class YahooTranslator(object):
         return self.api(), response
 
     def detect(self, text):
-        yield self.api(), u"Not Supported"
+        return self.api(), u"Not Supported"
 
     def translate(self, text):
         self.query.update(text=text.encode("utf-8"))
         api, response = self.call_api(self.translate, self.query)
-        yield api, response["value"]["items"][0]["description"]
+        return api, response["value"]["items"][0]["description"]

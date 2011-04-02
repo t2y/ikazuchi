@@ -32,36 +32,14 @@ class Translator(object):
         method = getattr(self, self.handler.method_name)
         self.handler._call_method(method)
 
-class AllTranslator(object):
-    """Class included in all translators for comparison"""
-    def __init__(self, lang_from, lang_to, handler):
-        self.handler = handler
-        self.translators = [
-            TranslatingGoogle(lang_from, lang_to, handler),
-            TranslatingMicrosoft(lang_from, lang_to, handler),
-            TranslatingYahoo(lang_from, lang_to, handler),
-        ]
-
-    def detect(self, text):
-        for t in self.translators:
-            for lang in t.detect(text):
-                yield lang
-
-    def translate(self, text):
-        for t in self.translators:
-            for translated in t.translate(text):
-                yield translated
-
 
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
 class TranslatingYahoo(YahooTranslator, Translator): pass
-class TranslatingAll(AllTranslator, Translator): pass
 
 TRANSLATE_API = {
     "google": TranslatingGoogle,
     "microsoft": TranslatingMicrosoft,
     "yahoo": TranslatingYahoo,
-    "all": TranslatingAll,
 }

@@ -147,9 +147,8 @@ class MicrosoftTranslator(object):
             "text": text.encode("utf-8"),
             "language": self.lang_from,
         }
-        api, items = self.call_api(self.break_sentences, query,
-                                   self.xml_tag["array"]["int"])
-        yield api, items
+        return self.call_api(self.break_sentences, query,
+                             self.xml_tag["array"]["int"])
 
     def detect(self, text):
         """ Detect Method
@@ -158,7 +157,7 @@ class MicrosoftTranslator(object):
         query = {"appId": self.app_id, "text": text.encode("utf-8")}
         api, items = self.call_api(self.detect, query,
                                    self.xml_tag["base"]["str"])
-        yield api, items[0]
+        return api, items[0]
 
     def detect_array(self, texts):
         """ DetectArray Method
@@ -169,9 +168,8 @@ class MicrosoftTranslator(object):
             "type": self.content_type["xml"],
             "data": self.serialize_array(texts, *self.xml_type["str"]),
         }
-        api, items = self.call_api(self.detect_array, query,
-                                   self.xml_tag["array"]["str"], data)
-        yield api, items
+        return self.call_api(self.detect_array, query,
+                             self.xml_tag["array"]["str"], data)
 
     def get_language_names(self, lang_codes):
         """ GetLanguageNames Method
@@ -182,27 +180,24 @@ class MicrosoftTranslator(object):
             "type": self.content_type["xml"],
             "data": self.serialize_array(lang_codes, *self.xml_type["str"]),
         }
-        api, items = self.call_api(self.get_language_names, query,
-                                   self.xml_tag["array"]["str"], data)
-        yield api, items
+        return self.call_api(self.get_language_names, query,
+                             self.xml_tag["array"]["str"], data)
 
     def get_languages_for_speak(self):
         """ GetLanguagesForSpeak Method
         http://msdn.microsoft.com/en-us/library/ff512415.aspx
         """
         query = {"appId": self.app_id}
-        api, items = self.call_api(self.get_languages_for_speak, query,
-                                   self.xml_tag["array"]["str"])
-        yield api, items
+        return self.call_api(self.get_languages_for_speak, query,
+                             self.xml_tag["array"]["str"])
 
     def get_languages_for_translate(self):
         """ GetLanguagesForTranslate Method
         http://msdn.microsoft.com/en-us/library/ff512416.aspx
         """
         query = {"appId": self.app_id}
-        api, items = self.call_api(self.get_languages_for_translate, query,
-                                   self.xml_tag["array"]["str"])
-        yield api, items
+        return self.call_api(self.get_languages_for_translate, query,
+                             self.xml_tag["array"]["str"])
 
     def get_translations(self, text):
         """ GetTranslations Method
@@ -226,8 +221,7 @@ class MicrosoftTranslator(object):
             "type": self.content_type["xml"],
             "data": self.serialize_option(options, self.xml_type["opt"][0])
         }
-        api, items = self.call_api(self.get_translations, query, None, data)
-        yield api, items
+        return self.call_api(self.get_translations, query, None, data)
 
     def get_translations_array(self, texts):
         """ GetTranslationsArray Method
@@ -253,9 +247,7 @@ class MicrosoftTranslator(object):
             "data": self.serialize_translate_array(
                         params, self.xml_type["gettrans_req"][0]),
         }
-        api, items = self.call_api(self.get_translations_array, query,
-                                   None, data)
-        yield api, items
+        return self.call_api(self.get_translations_array, query, None, data)
 
     def speak(self, text):
         """ Speak Method
@@ -289,7 +281,7 @@ class MicrosoftTranslator(object):
         }
         api, items = self.call_api(self.translate, query,
                                    self.xml_tag["base"]["str"])
-        yield self.api(), items[0]
+        return api, items[0]
 
     def translate_array(self, texts):
         """ TranslateArray Method
@@ -317,4 +309,4 @@ class MicrosoftTranslator(object):
         api, items = self.call_api(self.translate_array, query, None, data)
         step = 7
         trans = [items[i] for i in xrange(5, len(texts) * step, step)]
-        yield self.api(), trans
+        return api, trans

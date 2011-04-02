@@ -49,7 +49,7 @@ class TestSingleSentenceHandler(object):
         self.opts = TestSingleSentenceHandler.Option()
 
     def _dummy_translate(self, sentence):
-        yield "", sentence
+        return "", sentence
 
     def test_with_quiet_option(self):
         self.opts.quiet = True

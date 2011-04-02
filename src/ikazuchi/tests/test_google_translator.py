@@ -16,9 +16,9 @@ class TestGoogleTranslator(object):
         assert_equal("detect?", self.t.get_api_path(detect))
 
     def test_detect(self):
-        res = list(self.t.detect(unicode("テスト", "utf-8")))
-        assert_equal(u"ja", res[0][1])
+        res = self.t.detect(unicode("テスト", "utf-8"))
+        assert_equal(u"ja", res[1])
 
     def test_translate(self):
-        assert_equal([('Google', u'Test')],
-                     list(self.t.translate(unicode("テスト", "utf-8"))))
+        assert_equal(('Google', u'Test'),
+                     self.t.translate(unicode("テスト", "utf-8")))

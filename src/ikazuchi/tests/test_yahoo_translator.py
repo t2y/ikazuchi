@@ -16,9 +16,9 @@ class TestYahooTranslator(object):
         assert_equal("ja2en_?", self.t.get_api_path(translate))
 
     def test_detect(self):
-        res = list(self.t.detect(unicode("テスト", "utf-8")))
-        assert_equal(u"Not Supported", res[0][1])
+        res = self.t.detect(unicode("テスト", "utf-8"))
+        assert_equal(u"Not Supported", res[1])
 
     def test_translate(self):
-        assert_equal([('Yahoo', u'Test')],
-                     list(self.t.translate(unicode("テスト", "utf-8"))))
+        assert_equal(('Yahoo', u'Test'),
+                     self.t.translate(unicode("テスト", "utf-8")))

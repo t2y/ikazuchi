@@ -19,9 +19,7 @@ def get_args():
                         po_file=None, sentence=None, encoding=None,
                         quiet=False, verbose=False)
     parser.add_argument("-a", "--api", dest="api", metavar="API",
-                        help=u"APIs are {0}, 'all' cannot use with "
-                              "'-p po_file' option".format(
-                              TRANSLATE_API.keys()))
+                        help=u"APIs are {0}".format(TRANSLATE_API.keys()))
     parser.add_argument("-d", "--detect", dest="detect", action="store_true",
                         help=u"detect language for target sentence")
     parser.add_argument("-f", "--from", dest="lang_from", metavar="LANG",
@@ -45,8 +43,6 @@ def get_args():
     err_msg = None
     if opts.api not in TRANSLATE_API.keys():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
-    elif opts.api == "all" and opts.po_file:
-        err_msg = _(u"Unsupport to translate po file with all translators")
     elif opts.po_file and not os.access(opts.po_file, os.R_OK):
         err_msg = _(u"Cannot access po file: {0}").format(opts.po_file)
     elif not (opts.po_file or opts.sentence):
