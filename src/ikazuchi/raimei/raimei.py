@@ -12,10 +12,15 @@ import izuchi
 
 def get_vim_variables():
     # settings from VimScript(.vimrc)
-    api_name = vim.eval("raimei_api")
-    lang_from = vim.eval("raimei_from")
-    lang_to = vim.eval("raimei_to")
-    enc = vim.eval("&enc")
+    try:
+        api_name = vim.eval("raimei_api")
+        lang_from = vim.eval("raimei_from")
+        lang_to = vim.eval("raimei_to")
+        enc = vim.eval("&enc")
+    except vim.error:
+        #  vim.error is String Exception
+        print "Set enc, raimei_api, raimei_from, raimei_to variables!"
+        raise
     return api_name, lang_from, lang_to, enc
 
 def get_lines_with_sentence(start, end):
@@ -42,26 +47,36 @@ def get_lines_with_sentence(start, end):
                 lines = [match[0].strip().rstrip()]
     return lines
 
-def get_target_lines():
-    match = re.search(r"\((.*)\)", str(vim.current.range))
-    start, end = map(int, match.groups()[0].split(":"))
+def get_target_lines(start, end):
     lines = get_lines_with_sentence(start, end)
     if not lines:
         # with lines "as is"
         lines = vim.current.buffer[start - 1:end]
     return lines
 
+def get_index_of_range():
+    # FIXME: how to get indexes(start, end) of the range
+    range_text = str(vim.current.range)
+    match = re.search(r"\((.*)\)", range_text)
+    if match:
+        start, end = map(int, match.groups()[0].split(":"))
+    else:
+        raise ValueError("Cannot get index of the range: {0}".format(
+                         range_text))
+    return start, end
+
 def translate_with_range(translator, enc):
-    apis, translated = set(), []
-    vim.current.range.append("")
-    target_lines = get_target_lines()
+    apis, translated = set(), ["", ]
+    start, end = get_index_of_range()
+    target_lines = get_target_lines(start, end)
+    # call translate API
     for line in target_lines:
         for info in translator.translate(unicode(line, enc)):
             apis.add(info[0])
             translated.append(info[1].encode(enc))
-    # append translated text into vim in reverse
-    for text in reversed(translated):
-        vim.current.range.append(text)
+    # add translated text into vim
+    translated.extend(["", ])  # just for look and feel
+    vim.current.buffer.append(translated, end)
     vim.command("let raimei_target_lines={0}".format(target_lines))
     print "Translated by {0}".format(list(apis))
 
@@ -72,12 +87,10 @@ def translate(api_name, lang_from, lang_to, enc):
 def main():
     try:
         vim_vars = get_vim_variables()
-    except NameError:
+        translate(*vim_vars)
+    except Exception as err:
+        print err.message
         return
-    except vim.error:
-        print "Set enc, raimei_api, raimei_from, raimei_to variables!"
-        return
-    translate(*vim_vars)
 
 if __name__ == "__main__":
     main()
