@@ -31,7 +31,7 @@ def get_vim_variables():
 def get_lines_with_sentence(start, end):
     previous = start - 2
     subsequent = end + 2
-    text = " ".join(vim.current.buffer[previous:subsequent])
+    text = " ".join(t.strip() for t in vim.current.buffer[previous:subsequent])
     text += " "  # FIXME: pattern matching for end with "."
 
     # get lines each single sentence
