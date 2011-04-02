@@ -12,7 +12,7 @@ import izuchi
 
 _SENTENCE_PATTERN = {
     "en": r"[\.|:][ |$]+",
-    "ja": r"。",
+    "ja": r"[。|．]",
 }
 
 def get_vim_variables():
@@ -28,27 +28,32 @@ def get_vim_variables():
         raise
     return api_name, lang_from, lang_to, enc
 
+def remove_imcomplete_line(lines, start):
+    prev = vim.current.buffer[start -1:start]
+    if prev and prev[0]:
+        if not re.search(r"[\.|:|。|．]$", prev[0].rstrip()):
+            # remove first line if previous line is not end of a sentence
+            lines = lines[1:]
+    return lines
+
 def get_lines_with_sentence(start, end):
-    previous = start - 2
-    subsequent = end + 2
-    text = " ".join(t.strip() for t in vim.current.buffer[previous:subsequent])
+    text = " ".join(t.strip() for t in vim.current.buffer[start:end])
     text += " "  # FIXME: pattern matching for end with "."
 
-    # get lines each single sentence
+    # get lines for each single sentence
     lines = []
     flags = re.MULTILINE
     base_ptrn = _SENTENCE_PATTERN.get(vim.eval("raimei_from")) or \
                 _SENTENCE_PATTERN["en"]
     sentence_num = len(re.findall(base_ptrn, text, flags))
     if sentence_num > 0:
-        ptrn = ""
-        for i in range(sentence_num):
-            ptrn += r"(.*{0})".format(base_ptrn)
+        ptrn = r"(.*{0})".format(base_ptrn) * sentence_num
         match = re.findall(ptrn, text, flags)
         # format lines
         if match:
             if isinstance(match[0], tuple):
-                lines = [line.strip().rstrip() for line in match[0]]
+                lines = remove_imcomplete_line(match[0], start)
+                lines = [line.strip().rstrip() for line in lines]
             else:
                 lines = [match[0].strip().rstrip()]
     return lines
@@ -57,7 +62,7 @@ def get_target_lines(start, end):
     lines = get_lines_with_sentence(start, end)
     if not lines:
         # with lines "as is"
-        lines = vim.current.buffer[start - 1:end]
+        lines = vim.current.buffer[start:end]
     return lines
 
 def get_index_of_range():
@@ -66,6 +71,7 @@ def get_index_of_range():
     match = re.search(r"\((.*)\)", range_text)
     if match:
         start, end = map(int, match.groups()[0].split(":"))
+        start -= 1  # because range returns line number(start from 1)
     else:
         raise ValueError("Cannot get index of the range: {0}".format(
                          range_text))
