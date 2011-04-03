@@ -5,10 +5,10 @@ try:
 except ImportError:
     print "call ':pyfile raimei' from vim"
 
+import izuchi
 import re
 import sys
-import izuchi
-
+import threading
 
 _SENTENCE_PATTERN = {
     "en": r"[\.|:][ |$]+",
@@ -77,17 +77,31 @@ def get_index_of_range():
                          range_text))
     return start, end
 
+def call_api_with_multithread(api_method, enc, target_lines):
+    def worker(line, results, i):
+        results[i] = api_method(unicode(line, enc))
+
+    results = []
+    for i, line in enumerate(target_lines):
+        results.append(None)
+        t = threading.Thread(target=worker, args=(line, results, i))
+        t.start()
+    # waiting for threads to complete
+    main_thread = threading.currentThread()
+    for t in threading.enumerate():
+        if t is not main_thread:
+            t.join()
+    return results
+
 def translate_with_range(translator, enc):
-    api, translated = "", ["", ]
     start, end = get_index_of_range()
     target_lines = get_target_lines(start, end)
-    # call translate API
-    for line in target_lines:
-        #info = translator.translate(unicode(line, enc))
-        api, _translated = translator.translate(unicode(line, enc))
-        translated.append(_translated.encode(enc))
+    # call translate API with multithread
+    ret = call_api_with_multithread(translator.translate, enc, target_lines)
+    api = ret[0][0]
+    # previous and last empty lines are just for look and feel
+    translated = ["", ] + [r.encode(enc) for _, r in ret] + ["", ]
     # add translated text into vim
-    translated.append("")  # just for look and feel
     vim.current.buffer.append(translated, end)
     vim.command("let raimei_target_lines={0}".format(target_lines))
     print "Translated by {0}".format(api)
