@@ -8,10 +8,6 @@ from ikazuchi.raimei import raimei
 
 class TestRaimei(object):
 
-    class Range(Mock):
-        def __str__(self):
-            return "<range test.txt (3:11)>"
-
     eval_var = {
         "raimei_api": "google",
         "raimei_from": "en",
@@ -25,7 +21,6 @@ class TestRaimei(object):
         _eval_func = lambda var: self.eval_var[var]
         raimei.vim.eval = Mock('eval', returns_func=_eval_func)
         raimei.vim.current = Mock('current')
-        raimei.vim.current.range = self.Range('range')
 
     def teardown(self):
         restore()
@@ -78,6 +73,3 @@ class TestRaimei(object):
         assert_equal(['The Raimei means a sounds of ikazuchi.',
                       'Japanese hear the sounds such as Goro-goro-goro.'],
                      raimei.get_lines_with_sentence(1, 4, _enc))
-
-    def test_get_index_of_range(self):
-        assert_equal((2, 11), raimei.get_index_of_range())

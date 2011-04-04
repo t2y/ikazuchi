@@ -74,18 +74,6 @@ def get_target_lines(start, end, enc):
         lines = _to_unicode(vim.current.buffer[start:end], enc)
     return lines
 
-def get_index_of_range():
-    # FIXME: how to get indexes(start, end) of the range
-    range_text = str(vim.current.range)
-    match = re.search(r"\((.*)\)", range_text)
-    if match:
-        start, end = map(int, match.groups()[0].split(":"))
-        start -= 1  # because range returns line number(start from 1)
-    else:
-        raise ValueError("Cannot get index of the range: {0}".format(
-                         range_text))
-    return start, end
-
 def call_api_with_multithread(api_method, target_lines):
     def worker(line, results, i):
         results[i] = api_method(line)
@@ -103,7 +91,8 @@ def call_api_with_multithread(api_method, target_lines):
     return results
 
 def translate_with_range(translator, enc):
-    start, end = get_index_of_range()
+    start = vim.current.range.start
+    end = vim.current.range.end + 1
     target_lines = get_target_lines(start, end, enc)
     # call translate API with multithread
     ret = call_api_with_multithread(translator.translate, target_lines)
