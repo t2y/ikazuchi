@@ -18,8 +18,6 @@ _SENTENCE_PATTERN = {
 
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 
-_RAIMEI_MODE = splitext(vim.current.buffer.name)[1][1:]
-
 def _to_unicode(seq, enc):
     return [unicode(i, enc) for i in seq]
 
@@ -123,7 +121,8 @@ def main():
     try:
         vim_vars = get_vim_variables()
         translate(*vim_vars)
-        if _RAIMEI_MODE == "rst":
+        ext = splitext(vim.current.buffer.name)[1][1:]
+        if ext == "rst":
             comment_out_original_lines()
     except Exception as err:
         print err.message
