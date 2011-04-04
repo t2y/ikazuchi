@@ -9,6 +9,7 @@ import izuchi
 import re
 import sys
 import threading
+from os.path import splitext
 
 _SENTENCE_PATTERN = {
     "en": unicode(r"[\.|\?|!|:][ |$]+", "utf-8"),
@@ -16,6 +17,8 @@ _SENTENCE_PATTERN = {
 }
 
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
+
+_RAIMEI_MODE = splitext(vim.current.buffer.name)[1][1:]
 
 def _to_unicode(seq, enc):
     return [unicode(i, enc) for i in seq]
@@ -109,10 +112,19 @@ def translate(api_name, lang_from, lang_to, enc):
     t = izuchi.translator.TRANSLATE_API[api_name](lang_from, lang_to, None)
     return translate_with_range(t, enc)
 
+def comment_out_original_lines():
+    start = vim.current.range.start + 1
+    end = vim.current.range.end + 2
+    vim.current.buffer.append("..", start - 1)
+    for num, line in enumerate(vim.current.buffer[start:end]):
+        vim.current.buffer[start + num] = "{0}{1}".format(" " * 4, line)
+
 def main():
     try:
         vim_vars = get_vim_variables()
         translate(*vim_vars)
+        if _RAIMEI_MODE == "rst":
+            comment_out_original_lines()
     except Exception as err:
         print err.message
         return
