@@ -58,7 +58,7 @@ setup(
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
-        raimei = ikazuchi.raimei:main
+        raimei = ikazuchi.raimei.raimei:main
+        enrai = ikazuchi.raimei.enrai:main
      """,
-        #[vim_plugins]
 )

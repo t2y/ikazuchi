@@ -17,10 +17,10 @@ class TestRaimei(object):
 
     def setup(self):
         raimei.vim = None
-        mock('raimei.vim')
+        mock("raimei.vim")
         _eval_func = lambda var: self.eval_var[var]
-        raimei.vim.eval = Mock('eval', returns_func=_eval_func)
-        raimei.vim.current = Mock('current')
+        raimei.vim.eval = Mock("eval", returns_func=_eval_func)
+        raimei.vim.current = Mock("current")
 
     def teardown(self):
         restore()
@@ -64,12 +64,12 @@ class TestRaimei(object):
     def test_get_lines_with_sentence(self):
         class Buffer(Mock):
             def __getitem__(self, i):
-                return ["What is the Raimei mean? Year, It's a",
+                return ["What is the Raimei mean? Year, It is a",
                         "Japanese word. The Raimei means a sounds of",
                         "ikazuchi. Japanese hear the sounds such as",
                         "Goro-goro-goro."][i]
         _enc = self.eval_var["&enc"]
         raimei.vim.current.buffer = Buffer("buffer")
-        assert_equal(['The Raimei means a sounds of ikazuchi.',
-                      'Japanese hear the sounds such as Goro-goro-goro.'],
+        assert_equal(["The Raimei means a sounds of ikazuchi.",
+                      "Japanese hear the sounds such as Goro-goro-goro."],
                      raimei.get_lines_with_sentence(1, 4, _enc))
