@@ -3,7 +3,7 @@
 try:
     import vim
 except ImportError:
-    print "call ':pyfile raimei' from vim"
+    print "call ':pyfile enrai' from vim"
 
 import izuchi
 import sys
@@ -24,7 +24,7 @@ def translate_with_word(t, enc):
     word = get_word_on_cursor(enc)
     if word:
         ret = t.translate(word)
-        vim.command("let raimei_target_word='{0}'".format(word.encode(enc)))
+        vim.command("let enrai_target_word='{0}'".format(word.encode(enc)))
         print "Translated by {0}: {1}".format(*_to_encode(ret, enc))
 
 def translate(api_name, lang_from, lang_to, enc):
