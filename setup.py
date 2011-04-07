@@ -40,7 +40,7 @@ setup(
      author_email="tetsuya dot morimoto at gmail dot com",
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
      license="PSL",
-     py_modules=["izuchi"],
+     py_modules=["izuchi", "raimei", "enrai"],
      packages=find_packages("src"),
      package_dir={"": "src"},
      package_data = {"": ["buildout.cfg"]},
@@ -58,7 +58,7 @@ setup(
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
-        raimei = ikazuchi.raimei.raimei:main
-        enrai = ikazuchi.raimei.enrai:main
+        raimei = raimei:main
+        enrai = enrai:main
      """,
 )
