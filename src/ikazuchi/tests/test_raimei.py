@@ -4,7 +4,7 @@ from minimock import mock, Mock, restore
 from nose.tools import *
 
 # functions for test
-from ikazuchi.vim import raimei
+from ikazuchi.vim import (raimei, utils)
 
 class TestRaimei(object):
 
@@ -19,8 +19,10 @@ class TestRaimei(object):
         raimei.vim = None
         mock("raimei.vim")
         _eval_func = lambda var: self.eval_var[var]
-        raimei.vim.eval = Mock("eval", returns_func=_eval_func)
         raimei.vim.current = Mock("current")
+        utils.vim = None
+        mock("utils.vim")
+        utils.vim.eval = Mock("eval", returns_func=_eval_func)
 
     def teardown(self):
         restore()

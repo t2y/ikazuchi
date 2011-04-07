@@ -10,6 +10,7 @@ import re
 import sys
 import threading
 from os.path import splitext
+from utils import (to_unicode, to_encode, get_vim_variables)
 
 _SENTENCE_PATTERN = {
     "en": unicode(r"[\.|\?|!|:][ |$]+", "utf-8"),
@@ -18,24 +19,6 @@ _SENTENCE_PATTERN = {
 
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 
-def _to_unicode(seq, enc):
-    return [unicode(i, enc) for i in seq]
-
-def _to_encode(seq, enc):
-    return [i.encode(enc) for i in seq]
-
-def get_vim_variables():
-    # settings from VimScript(.vimrc)
-    try:
-        api_name = vim.eval("raimei_api")
-        lang_from = vim.eval("raimei_from")
-        lang_to = vim.eval("raimei_to")
-        enc = vim.eval("&enc")
-    except vim.error:
-        #  vim.error is String Exception
-        print "Set enc, raimei_api, raimei_from, raimei_to variables!"
-        raise
-    return api_name, lang_from, lang_to, enc
 
 def remove_imcomplete_line(lines, start, enc):
     prev = vim.current.buffer[start - 1:start]
@@ -72,7 +55,7 @@ def get_target_lines(start, end, enc):
     lines = get_lines_with_sentence(start, end, enc)
     if not lines:
         # with lines "as is"
-        lines = _to_unicode(vim.current.buffer[start:end], enc)
+        lines = to_unicode(vim.current.buffer[start:end], enc)
     return lines
 
 def call_api_with_multithread(api_method, target_lines):
@@ -103,7 +86,7 @@ def translate_with_range(translator, enc):
     # add translated text into vim
     vim.current.buffer.append(translated, end)
     vim.command("let raimei_target_lines={0}".format(
-                _to_encode(target_lines, enc)))
+                to_encode(target_lines, enc)))
     print "Translated by {0}".format(api.encode(enc))
 
 def translate(api_name, lang_from, lang_to, enc):
