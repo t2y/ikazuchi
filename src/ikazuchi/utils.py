@@ -14,8 +14,8 @@ def get_lang():
 def get_handler(opts):
     h = None
     if opts.po_file:
-        h = POFileHandler(opts.po_file, opts.encoding)
-    elif opts.sentence:
+        h = POFileHandler(opts.po_file[0], opts.encoding)
+    elif opts.sentences:
         h = SingleSentenceHandler(opts)
     return h
 
@@ -39,9 +39,9 @@ def set_default_encoding(opts):
     enc = getdefaultlocale()[1]
     opts.encoding = [enc, enc]
 
-def convrt_str_to_unicode(opts):
-    if opts.sentence:
-        opts.sentence = unicode(opts.sentence, opts.encoding[0])
+def convert_str_to_unicode(opts):
+    if opts.sentences:
+        opts.sentences = [unicode(s, opts.encoding[0]) for s in opts.sentences]
 
 _UNSUPPORTED_VERSION = _("Unsupported Python version, use 2.6 above")
 

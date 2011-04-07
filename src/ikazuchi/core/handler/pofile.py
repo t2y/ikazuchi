@@ -10,7 +10,7 @@ except ImportError:
 
 class POFileHandler(BaseHandler):
     """
-    Handler class for translating interactively
+    Handler class for translating PO file interactively
     """
     def __init__(self, po_file, encoding):
         self.encoding = encoding

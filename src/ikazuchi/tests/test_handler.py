@@ -39,7 +39,7 @@ class TestPOFileHandler(object):
 class TestSingleSentenceHandler(object):
 
     class Option(object):
-        sentence = ""
+        sentences = [""]
         encoding = ["utf-8", "utf-8"]
         quiet = False
         detect = False

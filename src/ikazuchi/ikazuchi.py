@@ -26,9 +26,9 @@ def get_args():
                         help=u"original language")
     parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
                         help=u"target language to translate")
-    parser.add_argument("-p", "--pofile", dest="po_file",
+    parser.add_argument("-p", "--pofile", dest="po_file", nargs=1,
                         metavar="POFILE", help=u"target po file")
-    parser.add_argument("-s", "--sentence", dest="sentence",
+    parser.add_argument("-s", "--sentence", dest="sentences", nargs="+",
                         metavar="SENTENCE", help=u"target sentence")
     parser.add_argument("-e", "--encoding", dest="encoding",
                         action=EncodingAction, metavar="ENCODING",
@@ -43,10 +43,8 @@ def get_args():
     err_msg = None
     if opts.api not in TRANSLATE_API.keys():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
-    elif opts.po_file and not os.access(opts.po_file, os.R_OK):
-        err_msg = _(u"Cannot access po file: {0}").format(opts.po_file)
-    elif not (opts.po_file or opts.sentence):
-        err_msg = _(u"Set argument either '-p po_file' or '-s sentence'")
+    elif opts.po_file and not os.access(opts.po_file[0], os.R_OK):
+        err_msg = _(u"Cannot access po file: {0}").format(opts.po_file[0])
     elif opts.encoding:
         err_encoding = check_encoding(opts.encoding)
         if err_encoding:
@@ -59,7 +57,7 @@ def get_args():
 
     if not opts.encoding:
         set_default_encoding(opts)
-    convrt_str_to_unicode(opts)
+    convert_str_to_unicode(opts)
     return opts
 
 def main():
