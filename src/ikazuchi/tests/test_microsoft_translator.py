@@ -3,7 +3,7 @@
 from nose.tools import *
 
 # functions for test
-from ikazuchi.izuchi.translator import TranslatingMicrosoft
+from ikazuchi.core.translator import TranslatingMicrosoft
 
 class TestMicrosoftTranslator(object):
 

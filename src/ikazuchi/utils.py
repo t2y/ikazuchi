@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from izuchi.handler import *
+from core.handler import *
 from locale import _
 
 def get_lang():

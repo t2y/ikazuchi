@@ -4,7 +4,7 @@ from minimock import mock, Mock, restore
 from nose.tools import *
 
 # functions for test
-from ikazuchi.raimei import enrai
+from ikazuchi.vim import enrai
 
 class TestEnrai(object):
 

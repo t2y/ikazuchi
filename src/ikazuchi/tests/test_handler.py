@@ -6,7 +6,7 @@ from nose.tools import *
 from StringIO import StringIO
 
 # functions for test
-from ikazuchi.izuchi.handler import *
+from ikazuchi.core.handler import *
 
 
 class TestPOFileHandler(object):

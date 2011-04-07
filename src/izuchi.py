@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from ikazuchi.izuchi import handler
-from ikazuchi.izuchi import translator
+from ikazuchi.core import handler
+from ikazuchi.core import translator

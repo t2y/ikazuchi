@@ -3,7 +3,7 @@
 from nose.tools import *
 
 # functions for test
-from ikazuchi.izuchi.translator import TranslatingYahoo
+from ikazuchi.core.translator import TranslatingYahoo
 
 class TestYahooTranslator(object):
 

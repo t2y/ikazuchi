@@ -5,7 +5,7 @@ import argparse
 import os
 import sys
 
-from izuchi.translator import TRANSLATE_API
+from core.translator import TRANSLATE_API
 from locale import _
 from utils import *
 
