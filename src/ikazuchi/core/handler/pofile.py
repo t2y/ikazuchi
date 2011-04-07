@@ -1,28 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import abc
 import polib
+from base import BaseHandler
 
 try:
     from ikazuchi.locale import _
 except ImportError:
     def _(s): return s
-
-__all__ = [
-    "POFileHandler",
-    "SingleSentenceHandler",
-]
-
-
-class BaseHandler(object):
-    """Base class for handler"""
-
-    __metaclass__ = abc.ABCMeta
-
-    method_name = "translate"
-
-    @abc.abstractmethod
-    def _call_method(self, method): pass
 
 class POFileHandler(BaseHandler):
     """
@@ -58,24 +42,3 @@ class POFileHandler(BaseHandler):
             self.po.save()
             print _(u"updated msgstr:\t\t{0}").format(p.msgstr)
             print ""
-
-class SingleSentenceHandler(BaseHandler):
-    """
-    Handler class for translating single sentence
-    """
-    def __init__(self, opts):
-        self.sentence = opts.sentence
-        self.encoding = opts.encoding
-        self.quiet = opts.quiet
-        if opts.detect:
-            self.method_name = "detect"
-
-    def _encode(self, text):
-        return text.encode(self.encoding[1])
-
-    def _call_method(self, api_method):
-        if not self.quiet:
-            print self._encode(u"{0:25}{1}".format("sentence:", self.sentence))
-        api, result = api_method(self.sentence)
-        _method = u"{0}({1}):".format(self.method_name, api)
-        print self._encode(u"{0:25}{1}".format(_method, result))
