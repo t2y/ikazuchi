@@ -8,7 +8,6 @@ except ImportError:
 import izuchi
 import re
 import sys
-import threading
 from os.path import splitext
 from utils import (to_unicode, to_encode, get_vim_variables)
 
@@ -19,6 +18,9 @@ _SENTENCE_PATTERN = {
 
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 
+# just for alias
+_translate_api = izuchi.translator.TRANSLATE_API
+_call_api_with_multithread = izuchi.translator.utils.call_api_with_multithread
 
 def remove_imcomplete_line(lines, start, enc):
     prev = vim.current.buffer[start - 1:start]
@@ -58,28 +60,12 @@ def get_target_lines(start, end, enc):
         lines = to_unicode(vim.current.buffer[start:end], enc)
     return lines
 
-def call_api_with_multithread(api_method, target_lines):
-    def worker(line, results, i):
-        results[i] = api_method(line)
-
-    results = []
-    for i, line in enumerate(target_lines):
-        results.append(None)
-        t = threading.Thread(target=worker, args=(line, results, i))
-        t.start()
-    # waiting for threads to complete
-    main_thread = threading.currentThread()
-    for t in threading.enumerate():
-        if t is not main_thread:
-            t.join()
-    return results
-
 def translate_with_range(translator, enc):
     start = vim.current.range.start
     end = vim.current.range.end + 1
     target_lines = get_target_lines(start, end, enc)
     # call translate API with multithread
-    ret = call_api_with_multithread(translator.translate, target_lines)
+    ret = _call_api_with_multithread(translator.translate, target_lines)
     api = ret[0][0]
     # previous and last empty lines are just for look and feel
     translated = ["", ] + [r.encode(enc) for _, r in ret] + ["", ]
@@ -90,8 +76,8 @@ def translate_with_range(translator, enc):
     print "Translated by {0}".format(api.encode(enc))
 
 def translate(api_name, lang_from, lang_to, enc):
-    t = izuchi.translator.TRANSLATE_API[api_name](lang_from, lang_to, None)
-    return translate_with_range(t, enc)
+    translator = _translate_api[api_name](lang_from, lang_to, None)
+    return translate_with_range(translator, enc)
 
 def comment_out_original_lines():
     start = vim.current.range.start + 1
