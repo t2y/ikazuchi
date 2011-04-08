@@ -10,7 +10,7 @@ import sys
 from utils import (to_unicode, to_encode, get_vim_variables)
 
 def get_word_on_cursor(enc):
-    words = to_unicode(vim.current.line.split(), enc)
+    words = to_unicode(vim.current.line.split(" "), enc)
     cur_row, cur_column = vim.current.window.cursor
     cur_column += 1  # add 1 since cursor column start from 0
     word_pos = 0

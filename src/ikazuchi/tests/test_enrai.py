@@ -15,7 +15,7 @@ class TestEnrai(object):
         "&enc": "utf-8",
     }
 
-    test_text = "Enrai is translated as 'Distant thunder'."
+    test_text = " \t   Enrai is translated   as 'Distant thunder'."
 
     def setup(self):
         enrai.vim = None
@@ -25,7 +25,7 @@ class TestEnrai(object):
         enrai.vim.current = Mock("current",
             window=Mock("window"),
             line=Mock("line",
-                split=Mock("split", returns=self.test_text.split()),
+                split=Mock("split", returns=self.test_text.split(" ")),
             ),
         )
 
@@ -34,15 +34,15 @@ class TestEnrai(object):
 
     def test_get_word_on_cursor_1(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 2)
+        enrai.vim.current.window.cursor = (0, 6)
         assert_equal("Enrai", enrai.get_word_on_cursor(_enc))
 
     def test_get_word_on_cursor_2(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 8)
+        enrai.vim.current.window.cursor = (0, 12)
         assert_equal("is", enrai.get_word_on_cursor(_enc))
 
     def test_get_word_on_cursor_3(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 24)
+        enrai.vim.current.window.cursor = (0, 32)
         assert_equal("'Distant", enrai.get_word_on_cursor(_enc))
