@@ -34,15 +34,15 @@ class TestEnrai(object):
 
     def test_get_word_on_cursor_1(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 6)
+        enrai.vim.current.window.cursor = (1, 6)
         assert_equal("Enrai", enrai.get_word_on_cursor(_enc))
 
     def test_get_word_on_cursor_2(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 12)
+        enrai.vim.current.window.cursor = (1, 12)
         assert_equal("is", enrai.get_word_on_cursor(_enc))
 
     def test_get_word_on_cursor_3(self):
         _enc = self.eval_var["&enc"]
-        enrai.vim.current.window.cursor = (0, 32)
+        enrai.vim.current.window.cursor = (1, 32)
         assert_equal("'Distant", enrai.get_word_on_cursor(_enc))

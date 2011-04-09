@@ -60,9 +60,22 @@ def get_target_lines(start, end, enc):
         lines = to_unicode(vim.current.buffer[start:end], enc)
     return lines
 
-def translate_with_range(translator, enc):
+_MAX_TARGET_RANGE = 100
+
+def get_target_range():
+    # take a range until next blank line if target range is not specified
+    cur_row, cur_column = vim.current.window.cursor
     start = vim.current.range.start
     end = vim.current.range.end + 1
+    if cur_row == end and (start + 1) == end:
+        # it is considered as target range is not specified.
+        _max_range = end + _MAX_TARGET_RANGE
+        while vim.current.buffer[end:end + 1] != [""] and end < _max_range:
+            end += 1
+    return start, end
+
+def translate_with_range(translator, enc):
+    start, end = get_target_range()
     target_lines = get_target_lines(start, end, enc)
     # call translate API with multithread
     ret = _call_api_with_multithread(translator.translate, target_lines)
@@ -80,10 +93,10 @@ def translate(api_name, lang_from, lang_to, enc):
     return translate_with_range(translator, enc)
 
 def comment_out_original_lines():
-    start = vim.current.range.start + 1
-    end = vim.current.range.end + 2
+    start, end = get_target_range()
+    start += 1
     vim.current.buffer.append("..", start - 1)
-    for num, line in enumerate(vim.current.buffer[start:end]):
+    for num, line in enumerate(vim.current.buffer[start:end + 1]):
         vim.current.buffer[start + num] = "{0}{1}".format(" " * 4, line)
 
 def main():
