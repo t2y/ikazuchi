@@ -3,7 +3,7 @@
 import json
 import socket
 import urllib2
-from contextlib import closing, nested
+from contextlib import closing
 from urllib import urlencode
 
 __all__ = [
@@ -82,3 +82,21 @@ class GoogleTranslator(object):
         }
         _key = "translatedText"
         return self.call_api(self.translate, query, _key)
+
+    def translate_tts(self, text, f):
+        """ Unofficial Google Text To Speech API
+        http://weston.ruter.net/projects/google-tts/
+        """
+        headers = {"User-Agent":
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-US) "
+            "AppleWebKit/534.16 (KHTML, like Gecko) "
+            "Chrome/10.0.648.204 Safari/534.16"
+        }
+        query = {"tl": self.lang_to, "q": text.encode("utf-8")}
+        url = "http://translate.google.com/translate_tts?{0}".format(
+                urlencode(query))
+        req = urllib2.Request(url, None, headers)
+        with closing(urllib2.urlopen(req)) as res:
+            f.write(res.read())
+            f.flush()
+        return self.api()

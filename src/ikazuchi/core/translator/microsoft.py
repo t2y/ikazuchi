@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import tempfile
 import urllib2
-from contextlib import closing, nested
+from contextlib import closing
 from urllib import urlencode
 from xml.etree import ElementTree as ET
 
@@ -249,7 +248,7 @@ class MicrosoftTranslator(object):
         }
         return self.call_api(self.get_translations_array, query, None, data)
 
-    def speak(self, text):
+    def speak(self, text, f):
         """ Speak Method
         http://msdn.microsoft.com/en-us/library/ff512420.aspx
         """
@@ -262,10 +261,10 @@ class MicrosoftTranslator(object):
         }
         url = self.get_url(self.speak, query)
         req = urllib2.Request(url)
-        with nested(tempfile.NamedTemporaryFile(mode="wb"),
-                    closing(urllib2.urlopen(req))) as (tmp, res):
-            tmp.write(res.read())
-            tmp.file.seek(0)
+        with closing(urllib2.urlopen(req)) as res:
+            f.write(res.read())
+            f.flush()
+        return self.api()
 
     def translate(self, text):
         """ Translate Method

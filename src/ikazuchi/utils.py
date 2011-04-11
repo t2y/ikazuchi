@@ -16,7 +16,11 @@ def get_handler(opts):
     if opts.po_file:
         h = POFileHandler(opts.po_file[0], opts.encoding)
     elif opts.sentences:
-        h = SingleSentenceHandler(opts)
+        # FIXME: consider later about audio handler
+        if opts.sentences[0] == "audio" and len(opts.sentences) >= 2:
+            h = AudioHandler(opts)
+        else:
+            h = SingleSentenceHandler(opts)
     return h
 
 class EncodingAction(argparse.Action):
