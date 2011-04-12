@@ -23,6 +23,7 @@ class GoogleTranslator(object):
     key = "ABQIAAAAK6kpHnylgmAYtO7ZX01XXRSvW2ISZ2KI4wU-F"\
           "k6WlRk77d73EhTtYeI1LUl3BfkKv-17KKEWzdRTMw"
     userip = socket.gethostbyname(socket.gethostname())
+    q_format = "html"
 
     def __init__(self, lang_from, lang_to, handler):
         self.lang_from = lang_from
@@ -79,9 +80,11 @@ class GoogleTranslator(object):
             "langpair": "{0}|{1}".format(self.lang_from, self.lang_to),
             "key": self.key,
             "userip": self.userip,
+            "format": self.q_format,
         }
         _key = "translatedText"
-        return self.call_api(self.translate, query, _key)
+        api, response = self.call_api(self.translate, query, _key)
+        return api, self.parse_html(response)
 
     def translate_tts(self, text, f):
         """ Unofficial Google Text To Speech API

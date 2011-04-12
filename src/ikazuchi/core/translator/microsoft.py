@@ -211,7 +211,7 @@ class MicrosoftTranslator(object):
         }
         options = [
             ("Category", "general"),
-            ("ContentType", self.content_type["text"]),
+            ("ContentType", self.content_type["html"]),
             ("Uri", ""),
             ("User", ""),
             ("State", ""),
@@ -232,7 +232,7 @@ class MicrosoftTranslator(object):
             ("From", self.lang_from),
             ("Options", [
                 ("Category", "general"),
-                ("ContentType", self.content_type["text"]),
+                ("ContentType", self.content_type["html"]),
                 ("Uri", ""),
                 ("User", ""),
                 ("State", ""),
@@ -275,12 +275,12 @@ class MicrosoftTranslator(object):
             "text": text.encode("utf-8"),
             "from": self.lang_from,
             "to": self.lang_to,
-            "contentType": self.content_type["text"],
+            "contentType": self.content_type["html"],
             "category": "general",
         }
         api, items = self.call_api(self.translate, query,
                                    self.xml_tag["base"]["str"])
-        return api, items[0]
+        return api, self.parse_html(items[0])
 
     def translate_array(self, texts):
         """ TranslateArray Method
@@ -292,7 +292,7 @@ class MicrosoftTranslator(object):
             ("From", self.lang_from),
             ("Options", [
                 ("Category", "general"),
-                ("ContentType", self.content_type["text"]),
+                ("ContentType", self.content_type["html"]),
                 ("Uri", ""),
                 ("User", ""),
                 ("State", ""),
