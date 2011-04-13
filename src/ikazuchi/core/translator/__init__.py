@@ -19,6 +19,7 @@ class Translator(object):
     # FIXME: span tag only, cannot match for minimal when html tag is nested
     notrans_tag = re.compile(
         r"<span class=[\"']?notranslate[\"']?>(.*?)</span>", re.I)
+    whitespaces = re.compile(r"\s+", re.I | re.U)
 
     @abc.abstractmethod
     def __init__(self, lang_from, lang_to, handler):
@@ -44,7 +45,7 @@ class Translator(object):
         buf = StringIO()
         p = HTMLParser(AbstractFormatter(DumbWriter(buf)))
         p.feed(_html)
-        return buf.getvalue()
+        return re.sub(self.whitespaces, " ", buf.getvalue())
 
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass

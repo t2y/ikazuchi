@@ -37,7 +37,7 @@ class TestTranslator(object):
                'は<p>テスト</p>のためで<span>regexp</span>の'\
                'マッチングが<span class="notranslate">correct</span>か'\
                'どうかを<strong>調べます</strong>。</html>'
-        expected = "この string は\n\nテストのためでregexpの"\
+        expected = "この string は テストのためでregexpの"\
                    "マッチングが correct かどうかを調べます。"
         actual = self.t.parse_html(unicode(html, "utf-8")).encode("utf-8")
         assert_equal(expected, actual)
