@@ -9,7 +9,14 @@ class AudioHandler(BaseHandler):
     Handler class for text-to-speech
     """
     def __init__(self, opts):
-        self.sentences = opts.sentences[1:]
+        self.is_translate = False
+        if opts.sentences[0] == "audio":
+            self.sentences = opts.sentences[1:]
+            self.lang = opts.lang_from
+        else:
+            self.sentences = opts.sentences[:-1]
+            self.lang = opts.lang_to
+            self.is_translate = True
         self.encoding = opts.encoding
         self.quiet = opts.quiet
         self.translator = API[opts.api](opts.lang_from, opts.lang_to, None)
@@ -21,17 +28,20 @@ class AudioHandler(BaseHandler):
     def _encode(self, text):
         return text.encode(self.encoding[1])
 
+    def _translate(self, text):
+        if not self.quiet:
+            print self._encode(u"{0:25}{1}".format("sentence:", text))
+        api, translated = self.translator.translate(text)
+        _method = u"{0}({1}):".format("translate", api)
+        print self._encode(u"{0:25}{1}".format(_method, translated))
+        return translated
+
     def _call_method(self, api_method):
-        for s in self.sentences:
-            # call translate api
-            if not self.quiet:
-                print self._encode(u"{0:25}{1}".format("sentence:", s))
-            api, translated = self.translator.translate(s)
-            _method = u"{0}({1}):".format("translate", api)
-            print self._encode(u"{0:25}{1}".format(_method, translated))
-            # call read out api
+        for target in self.sentences:
+            if self.is_translate:
+                target = self._translate(target)
             with NamedTemporaryFile(mode="wb") as tmp:
-                api = api_method(translated, tmp)
+                api = api_method(target, self.lang, tmp)
                 _method = u"{0}({1}):".format(self.method_name, api)
                 print self._encode(u"{0:25}".format(_method))
                 self.play_audio(tmp.name)

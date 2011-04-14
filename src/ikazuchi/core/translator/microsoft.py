@@ -248,7 +248,7 @@ class MicrosoftTranslator(object):
         }
         return self.call_api(self.get_translations_array, query, None, data)
 
-    def speak(self, text, f):
+    def speak(self, text, lang, f):
         """ Speak Method
         http://msdn.microsoft.com/en-us/library/ff512420.aspx
         """
@@ -256,7 +256,7 @@ class MicrosoftTranslator(object):
         query = {
             "appId": self.app_id,
             "text": text.encode("utf-8"),
-            "language": self.lang_to,
+            "language": lang,
             "format": "audio/wav",
         }
         url = self.get_url(self.speak, query)
