@@ -3,6 +3,7 @@
 import codecs
 import re
 from base import BaseHandler
+from ikazuchi.core.translator.utils import call_api_with_multithread
 
 try:
     from ikazuchi.locale import _
@@ -19,11 +20,16 @@ _ROLE = [
 ]
 
 _SECTION = [
-    '^[#|*|=|\-|^|"]{2,}$',    # ===
+    '^[#|*|=|\-|^|"]{2,}$',     # ===
+]
+
+_HYPER_LINK = [
+    "`.*?\s*`_",    # `link <http://xxx>`_ or `link`_
+    "^\.\.\s*_.*?:\s*http.*$",  # .. _link: http://xxx
 ]
 
 _PARAGRAPH_PTRN = re.compile(r"({0})".format("|".join(
-                    _INLINE + _ROLE + _SECTION)), re.M)
+    _INLINE + _ROLE + _SECTION + _HYPER_LINK)), re.M)
 
 _DIRECTIVE = [
     "^\s*::\s*",        # source code
@@ -33,7 +39,13 @@ _DIRECTIVE = [
 
 _DIRECTIVE_PTRN = re.compile(r"({0})".format("|".join(_DIRECTIVE)), re.U)
 
+_DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
+      ^\.\.\s+note::.*$     # .. note::
+    | ^\.\.\s+seealso::.*$  # .. seealso::
+)""", re.U | re.X)
+
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
+_INDENT_PREFIX = re.compile(r"^\s+", re.U)
 _PARAGRAPH_START = re.compile(r"^\S+.*$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r"[\.|\?|!|]", "utf-8"), re.M | re.U),
@@ -141,6 +153,40 @@ class reSTFileHandler(BaseHandler):
                     lines = [match[0]]
         return _add_linebreak(lines)
 
+    def has_paragraph(self, directive):
+        if re.search(_DIRECTIVE_WITH_PARAGRAPH, directive):
+            return True
+        return False
+
+    def _call_for_directive(self, api_method, block_lines):
+        def _concatenate_lines(lines):
+            _lines, prev_indent = [], None
+            for line in lines:
+                match = re.match(_INDENT_PREFIX, line)
+                if re.search(_EMPTY_LINE, line) or not match:
+                    _lines.append(line)
+                    prev_indent = None
+                else:
+                    indent = match.group()
+                    if prev_indent == indent:
+                        _prev = _lines[-1].rstrip()
+                        _lines[-1] = u"{0} {1}".format(_prev, line.strip())
+                    else:
+                        _lines.append(line)
+                    prev_indent = indent
+            return _lines
+
+        lines = block_lines[:1]
+        for line in _concatenate_lines(block_lines[1:]):
+            match = re.match(_INDENT_PREFIX, line)
+            if re.search(_EMPTY_LINE, line) or not match:
+                lines.append(line)
+            else:
+                text = self.markup_paragraph_notranslate(line)
+                api, result = api_method(text)
+                lines.append(u"{0}{1}\n".format(match.group(), result))
+        return api, lines
+
     def _call_for_paragraph(self, api_method, block_lines):
         text = u" ".join(t.strip() for t in block_lines)
         _text = self.markup_paragraph_notranslate(text)
@@ -154,6 +200,9 @@ class reSTFileHandler(BaseHandler):
                 print block_lines
                 if btype == self.block_type["directive"]:
                     lines = block_lines
+                    if self.has_paragraph(match):
+                        ret = self._call_for_directive(api_method, block_lines)
+                        lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
                     lines = self.get_lines_with_sentence(ret[1])
