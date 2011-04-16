@@ -15,9 +15,12 @@ def get_handler(opts):
     h = None
     if opts.po_file:
         h = POFileHandler(opts.po_file[0], opts.encoding)
+    elif opts.rst_file:
+        h = reSTFileHandler(opts)
     elif opts.sentences:
         # FIXME: consider later about audio handler
-        if opts.sentences[0] == "audio" and len(opts.sentences) >= 2:
+        if (opts.sentences[0] == "audio" or opts.sentences[-1] == "audio") \
+            and len(opts.sentences) >= 2:
             h = AudioHandler(opts)
         else:
             h = SingleSentenceHandler(opts)

@@ -28,6 +28,8 @@ def get_args():
                         help=u"target language to translate")
     parser.add_argument("-p", "--pofile", dest="po_file", nargs=1,
                         metavar="POFILE", help=u"target po file")
+    parser.add_argument("-r", "--rstfile", dest="rst_file", nargs=1,
+                        metavar="RSTFILE", help=u"target reST file")
     parser.add_argument("-s", "--sentence", dest="sentences", nargs="+",
                         metavar="SENTENCE", help=u"target sentence")
     parser.add_argument("-e", "--encoding", dest="encoding",
@@ -45,6 +47,8 @@ def get_args():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
     elif opts.po_file and not os.access(opts.po_file[0], os.R_OK):
         err_msg = _(u"Cannot access po file: {0}").format(opts.po_file[0])
+    elif opts.rst_file and not os.access(opts.rst_file[0], os.R_OK):
+        err_msg = _(u"Cannot access reST file: {0}").format(opts.rst_file[0])
     elif opts.encoding:
         err_encoding = check_encoding(opts.encoding)
         if err_encoding:
