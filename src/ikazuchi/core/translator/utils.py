@@ -9,10 +9,9 @@ def call_api_with_multithread(api_method, target_lines):
         with semaphore:
             results[i] = api_method(line)
 
-    results = []
+    results = [None] * len(target_lines)
     s = threading.Semaphore(_MAX_SEMAPHORE)
     for i, line in enumerate(target_lines):
-        results.append(None)
         t = threading.Thread(target=worker, args=(line, results, i, s))
         t.start()
     # waiting for threads to complete
