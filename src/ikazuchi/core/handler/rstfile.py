@@ -36,13 +36,17 @@ _RUBRIC = [
 _REFFERENCE = [
     "\[(?!#).*?\]_",            # [ref]_
     "^\.\.\s*\[(?!#).*?\].*$",  # .. [ref] description
-
 ]
 
 _NOTRANSLATE = _INLINE + _ROLE + _SECTION + _HYPER_LINK + \
                _RUBRIC + _REFFERENCE
 _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
+
+_LISTBLOCK = re.compile(r"""(
+      ^[*|\-|\d|#]\.*\s+        # * list
+    | ^\s+[*|\-|\d|#]\.*\s+     #   * nested list
+)(.*?)$""", re.U | re.X)
 
 _DIRECTIVE = [
     "^\s*::\s*$",           # source code
@@ -53,18 +57,18 @@ _DIRECTIVE = [
 _DIRECTIVE_PTRN = re.compile(r"({0})".format("|".join(_DIRECTIVE)), re.U)
 
 _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
-      ^\.\.\s+note::.*$         # .. note::
-    | ^\.\.\s+warning::.*$      # .. warning::
-    | ^\.\.\s+seealso::.*$      # .. seealso::
-    | ^\.\.\s+rubric::.*$       # .. rubric::
-    | ^\.\.\s+tip::.*$          # .. tip::
-    | ^\.\.\s+error::.*$        # .. error::
-    | ^\.\.\s+hint::.*$         # .. hint::
-    | ^\.\.\s+important::.*$    # .. important::
-    | ^\.\.\s+attention::.*$    # .. attention::
-    | ^\.\.\s+caution::.*$      # .. caution::
-    | ^\.\.\s+danger::.*$       # .. danger::
-)""", re.U | re.X)
+      ^\.\.\s+note::        # .. note::
+    | ^\.\.\s+warning::     # .. warning::
+    | ^\.\.\s+seealso::     # .. seealso::
+    | ^\.\.\s+rubric::      # .. rubric::
+    | ^\.\.\s+tip::         # .. tip::
+    | ^\.\.\s+error::       # .. error::
+    | ^\.\.\s+hint::        # .. hint::
+    | ^\.\.\s+important::   # .. important::
+    | ^\.\.\s+attention::   # .. attention::
+    | ^\.\.\s+caution::     # .. caution::
+    | ^\.\.\s+danger::      # .. danger::
+).*$""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
 _INDENT_PREFIX = re.compile(r"^\s+", re.U)
@@ -81,6 +85,7 @@ class reSTFileHandler(BaseHandler):
 
     block_type = {
         "directive": "d",
+        "listblock": "l",
         "paragraph": "p",
     }
 
@@ -102,6 +107,8 @@ class reSTFileHandler(BaseHandler):
                 skip_num -= 1
                 continue
             info, skip_num = self.get_directive(num, lines)
+            if not info[0]:
+                info, skip_num = self.get_listblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_paragraph(num, lines)
             if not info[0]:  # others
@@ -131,6 +138,32 @@ class reSTFileHandler(BaseHandler):
             directive = match.groups()[0]
             end, block = _get_code_block(lines[line_num:])
         return (btype, block, directive), end
+
+    def get_listblock(self, line_num, lines):
+        def _get_code_block(_lines):
+            num = 0
+            empty = False
+            for num, line in enumerate(_lines[1:]):
+                if re.search(_EMPTY_LINE, line) and not empty:
+                    empty = True
+                elif re.search(_LISTBLOCK, line):
+                    empty = False
+                else:
+                    # end of list block is previous line of current
+                    num -= 1
+                    break
+            if num + 2 == len(_lines):
+                # reaching to EOF might not be found _PARAGRAPH_START
+                num += 1
+            return num, _lines[0:num + 1]
+
+        btype, block, listblock, end = None, [], None, 0
+        match = re.search(_LISTBLOCK, lines[line_num])
+        if match:
+            btype = self.block_type["listblock"]
+            listblock = match.groups()[0]
+            end, block = _get_code_block(lines[line_num:])
+        return (btype, block, listblock), end
 
     def get_paragraph(self, line_num, lines):
         def _get_code_block(_lines):
@@ -196,7 +229,7 @@ class reSTFileHandler(BaseHandler):
                     prev_indent = indent
             return _lines
 
-        lines = block_lines[:1]
+        api, lines = None, block_lines[:1]
         for line in _concatenate_lines(block_lines[1:]):
             match = re.match(_INDENT_PREFIX, line)
             if re.search(_EMPTY_LINE, line) or not match:
@@ -205,6 +238,19 @@ class reSTFileHandler(BaseHandler):
                 text = self.markup_paragraph_notranslate(line)
                 api, result = api_method(text)
                 lines.append(u"{0}{1}\n".format(match.group(), result))
+        return api, lines
+
+    def _call_for_listblock(self, api_method, block_lines):
+        api, lines = None, []
+        for line in block_lines:
+            match = re.match(_LISTBLOCK, line)
+            if re.search(_EMPTY_LINE, line) or not match:
+                lines.append(line)
+            else:
+                prefix, text = match.groups()
+                _text = self.markup_paragraph_notranslate(text)
+                api, result = api_method(_text)
+                lines.append(u"{0}{1}\n".format(prefix, result))
         return api, lines
 
     def _call_for_paragraph(self, api_method, block_lines):
@@ -221,8 +267,12 @@ class reSTFileHandler(BaseHandler):
                 if btype == self.block_type["directive"]:
                     lines = block_lines
                     if re.search(_DIRECTIVE_WITH_PARAGRAPH, match):
-                        ret = self._call_for_directive(api_method, block_lines)
+                        ret = self._call_for_directive(
+                                api_method, block_lines)
                         lines = ret[1]
+                elif btype == self.block_type["listblock"]:
+                    ret = self._call_for_listblock(api_method, block_lines)
+                    lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
                     lines = self.get_lines_with_sentence(ret[1])
