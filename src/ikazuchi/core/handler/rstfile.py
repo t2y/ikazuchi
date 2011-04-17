@@ -48,6 +48,10 @@ _LISTBLOCK = re.compile(r"""(
     | ^\s+[*|\-|\d|#]\.*\s+     #   * nested list
 )(.*?)$""", re.U | re.X)
 
+_LINEBLOCK = re.compile(r"""(
+    ^\|\s+  # | line block
+)(.*?)$""", re.U | re.X)
+
 _DIRECTIVE = [
     "^\s*::\s*$",           # source code
     "^\.\..*(?<!::)$",      # comment
@@ -85,6 +89,7 @@ class reSTFileHandler(BaseHandler):
 
     block_type = {
         "directive": "d",
+        "lineblock": "i",
         "listblock": "l",
         "paragraph": "p",
     }
@@ -107,6 +112,8 @@ class reSTFileHandler(BaseHandler):
                 skip_num -= 1
                 continue
             info, skip_num = self.get_directive(num, lines)
+            if not info[0]:
+                info, skip_num = self.get_lineblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_listblock(num, lines)
             if not info[0]:
@@ -138,6 +145,24 @@ class reSTFileHandler(BaseHandler):
             directive = match.groups()[0]
             end, block = _get_code_block(lines[line_num:])
         return (btype, block, directive), end
+
+    def get_lineblock(self, line_num, lines):
+        def _get_code_block(_lines):
+            num = 0
+            for num, line in enumerate(_lines):
+                if not re.search(_LINEBLOCK, line):
+                    # end of line block is previous line of current
+                    num -= 1
+                    break
+            return num, _lines[0:num + 1]
+
+        btype, block, lineblock, end = None, [], None, 0
+        match = re.search(_LINEBLOCK, lines[line_num])
+        if match:
+            btype = self.block_type["lineblock"]
+            lineblock = match.groups()[0]
+            end, block = _get_code_block(lines[line_num:])
+        return (btype, block, lineblock), end
 
     def get_listblock(self, line_num, lines):
         def _get_code_block(_lines):
@@ -240,6 +265,19 @@ class reSTFileHandler(BaseHandler):
                 lines.append(u"{0}{1}\n".format(match.group(), result))
         return api, lines
 
+    def _call_for_lineblock(self, api_method, block_lines):
+        api, lines = None, []
+        for line in block_lines:
+            match = re.match(_LINEBLOCK, line)
+            if match:
+                prefix, text = match.groups()
+                _text = self.markup_paragraph_notranslate(text)
+                api, result = api_method(_text)
+                lines.append(u"{0}{1}\n".format(prefix, result))
+            else:
+                lines.append(line)
+        return api, lines
+
     def _call_for_listblock(self, api_method, block_lines):
         api, lines = None, []
         for line in block_lines:
@@ -270,6 +308,9 @@ class reSTFileHandler(BaseHandler):
                         ret = self._call_for_directive(
                                 api_method, block_lines)
                         lines = ret[1]
+                elif btype == self.block_type["lineblock"]:
+                    ret = self._call_for_lineblock(api_method, block_lines)
+                    lines = ret[1]
                 elif btype == self.block_type["listblock"]:
                     ret = self._call_for_listblock(api_method, block_lines)
                     lines = ret[1]
