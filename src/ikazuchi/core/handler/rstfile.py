@@ -28,20 +28,42 @@ _HYPER_LINK = [
     "^\.\.\s*_.*?:\s*http.*$",  # .. _link: http://xxx
 ]
 
-_PARAGRAPH_PTRN = re.compile(r"({0})".format("|".join(
-    _INLINE + _ROLE + _SECTION + _HYPER_LINK)), re.M)
+_RUBRIC = [
+    "\[#.*\]_",                 # [#f1]_
+    "^\.\.\s*\[#.*\].*$",       # .. [#f1] description
+]
+
+_REFFERENCE = [
+    "\[(?!#).*?\]_",            # [ref]_
+    "^\.\.\s*\[(?!#).*?\].*$",  # .. [ref] description
+
+]
+
+_NOTRANSLATE = _INLINE + _ROLE + _SECTION + _HYPER_LINK + \
+               _RUBRIC + _REFFERENCE
+_NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
+                               re.M | re.U)
 
 _DIRECTIVE = [
-    "^\s*::\s*",        # source code
-    "^\.\..*$",         # comment
-    "^\.\.\s+.+::.*$",  # .. xxx:: or .. xxx:: yyy
+    "^\s*::\s*$",           # source code
+    "^\.\..*(?<!::)$",      # comment
+    "^\.\.\s+.+::.*$",      # .. xxx:: or .. xxx:: yyy
 ]
 
 _DIRECTIVE_PTRN = re.compile(r"({0})".format("|".join(_DIRECTIVE)), re.U)
 
 _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
-      ^\.\.\s+note::.*$     # .. note::
-    | ^\.\.\s+seealso::.*$  # .. seealso::
+      ^\.\.\s+note::.*$         # .. note::
+    | ^\.\.\s+warning::.*$      # .. warning::
+    | ^\.\.\s+seealso::.*$      # .. seealso::
+    | ^\.\.\s+rubric::.*$       # .. rubric::
+    | ^\.\.\s+tip::.*$          # .. tip::
+    | ^\.\.\s+error::.*$        # .. error::
+    | ^\.\.\s+hint::.*$         # .. hint::
+    | ^\.\.\s+important::.*$    # .. important::
+    | ^\.\.\s+attention::.*$    # .. attention::
+    | ^\.\.\s+caution::.*$      # .. caution::
+    | ^\.\.\s+danger::.*$       # .. danger::
 )""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
@@ -97,6 +119,9 @@ class reSTFileHandler(BaseHandler):
                     # end of directive block is previous line of current
                     num -= 1
                     break
+            if num + 2 == len(_lines):
+                # reaching to EOF might not be found _PARAGRAPH_START
+                num += 1
             return num, _lines[0:num + 1]
 
         btype, block, directive, end = None, [], None, 0
@@ -153,11 +178,6 @@ class reSTFileHandler(BaseHandler):
                     lines = [match[0]]
         return _add_linebreak(lines)
 
-    def has_paragraph(self, directive):
-        if re.search(_DIRECTIVE_WITH_PARAGRAPH, directive):
-            return True
-        return False
-
     def _call_for_directive(self, api_method, block_lines):
         def _concatenate_lines(lines):
             _lines, prev_indent = [], None
@@ -200,7 +220,7 @@ class reSTFileHandler(BaseHandler):
                 print block_lines
                 if btype == self.block_type["directive"]:
                     lines = block_lines
-                    if self.has_paragraph(match):
+                    if re.search(_DIRECTIVE_WITH_PARAGRAPH, match):
                         ret = self._call_for_directive(api_method, block_lines)
                         lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
@@ -211,13 +231,9 @@ class reSTFileHandler(BaseHandler):
                 f.writelines(lines)
 
     @classmethod
-    def markup_directive_notranslate(self, text):
-        pass
-
-    @classmethod
     def markup_paragraph_notranslate(self, text):
         text = text.replace(u"&", u"&amp;")
         text = text.replace(u"<", u"&lt;")
         text = text.replace(u">", u"&gt;")
         repl = r"<span class=notranslate>\1</span>"
-        return re.sub(_PARAGRAPH_PTRN, repl, text)
+        return re.sub(_NOTRANSLATE_PTRN, repl, text)
