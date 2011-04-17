@@ -75,7 +75,7 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 ).*$""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
-_INDENT_PREFIX = re.compile(r"^\s+", re.U)
+_LINE_WITH_INDENT = re.compile(r"(^\s+)(.*?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^\S+.*$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r"[\.|\?|!|]", "utf-8"), re.M | re.U),
@@ -119,7 +119,7 @@ class reSTFileHandler(BaseHandler):
             if not info[0]:
                 info, skip_num = self.get_paragraph(num, lines)
             if not info[0]:  # others
-                info = (None, line, None)
+                info = (None, [line], None)
             blocks.append(info)
         return blocks
 
@@ -240,15 +240,15 @@ class reSTFileHandler(BaseHandler):
         def _concatenate_lines(lines):
             _lines, prev_indent = [], None
             for line in lines:
-                match = re.match(_INDENT_PREFIX, line)
+                match = re.search(_LINE_WITH_INDENT, line)
                 if re.search(_EMPTY_LINE, line) or not match:
                     _lines.append(line)
                     prev_indent = None
                 else:
-                    indent = match.group()
+                    indent, text = match.groups()
                     if prev_indent == indent:
                         _prev = _lines[-1].rstrip()
-                        _lines[-1] = u"{0} {1}".format(_prev, line.strip())
+                        _lines[-1] = u"{0} {1}".format(_prev, text)
                     else:
                         _lines.append(line)
                     prev_indent = indent
@@ -256,13 +256,14 @@ class reSTFileHandler(BaseHandler):
 
         api, lines = None, block_lines[:1]
         for line in _concatenate_lines(block_lines[1:]):
-            match = re.match(_INDENT_PREFIX, line)
+            match = re.search(_LINE_WITH_INDENT, line)
             if re.search(_EMPTY_LINE, line) or not match:
                 lines.append(line)
             else:
-                text = self.markup_paragraph_notranslate(line)
-                api, result = api_method(text)
-                lines.append(u"{0}{1}\n".format(match.group(), result))
+                indent, text = match.groups()
+                _text = self.markup_paragraph_notranslate(text)
+                api, result = api_method(_text)
+                lines.append(u"{0}{1}\n".format(indent, result))
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
