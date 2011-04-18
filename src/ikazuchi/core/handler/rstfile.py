@@ -256,6 +256,12 @@ class reSTFileHandler(BaseHandler):
                     lines = [match[0]]
         return _add_linebreak(lines)
 
+    def _call_keeping_prefix(self, api_method, line, match):
+        prefix, text = match.groups()
+        _text = self.markup_paragraph_notranslate(text)
+        api, result = api_method(_text)
+        return api, u"{0}{1}\n".format(prefix, result)
+
     def _call_for_directive(self, api_method, block_lines):
         def _concatenate_lines(lines):
             _lines, prev_indent = [], None
@@ -277,13 +283,9 @@ class reSTFileHandler(BaseHandler):
         api, lines = None, block_lines[:1]
         for line in _concatenate_lines(block_lines[1:]):
             match = re.search(_LINE_WITH_INDENT, line)
-            if re.search(_EMPTY_LINE, line) or not match:
-                lines.append(line)
-            else:
-                indent, text = match.groups()
-                _text = self.markup_paragraph_notranslate(text)
-                api, result = api_method(_text)
-                lines.append(u"{0}{1}\n".format(indent, result))
+            if match and not re.search(_EMPTY_LINE, line):
+                api, line = self._call_keeping_prefix(api_method, line, match)
+            lines.append(line)
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
@@ -291,25 +293,17 @@ class reSTFileHandler(BaseHandler):
         for line in block_lines:
             match = re.match(_LINEBLOCK, line)
             if match:
-                prefix, text = match.groups()
-                _text = self.markup_paragraph_notranslate(text)
-                api, result = api_method(_text)
-                lines.append(u"{0}{1}\n".format(prefix, result))
-            else:
-                lines.append(line)
+                api, line = self._call_keeping_prefix(api_method, line, match)
+            lines.append(line)
         return api, lines
 
     def _call_for_listblock(self, api_method, block_lines):
         api, lines = None, []
         for line in block_lines:
             match = re.match(_LISTBLOCK, line)
-            if re.search(_EMPTY_LINE, line) or not match:
-                lines.append(line)
-            else:
-                prefix, text = match.groups()
-                _text = self.markup_paragraph_notranslate(text)
-                api, result = api_method(_text)
-                lines.append(u"{0}{1}\n".format(prefix, result))
+            if match and not re.search(_EMPTY_LINE, line):
+                api, line = self._call_keeping_prefix(api_method, line, match)
+            lines.append(line)
         return api, lines
 
     def _call_for_paragraph(self, api_method, block_lines):
@@ -323,12 +317,8 @@ class reSTFileHandler(BaseHandler):
         for line in block_lines:
             match = re.search(_LINE_WITH_INDENT, line)
             if match:
-                prefix, text = match.groups()
-                _text = self.markup_paragraph_notranslate(text)
-                api, result = api_method(_text)
-                lines.append(u"{0}{1}\n".format(prefix, result))
-            else:
-                lines.append(line)
+                api, line = self._call_keeping_prefix(api_method, line, match)
+            lines.append(line)
         return api, lines
 
     def _call_method(self, api_method):
