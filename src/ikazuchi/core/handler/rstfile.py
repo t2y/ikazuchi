@@ -199,6 +199,9 @@ class reSTFileHandler(BaseHandler):
             for num, line in enumerate(_lines[1:]):
                 if line[0:2] == ".." or re.search(_EMPTY_LINE, line):
                     break
+            if num + 2 == len(_lines):
+                # reaching to EOF might not be found _PARAGRAPH_START
+                num += 1
             return num, _lines[0:num + 1]
 
         btype, block, paragraph, end = None, [], None, 0
@@ -226,8 +229,15 @@ class reSTFileHandler(BaseHandler):
             end, block = _get_code_block(lines[line_num:])
         return (btype, block, indent_paragraph), end
 
-    def get_lines_with_sentence(self, text):
+    def split_text_into_multiline(self, text):
         def _add_linebreak(lines):
+            def _get_indent_and_text(text):
+                indent = ""
+                match = re.search(_LINE_WITH_INDENT, text)
+                if match:
+                    indent, text = match.groups()
+                return indent, text
+
             # FIXME: more simple!
             _section_ptrn = re.compile(r"""
                 ([#|*|=|\-|^|"]{2,})?  # section bar or None
@@ -235,12 +245,13 @@ class reSTFileHandler(BaseHandler):
                 ([#|*|=|\-|^|"]{2,})   # section bar
             """, re.X)
             _lines = []
+            indent, lines[0] = _get_indent_and_text(lines[0])
             for line in lines:
                 m = re.findall(_section_ptrn, line)
                 if m and isinstance(m[0], tuple):
                     # for section
                     line = "\n".join(m[0]) if m[0][0] else "\n".join(m[0][1:])
-                _lines.append(u"{0}\n".format(line))
+                _lines.append(u"{0}{1}\n".format(indent, line))
             return _lines
 
         lines = [text]
@@ -255,6 +266,12 @@ class reSTFileHandler(BaseHandler):
                 else:
                     lines = [match[0]]
         return _add_linebreak(lines)
+
+    def _call_and_split(self, api_method, line):
+        _text = self.markup_paragraph_notranslate(line)
+        api, result = api_method(_text)
+        split_lines = self.split_text_into_multiline(result)
+        return api, split_lines
 
     def _call_keeping_prefix(self, api_method, line, match):
         prefix, text = match.groups()
@@ -306,19 +323,53 @@ class reSTFileHandler(BaseHandler):
             lines.append(line)
         return api, lines
 
+    def _concatenate_paragraph_line(self, lines):
+        _lines, prev_indent = [], None
+        for line in lines:
+            match = re.search(_LINE_WITH_INDENT, line)
+            if re.search(_EMPTY_LINE, line):
+                _lines.append(line)
+                prev_indent = None
+            elif match:
+                indent, text = match.groups()
+                if prev_indent == indent:
+                    _prev = _lines[-1].rstrip()
+                    _lines[-1] = u"{0} {1}".format(_prev, text)
+                else:
+                    _lines.append(line)
+                prev_indent = indent
+            elif _lines[-1:]:
+                _lines[-1] = u"{0} {1}".format(_lines[-1].rstrip(), line)
+                prev_indent = None
+            else:
+                _lines.append(line)
+        return _lines
+
     def _call_for_paragraph(self, api_method, block_lines):
-        text = u" ".join(t.strip() for t in block_lines)
-        _text = self.markup_paragraph_notranslate(text)
-        api, result = api_method(_text)
-        return api, result
+        api, lines = None, []
+        for line in self._concatenate_paragraph_line(block_lines):
+            match = re.search(_LINE_WITH_INDENT, line)
+            if re.search(_EMPTY_LINE, line):
+                lines.append(line)
+            else:
+                if match:
+                    api, line = self._call_keeping_prefix(
+                                    api_method, line, match)
+                    split_lines = self.split_text_into_multiline(line)
+                else:
+                    api, split_lines = self._call_and_split(api_method, line)
+                lines.extend(split_lines)
+        return api, lines
 
     def _call_for_indent_paragraph(self, api_method, block_lines):
         api, lines = None, []
-        for line in block_lines:
+        for line in self._concatenate_paragraph_line(block_lines):
             match = re.search(_LINE_WITH_INDENT, line)
             if match:
                 api, line = self._call_keeping_prefix(api_method, line, match)
-            lines.append(line)
+                lines.extend(self.split_text_into_multiline(line))
+            else:
+                lines.append(line)
         return api, lines
 
     def _call_method(self, api_method):
@@ -340,7 +391,7 @@ class reSTFileHandler(BaseHandler):
                     lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
-                    lines = self.get_lines_with_sentence(ret[1])
+                    lines = ret[1]
                 elif btype == self.block_type["indent_paragraph"]:
                     ret = self._call_for_indent_paragraph(
                                     api_method, block_lines)
