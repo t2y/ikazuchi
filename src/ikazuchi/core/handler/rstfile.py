@@ -44,8 +44,8 @@ _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
 
 _LISTBLOCK = re.compile(r"""(
-      ^[*|\-|\d|#]\.*\s+        # * list
-    | ^\s+[*|\-|\d|#]\.*\s+     #   * nested list
+      ^[*\-\d#]\.*\s+       # * list
+    | ^\s+[*\-\d#]\.*\s+    #   * nested list
 )(.*?)$""", re.U | re.X)
 
 _LINEBLOCK = re.compile(r"""(
@@ -75,11 +75,11 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 ).*$""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
-_LINE_WITH_INDENT = re.compile(r"(^\s+)(.*?)$", re.U)
+_LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^\S+.*$", re.U)
 _END_OF_SENTENCE = {
-    "en": re.compile(unicode(r"[\.|\?|!|]", "utf-8"), re.M | re.U),
-    "ja": re.compile(unicode(r"[\.|\?|!|。|．|？|！]", "utf-8"), re.M | re.U),
+    "en": re.compile(unicode(r"[\.\?!]", "utf-8"), re.M | re.U),
+    "ja": re.compile(unicode(r"[\.\?!。．？！]", "utf-8"), re.M | re.U),
 }
 
 class reSTFileHandler(BaseHandler):
@@ -89,9 +89,10 @@ class reSTFileHandler(BaseHandler):
 
     block_type = {
         "directive": "d",
-        "lineblock": "i",
-        "listblock": "l",
+        "lineblock": "ln",
+        "listblock": "ls",
         "paragraph": "p",
+        "indent_paragraph": "i",
     }
 
     def __init__(self, opts):
@@ -118,6 +119,8 @@ class reSTFileHandler(BaseHandler):
                 info, skip_num = self.get_listblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_paragraph(num, lines)
+            if not info[0]:
+                info, skip_num = self.get_indent_paragraph(num, lines)
             if not info[0]:  # others
                 info = (None, [line], None)
             blocks.append(info)
@@ -205,6 +208,23 @@ class reSTFileHandler(BaseHandler):
             paragraph = match.group()
             end, block = _get_code_block(lines[line_num:])
         return (btype, block, paragraph), end
+
+    def get_indent_paragraph(self, line_num, lines):
+        def _get_code_block(_lines):
+            num = 0
+            for num, line in enumerate(_lines):
+                if re.search(_EMPTY_LINE, line):
+                    num -= 1
+                    break
+            return num, _lines[0:num + 1]
+
+        btype, block, indent_paragraph, end = None, [], None, 0
+        match = re.search(_LINE_WITH_INDENT, lines[line_num])
+        if match:
+            btype = self.block_type["indent_paragraph"]
+            indent_paragraph = match.group()
+            end, block = _get_code_block(lines[line_num:])
+        return (btype, block, indent_paragraph), end
 
     def get_lines_with_sentence(self, text):
         def _add_linebreak(lines):
@@ -298,6 +318,19 @@ class reSTFileHandler(BaseHandler):
         api, result = api_method(_text)
         return api, result
 
+    def _call_for_indent_paragraph(self, api_method, block_lines):
+        api, lines = None, []
+        for line in block_lines:
+            match = re.search(_LINE_WITH_INDENT, line)
+            if match:
+                prefix, text = match.groups()
+                _text = self.markup_paragraph_notranslate(text)
+                api, result = api_method(_text)
+                lines.append(u"{0}{1}\n".format(prefix, result))
+            else:
+                lines.append(line)
+        return api, lines
+
     def _call_method(self, api_method):
         in_enc, out_enc = self.encoding
         with codecs.open(self.out_file, mode="w", encoding=out_enc) as f:
@@ -318,6 +351,10 @@ class reSTFileHandler(BaseHandler):
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
                     lines = self.get_lines_with_sentence(ret[1])
+                elif btype == self.block_type["indent_paragraph"]:
+                    ret = self._call_for_indent_paragraph(
+                                    api_method, block_lines)
+                    lines = ret[1]
                 else:
                     lines = block_lines
                 f.writelines(lines)
