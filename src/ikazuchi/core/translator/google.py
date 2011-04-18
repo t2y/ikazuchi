@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-import socket
 import urllib2
 from contextlib import closing
 from urllib import urlencode
+from utils import get_ip_address
 
 __all__ = [
     "GoogleTranslator",
@@ -22,7 +22,7 @@ class GoogleTranslator(object):
     common_path = "/ajax/services/language/"
     key = "ABQIAAAAK6kpHnylgmAYtO7ZX01XXRSvW2ISZ2KI4wU-F"\
           "k6WlRk77d73EhTtYeI1LUl3BfkKv-17KKEWzdRTMw"
-    userip = socket.gethostbyname(socket.gethostname())
+    userip = get_ip_address()
     q_format = "html"
 
     def __init__(self, lang_from, lang_to, handler):

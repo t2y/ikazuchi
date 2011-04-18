@@ -20,3 +20,11 @@ def call_api_with_multithread(api_method, target_lines):
         if t is not main_thread:
             t.join()
     return results
+
+def get_ip_address():
+    import socket
+    try:
+        ip = socket.gethostbyname(socket.gethostname())
+    except:
+        ip = "127.0.0.1"
+    return ip
