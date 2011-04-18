@@ -48,9 +48,34 @@ class AudioHandler(BaseHandler):
 
     def play_audio(self, file_name):
         import platform
-        import subprocess
         os_name = platform.system()
         if os_name == "Darwin":
+            import subprocess
             subprocess.call(["afplay", file_name])
+        elif os_name in ("Linux", "FreeBSD"):
+            self.play_with_ossaudiodev(file_name)
         else:
             print "Not supported for playing audio: {0}".format(os_name)
+
+    def play_with_ossaudiodev(self, file_name):
+        import sys
+        import sndhdr
+        from contextlib import closing, nested
+        from ossaudiodev import open as oss_open
+        from wave import open as wave_open
+        file_info = sndhdr.what(file_name)
+        if not file_info or file_info[0] != "wav":
+            print "Not supported audio file type"
+            return
+        with nested(closing(wave_open(file_name, "rb")),
+                    closing(oss_open("w"))) as (wav, dev):
+            nc, sw, fr, nf, comptype, compname = wav.getparams()
+            try:
+                from ossaudiodev import (AFMT_S16_NE, AFMT_S16_BE, AFMT_S16_LE)
+            except ImportError:
+                AFMT_S16_NE = AFMT_S16_BE
+                if sys.byteorder == "little":
+                    AFMT_S16_NE = AFMT_S16_LE
+            dev.setparameters(AFMT_S16_NE, nc, fr)
+            data = wav.readframes(nf)
+            dev.write(data)
