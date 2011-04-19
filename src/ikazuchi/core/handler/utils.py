@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 def get_multiline(lines, range_num):
-    """ read lines every range_num 
+    """ read lines every range_num
     >>> list(get_multiline(["a", "b", "c"], 2))
     [['a', 'b'], ['b', 'c']]
     >>> list(get_multiline(["a", "b", "c", "d"], 2))

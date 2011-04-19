@@ -4,6 +4,7 @@ import codecs
 import re
 from base import BaseHandler
 from ikazuchi.core.translator.utils import call_api_with_multithread
+from utils import *
 
 try:
     from ikazuchi.locale import _
@@ -150,22 +151,10 @@ class reSTFileHandler(BaseHandler):
         return (btype, block, directive), end
 
     def get_lineblock(self, line_num, lines):
-        def _get_code_block(_lines):
-            num = 0
-            for num, line in enumerate(_lines):
-                if not re.search(_LINEBLOCK, line):
-                    # end of line block is previous line of current
-                    num -= 1
-                    break
-            return num, _lines[0:num + 1]
-
-        btype, block, lineblock, end = None, [], None, 0
-        match = re.search(_LINEBLOCK, lines[line_num])
-        if match:
-            btype = self.block_type["lineblock"]
-            lineblock = match.groups()[0]
-            end, block = _get_code_block(lines[line_num:])
-        return (btype, block, lineblock), end
+        _cmp = lambda line: not re.search(_LINEBLOCK, line)
+        bnum, block = get_sequential_block(lines[line_num:], _cmp)
+        btype = self.block_type["lineblock"] if bnum > 0 else None
+        return (btype, block, []), bnum
 
     def get_listblock(self, line_num, lines):
         def _get_code_block(_lines):
@@ -213,21 +202,12 @@ class reSTFileHandler(BaseHandler):
         return (btype, block, paragraph), end
 
     def get_indent_paragraph(self, line_num, lines):
-        def _get_code_block(_lines):
-            num = 0
-            for num, line in enumerate(_lines):
-                if re.search(_EMPTY_LINE, line):
-                    num -= 1
-                    break
-            return num, _lines[0:num + 1]
-
-        btype, block, indent_paragraph, end = None, [], None, 0
-        match = re.search(_LINE_WITH_INDENT, lines[line_num])
-        if match:
+        btype, block, bnum = None, [], 0
+        if re.search(_LINE_WITH_INDENT, lines[line_num]):
             btype = self.block_type["indent_paragraph"]
-            indent_paragraph = match.group()
-            end, block = _get_code_block(lines[line_num:])
-        return (btype, block, indent_paragraph), end
+            _cmp = lambda line: re.search(_EMPTY_LINE, line)
+            bnum, block = get_sequential_block(lines[line_num:], _cmp)
+        return (btype, block, []), bnum
 
     def split_text_into_multiline(self, text):
         def _add_linebreak(lines):

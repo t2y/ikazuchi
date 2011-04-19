@@ -47,5 +47,5 @@ def test_call_api_with_multithread():
         sleep(0.1)
         return num
     from time import sleep
-    args = range(30)
+    args = range(1, 30)
     assert_equal(args, call_api_with_multithread(dummy_func, args))
