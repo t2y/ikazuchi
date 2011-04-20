@@ -84,7 +84,7 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
 _LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
-_PARAGRAPH_START = re.compile(r"^\S+.*$", re.U)
+_PARAGRAPH_START = re.compile(r"^([\S\.]+)(.*?)$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r"[\.\?!]", "utf-8"), re.M | re.U),
     "ja": re.compile(unicode(r"[\.\?!。．？！]", "utf-8"), re.M | re.U),
@@ -182,7 +182,7 @@ class reSTFileHandler(BaseHandler):
                     num -= 1
                     break
             if num + 2 == len(_lines):
-                # reaching to EOF might not be found _PARAGRAPH_START
+                # reaching to EOF might not be found _LISTBLOCK
                 num += 1
             return num, _lines[0:num + 1]
 
@@ -204,23 +204,13 @@ class reSTFileHandler(BaseHandler):
         return (btype, block, []), bnum
 
     def get_paragraph(self, line_num, lines):
-        def _get_code_block(_lines):
-            num = 0
-            for num, line in enumerate(_lines[1:]):
-                if line[0:2] == ".." or re.search(_EMPTY_LINE, line):
-                    break
-            if num + 2 == len(_lines):
-                # reaching to EOF might not be found _PARAGRAPH_START
-                num += 1
-            return num, _lines[0:num + 1]
-
-        btype, block, paragraph, end = None, [], None, 0
+        btype, block, bnum = None, [], 0
         match = re.search(_PARAGRAPH_START, lines[line_num])
         if match:
             btype = self.block_type["paragraph"]
-            paragraph = match.group()
-            end, block = _get_code_block(lines[line_num:])
-        return (btype, block, paragraph), end
+            _cmp = lambda line: re.search(_EMPTY_LINE, line)
+            bnum, block = get_sequential_block(lines[line_num:], _cmp)
+        return (btype, block, []), bnum
 
     def get_indent_paragraph(self, line_num, lines):
         btype, block, bnum = None, [], 0
