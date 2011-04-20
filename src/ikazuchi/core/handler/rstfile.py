@@ -324,6 +324,104 @@ class reSTFileHandler(BaseHandler):
             lines.append(line)
         return api, lines
 
+    def _get_table_column_width(self, max_width, east_asian_width, items):
+        _columns = []
+        for num, text in enumerate(items):
+            text_width = get_east_asian_width(text)
+            if max_width[num] < text_width:
+                max_width[num] = text_width
+            _columns.append(text_width)
+        east_asian_width.append(_columns)
+
+    def _call_for_gridtable(self, api_method, block_lines, column_length):
+        api, results = None, []
+        # remove first/last column since it is empty column
+        max_width = [0] * (column_length - 2)
+        east_asian_width = []
+        for line in block_lines:
+            indent, line = self.get_indent_and_text(line)
+            d = re.search(_TABLEBLOCK, line).groupdict()
+            if d.get("grid_rule"):
+                items = line.split("+")[1:-1]
+            elif d.get("grid_rows"):
+                _items = [i.strip().rstrip() for i in line.split("|")]
+                _items = _items[1:-1]
+                items = call_api_with_multithread(api_method, _items)
+                api = items[0][0]
+                items = [text for _, text in items]
+            else:
+                items = [line]
+            self._get_table_column_width(max_width, east_asian_width, items)
+            results.append(items)
+
+        # format table block considering its width
+        lines = []
+        rule_fmt = u"#+#".join(u"{%s:{%s}}" % (num, num + 1)
+                            for num in range(0, len(max_width) * 2, 2))
+        rule_fmt = u"+#{0}{1}#+\n".format(indent, rule_fmt)
+        row_fmt = u" | ".join(u"{%s:{%s}}" % (num, num + 1)
+                            for num in range(0, len(max_width) * 2, 2))
+        row_fmt = u"| {0}{1} |\n".format(indent, row_fmt)
+        for rnum, row in enumerate(results):
+            _width = list(max_width)  # copy
+            len_width = map(len, row)
+            rule_flag = False
+            if re.search(r"[\-=]+\s*", row[0], re.U):
+                rule_flag = True
+            for cnum, col in enumerate(row):
+                if rule_flag:
+                    row[cnum] = col[0] * max_width[cnum]
+                else:
+                    _width[cnum] = max_width[cnum] - (
+                        east_asian_width[rnum][cnum] - len_width[cnum])
+            if rule_flag:
+                _line = rule_fmt.format(*zip_with_flatlist(row, _width))
+                _line = _line.replace("#", row[0][0])
+            else:
+                _line = row_fmt.format(*zip_with_flatlist(row, _width))
+            lines.append(_line)
+        return api, lines
+
+    def _call_for_simpletable(self, api_method, block_lines, column_length):
+        api, results = None, []
+        max_width = [0] * column_length
+        east_asian_width = []
+        for line in block_lines:
+            indent, line = self.get_indent_and_text(line)
+            d = re.search(_TABLEBLOCK, line).groupdict()
+            if d.get("simple_rule"):
+                items = line.split()
+                simple_rule_width = map(len, items)
+            elif d.get("simple_rows"):
+                _items = []
+                for column_width in simple_rule_width:
+                    _items.append(line[0:column_width].strip())
+                    line = line[column_width:].strip()
+                items = call_api_with_multithread(api_method, _items)
+                api = items[0][0]
+                items = [text for _, text in items]
+            else:
+                items = [line]
+            self._get_table_column_width(max_width, east_asian_width, items)
+            results.append(items)
+
+        # format table block considering its width
+        lines = []
+        fmt = u"  ".join(u"{%s:{%s}}" % (num, num + 1)
+                         for num in range(0, len(max_width) * 2, 2))
+        fmt = u"{0}{1}\n".format(indent, fmt)
+        for rnum, row in enumerate(results):
+            _width = list(max_width)  # copy
+            len_width = map(len, row)
+            for cnum, col in enumerate(row):
+                if re.search(r"=+", col, re.U):
+                    row[cnum] = col[0] * max_width[cnum]
+                else:
+                    _width[cnum] = max_width[cnum] - (
+                        east_asian_width[rnum][cnum] - len_width[cnum])
+            lines.append(fmt.format(*zip_with_flatlist(row, _width)))
+        return api, lines
+
     def _call_for_tableblock(self, api_method, block_lines):
         def _get_column_length(line):
             table_type, length = None, 0
@@ -338,92 +436,13 @@ class reSTFileHandler(BaseHandler):
                     length = len(line.split())
             return table_type, length
 
-        def _get_column_width(max_width, east_asian_width, items):
-            _columns = []
-            for num, text in enumerate(items):
-                text_width = get_east_asian_width(text)
-                if max_width[num] < text_width:
-                    max_width[num] = text_width
-                _columns.append(text_width)
-            east_asian_width.append(_columns)
-
-        api, results = None, []
-        simple_rule_width = []
-        table_type, column_length = _get_column_length(block_lines[0])
-        max_width = [0] * column_length
-        east_asian_width = []
-        for line in block_lines:
-            indent, line = self.get_indent_and_text(line)
-            match = re.search(_TABLEBLOCK, line)
-            if match:
-                d = match.groupdict()
-                if d.get("grid_rule"):
-                    items = line.split("+")[1:-1]
-                elif d.get("grid_rows"):
-                    _items = [i.strip().rstrip() for i in line.split("|")]
-                    _items = _items[1:-1]
-                    items = call_api_with_multithread(api_method, _items)
-                    api = items[0][0]
-                    items = [text for _, text in items]
-                elif d.get("simple_rule"):
-                    items = line.split()
-                    simple_rule_width = map(len, items)
-                elif d.get("simple_rows"):
-                    _items = []
-                    for column_width in simple_rule_width:
-                        _items.append(line[0:column_width].strip())
-                        line = line[column_width:].strip()
-                    items = call_api_with_multithread(api_method, _items)
-                    api = items[0][0]
-                    items = [text for _, text in items]
-                else:
-                    items = [line]
-                _get_column_width(max_width, east_asian_width, items)
-                results.append(items)
-
-        # format table block considering its width
-        lines = []
-        _calc_fmt_width = (lambda rnum, cnum: max_width[cnum] - (
-                           east_asian_width[rnum][cnum] - len_width[cnum]))
+        table_type, col_len = _get_column_length(block_lines[0])
+        max_width = [0] * col_len
         if table_type == "grid":
-            max_width = max_width[:-2]  # remove empty column
-            rule_fmt = u"#+#".join(u"{%s:{%s}}" % (num, num + 1)
-                            for num in range(0, len(max_width) * 2, 2))
-            rule_fmt = u"+#{0}{1}#+\n".format(indent, rule_fmt)
-            row_fmt = u" | ".join(u"{%s:{%s}}" % (num, num + 1)
-                            for num in range(0, len(max_width) * 2, 2))
-            row_fmt = u"| {0}{1} |\n".format(indent, row_fmt)
-            for rnum, row in enumerate(results):
-                _width = list(max_width)  # copy
-                len_width = map(len, row)
-                rule_flag = False
-                if re.search(r"[\-=]+\s*", row[0], re.U):
-                    rule_flag = True
-                for cnum, col in enumerate(row):
-                    if rule_flag:
-                        row[cnum] = col[0] * max_width[cnum]
-                    else:
-                        _width[cnum] = _calc_fmt_width(rnum, cnum)
-                if rule_flag:
-                    _line = rule_fmt.format(*zip_with_flatlist(row, _width))
-                    _line = _line.replace("#", row[0][0])
-                else:
-                    _line = row_fmt.format(*zip_with_flatlist(row, _width))
-                lines.append(_line)
+            ret = self._call_for_gridtable(api_method, block_lines, col_len)
         elif table_type == "simple":
-            fmt = u"  ".join(u"{%s:{%s}}" % (num, num + 1)
-                             for num in range(0, len(max_width) * 2, 2))
-            fmt = u"{0}{1}\n".format(indent, fmt)
-            for rnum, row in enumerate(results):
-                _width = list(max_width)  # copy
-                len_width = map(len, row)
-                for cnum, col in enumerate(row):
-                    if re.search(r"=+", col, re.U):
-                        row[cnum] = col[0] * max_width[cnum]
-                    else:
-                        _width[cnum] = _calc_fmt_width(rnum, cnum)
-                lines.append(fmt.format(*zip_with_flatlist(row, _width)))
-        return api, lines
+            ret = self._call_for_simpletable(api_method, block_lines, col_len)
+        return ret
 
     def _concatenate_paragraph_line(self, lines):
         _lines, prev_indent = [], None
