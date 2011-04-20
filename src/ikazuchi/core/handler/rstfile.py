@@ -345,7 +345,7 @@ class reSTFileHandler(BaseHandler):
                 items = line.split("+")[1:-1]
             elif d.get("grid_rows"):
                 _items = [i.strip().rstrip() for i in line.split("|")]
-                _items = _items[1:-1]
+                _items = map(self.markup_paragraph_notranslate, _items[1:-1])
                 items = call_api_with_multithread(api_method, _items)
                 api = items[0][0]
                 items = [text for _, text in items]
@@ -395,8 +395,9 @@ class reSTFileHandler(BaseHandler):
             elif d.get("simple_rows"):
                 _items = []
                 for column_width in simple_rule_width:
-                    _items.append(line[0:column_width].strip())
-                    line = line[column_width:].strip()
+                    _text = line[0:column_width].strip()
+                    _items.append(self.markup_paragraph_notranslate(_text))
+                    line = line[column_width:].strip()  # overwrite line
                 items = call_api_with_multithread(api_method, _items)
                 api = items[0][0]
                 items = [text for _, text in items]
