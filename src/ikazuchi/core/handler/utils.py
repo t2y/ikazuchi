@@ -41,3 +41,35 @@ def get_sequential_block(lines, compare_func):
         # maybe read out to EOF
         num += 1
     return num, lines[0:num + 1]
+
+def get_east_asian_width(unicode_str):
+    """
+    Na: Narrow    1 半角英数
+    H : Halfwidth 1 半角カナ
+    W : Wide      2 全角文字
+    F : Fullwidth 2 全角英数
+    N : Neutral   1 アラビア文字
+    A : Ambiguous 1 ギリシア文字、キリル文字(locale で幅が違う)
+    >>> get_east_asian_width(unicode("1２3あいうabc", "utf-8"))
+    13
+    >>> get_east_asian_width(unicode("ﾊﾝｶｸｶﾅはどうかな？", "utf-8"))
+    18
+    """
+    from unicodedata import east_asian_width
+    width = 0
+    for i in unicode_str:
+        width += 1
+        if east_asian_width(i) in ("W", "F"):
+            width += 1
+    return width
+
+def zip_with_flatlist(list1, list2):
+    """
+    >>> zip_with_flatlist(range(3), range(3,6))
+    [0, 3, 1, 4, 2, 5]
+    """
+    _list = []
+    for i, j in zip(list1, list2):
+        _list.append(i)
+        _list.append(j)
+    return _list

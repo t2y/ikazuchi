@@ -53,6 +53,13 @@ _LINEBLOCK = re.compile(r"""(
     ^\|\s+  # | line block
 )(.*?)$""", re.U | re.X)
 
+_TABLEBLOCK = re.compile(r"""(
+      (?P<grid_rule>^\s*\+([\-=]+\+)+\s*)       # grid table rule
+    | (?P<grid_rows>^\s*\|(.*?\|)+\s*)          # grid table rows
+    | (?P<simple_rule>^\s*=+(\s+=+){2,}\s*)     # simple table rule
+    | (?P<simple_rows>^\s*.*?(\s+.*?){2,}\s*)   # simple table rows
+)$""", re.U | re.X)
+
 _DIRECTIVE = [
     "^\s*::\s*$",           # source code
     "^\.\..*(?<!::)$",      # comment
@@ -94,6 +101,7 @@ class reSTFileHandler(BaseHandler):
         "listblock": "ls",
         "paragraph": "p",
         "indent_paragraph": "i",
+        "tableblock": "t",
     }
 
     def __init__(self, opts):
@@ -118,6 +126,8 @@ class reSTFileHandler(BaseHandler):
                 info, skip_num = self.get_lineblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_listblock(num, lines)
+            if not info[0]:
+                info, skip_num = self.get_tableblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_paragraph(num, lines)
             if not info[0]:
@@ -151,9 +161,11 @@ class reSTFileHandler(BaseHandler):
         return (btype, block, directive), end
 
     def get_lineblock(self, line_num, lines):
-        _cmp = lambda line: not re.search(_LINEBLOCK, line)
-        bnum, block = get_sequential_block(lines[line_num:], _cmp)
-        btype = self.block_type["lineblock"] if bnum > 0 else None
+        btype, block, bnum = None, [], 0
+        if re.search(_LINEBLOCK, lines[line_num]):
+            btype = self.block_type["lineblock"]
+            _cmp = lambda line: not re.search(_LINEBLOCK, line)
+            bnum, block = get_sequential_block(lines[line_num:], _cmp)
         return (btype, block, []), bnum
 
     def get_listblock(self, line_num, lines):
@@ -182,6 +194,15 @@ class reSTFileHandler(BaseHandler):
             end, block = _get_code_block(lines[line_num:])
         return (btype, block, listblock), end
 
+    def get_tableblock(self, line_num, lines):
+        btype, block, bnum = None, [], 0
+        match = re.search(_TABLEBLOCK, lines[line_num])
+        if match and not match.groupdict().get("simple_rows"):
+            btype = self.block_type["tableblock"]
+            _cmp = lambda line: not re.search(_TABLEBLOCK, line)
+            bnum, block = get_sequential_block(lines[line_num:], _cmp)
+        return (btype, block, []), bnum
+
     def get_paragraph(self, line_num, lines):
         def _get_code_block(_lines):
             num = 0
@@ -209,15 +230,15 @@ class reSTFileHandler(BaseHandler):
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
         return (btype, block, []), bnum
 
+    def get_indent_and_text(self, line):
+        indent, text = "", line
+        match = re.search(_LINE_WITH_INDENT, line)
+        if match:
+            indent, text = match.groups()
+        return indent, text
+
     def split_text_into_multiline(self, text):
         def _add_linebreak(lines):
-            def _get_indent_and_text(text):
-                indent = ""
-                match = re.search(_LINE_WITH_INDENT, text)
-                if match:
-                    indent, text = match.groups()
-                return indent, text
-
             # FIXME: more simple!
             _section_ptrn = re.compile(r"""
                 ([#|*|=|\-|^|"]{2,})?  # section bar or None
@@ -225,7 +246,7 @@ class reSTFileHandler(BaseHandler):
                 ([#|*|=|\-|^|"]{2,})   # section bar
             """, re.X)
             _lines = []
-            indent, lines[0] = _get_indent_and_text(lines[0])
+            indent, lines[0] = self.get_indent_and_text(lines[0])
             for line in lines:
                 m = re.findall(_section_ptrn, line)
                 if m and isinstance(m[0], tuple):
@@ -303,6 +324,107 @@ class reSTFileHandler(BaseHandler):
             lines.append(line)
         return api, lines
 
+    def _call_for_tableblock(self, api_method, block_lines):
+        def _get_column_length(line):
+            table_type, length = None, 0
+            match = re.search(_TABLEBLOCK, line)
+            if match:
+                d = match.groupdict()
+                if d.get("grid_rule"):
+                    table_type = "grid"
+                    length = len(line.split("+"))
+                elif d.get("simple_rule"):
+                    table_type = "simple"
+                    length = len(line.split())
+            return table_type, length
+
+        def _get_column_width(max_width, east_asian_width, items):
+            _columns = []
+            for num, text in enumerate(items):
+                text_width = get_east_asian_width(text)
+                if max_width[num] < text_width:
+                    max_width[num] = text_width
+                _columns.append(text_width)
+            east_asian_width.append(_columns)
+
+        api, results = None, []
+        simple_rule_width = []
+        table_type, column_length = _get_column_length(block_lines[0])
+        max_width = [0] * column_length
+        east_asian_width = []
+        for line in block_lines:
+            indent, line = self.get_indent_and_text(line)
+            match = re.search(_TABLEBLOCK, line)
+            if match:
+                d = match.groupdict()
+                if d.get("grid_rule"):
+                    items = line.split("+")[1:-1]
+                elif d.get("grid_rows"):
+                    _items = [i.strip().rstrip() for i in line.split("|")]
+                    _items = _items[1:-1]
+                    items = call_api_with_multithread(api_method, _items)
+                    api = items[0][0]
+                    items = [text for _, text in items]
+                elif d.get("simple_rule"):
+                    items = line.split()
+                    simple_rule_width = map(len, items)
+                elif d.get("simple_rows"):
+                    _items = []
+                    for column_width in simple_rule_width:
+                        _items.append(line[0:column_width].strip())
+                        line = line[column_width:].strip()
+                    items = call_api_with_multithread(api_method, _items)
+                    api = items[0][0]
+                    items = [text for _, text in items]
+                else:
+                    items = [line]
+                _get_column_width(max_width, east_asian_width, items)
+                results.append(items)
+
+        # format table block considering its width
+        lines = []
+        _calc_fmt_width = (lambda rnum, cnum: max_width[cnum] - (
+                           east_asian_width[rnum][cnum] - len_width[cnum]))
+        if table_type == "grid":
+            max_width = max_width[:-2]  # remove empty column
+            rule_fmt = u"#+#".join(u"{%s:{%s}}" % (num, num + 1)
+                            for num in range(0, len(max_width) * 2, 2))
+            rule_fmt = u"+#{0}{1}#+\n".format(indent, rule_fmt)
+            row_fmt = u" | ".join(u"{%s:{%s}}" % (num, num + 1)
+                            for num in range(0, len(max_width) * 2, 2))
+            row_fmt = u"| {0}{1} |\n".format(indent, row_fmt)
+            for rnum, row in enumerate(results):
+                _width = list(max_width)  # copy
+                len_width = map(len, row)
+                rule_flag = False
+                if re.search(r"[\-=]+\s*", row[0], re.U):
+                    rule_flag = True
+                for cnum, col in enumerate(row):
+                    if rule_flag:
+                        row[cnum] = col[0] * max_width[cnum]
+                    else:
+                        _width[cnum] = _calc_fmt_width(rnum, cnum)
+                if rule_flag:
+                    _line = rule_fmt.format(*zip_with_flatlist(row, _width))
+                    _line = _line.replace("#", row[0][0])
+                else:
+                    _line = row_fmt.format(*zip_with_flatlist(row, _width))
+                lines.append(_line)
+        elif table_type == "simple":
+            fmt = u"  ".join(u"{%s:{%s}}" % (num, num + 1)
+                             for num in range(0, len(max_width) * 2, 2))
+            fmt = u"{0}{1}\n".format(indent, fmt)
+            for rnum, row in enumerate(results):
+                _width = list(max_width)  # copy
+                len_width = map(len, row)
+                for cnum, col in enumerate(row):
+                    if re.search(r"=+", col, re.U):
+                        row[cnum] = col[0] * max_width[cnum]
+                    else:
+                        _width[cnum] = _calc_fmt_width(rnum, cnum)
+                lines.append(fmt.format(*zip_with_flatlist(row, _width)))
+        return api, lines
+
     def _concatenate_paragraph_line(self, lines):
         _lines, prev_indent = [], None
         for line in lines:
@@ -355,11 +477,11 @@ class reSTFileHandler(BaseHandler):
     def _call_method(self, api_method):
         in_enc, out_enc = self.encoding
         with codecs.open(self.out_file, mode="w", encoding=out_enc) as f:
-            for btype, block_lines, match in self.blocks:
-                print block_lines
+            for btype, block_lines, first in self.blocks:
+                print btype, block_lines
                 if btype == self.block_type["directive"]:
                     lines = block_lines
-                    if re.search(_DIRECTIVE_WITH_PARAGRAPH, match):
+                    if re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
                         ret = self._call_for_directive(
                                 api_method, block_lines)
                         lines = ret[1]
@@ -368,6 +490,9 @@ class reSTFileHandler(BaseHandler):
                     lines = ret[1]
                 elif btype == self.block_type["listblock"]:
                     ret = self._call_for_listblock(api_method, block_lines)
+                    lines = ret[1]
+                elif btype == self.block_type["tableblock"]:
+                    ret = self._call_for_tableblock(api_method, block_lines)
                     lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
