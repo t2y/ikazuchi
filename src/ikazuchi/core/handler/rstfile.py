@@ -20,10 +20,6 @@ _ROLE = [
     ":.*?:`.*?`",   # :role:`xxx`
 ]
 
-_SECTION = [
-    '^[#*=\-^"]{2,}$',     # ===
-]
-
 _HYPER_LINK = [
     "`.*?\s*`_",    # `link <http://xxx>`_ or `link`_
     "^\.\.\s*_.*?:\s*http.*$",  # .. _link: http://xxx
@@ -39,10 +35,17 @@ _REFFERENCE = [
     "^\.\.\s*\[(?!#).*?\].*$",  # .. [ref] description
 ]
 
-_NOTRANSLATE = _INLINE + _ROLE + _SECTION + _HYPER_LINK + \
-               _RUBRIC + _REFFERENCE
+_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFFERENCE
 _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
+
+_SECTION = re.compile(r"""
+    (?P<over_line>[#*=\-^"]{2,}\s+)?    # =======
+    (?P<section>.*?\s+)                 # section
+    (?P<under_line>[#*=\-^"]{2,}\s+)    # =======
+""", re.U | re.X)
+
+_SECTION_LINE = re.compile(r'^[#*=\-^"]{2,}\s+', re.U)
 
 _LISTBLOCK = re.compile(r"""(
       ^[*\-\d#]\.*\s+       # * list
@@ -102,6 +105,7 @@ class reSTFileHandler(BaseHandler):
         "paragraph": "p",
         "indent_paragraph": "i",
         "tableblock": "t",
+        "section": "s",
     }
 
     def __init__(self, opts):
@@ -128,6 +132,8 @@ class reSTFileHandler(BaseHandler):
                 info, skip_num = self.get_listblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_tableblock(num, lines)
+            if not info[0]:
+                info, skip_num = self.get_section(num, lines)
             if not info[0]:
                 info, skip_num = self.get_paragraph(num, lines)
             if not info[0]:
@@ -203,6 +209,27 @@ class reSTFileHandler(BaseHandler):
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
         return (btype, block, []), bnum
 
+    def get_section(self, line_num, lines):
+        def _get_code_block(_lines):
+            num, section = 0, []
+            for mline in get_multiline(_lines, 3):
+                match = re.search(_SECTION, "".join(mline))
+                if re.search(_EMPTY_LINE, mline[0]):
+                    break
+                elif match:
+                    d = match.groupdict()
+                    if (d.get("over_line") and d.get("section")) or \
+                       (d.get("under_line") and d.get("section")):
+                        num, section = 2, mline
+                        break
+            return num, section
+
+        btype = None
+        bnum, block = _get_code_block(lines[line_num:])
+        if bnum > 0:
+            btype = self.block_type["section"]
+        return (btype, block, []), bnum
+
     def get_paragraph(self, line_num, lines):
         btype, block, bnum = None, [], 0
         match = re.search(_PARAGRAPH_START, lines[line_num])
@@ -265,7 +292,9 @@ class reSTFileHandler(BaseHandler):
         return api, split_lines
 
     def _call_keeping_prefix(self, api_method, line, match):
-        prefix, text = match.groups()
+        prefix, text = "", line
+        if match:
+            prefix, text = match.groups()
         _text = self.markup_paragraph_notranslate(text)
         api, result = api_method(_text)
         return api, u"{0}{1}\n".format(prefix, result)
@@ -435,6 +464,23 @@ class reSTFileHandler(BaseHandler):
             ret = self._call_for_simpletable(api_method, block_lines, col_len)
         return ret
 
+    def _call_for_section(self, api_method, block_lines):
+        api, results, width = None, [], 0
+        for line in block_lines:
+            if not re.search(_EMPTY_LINE, line) and \
+               not re.search(_SECTION_LINE, line):
+                match = re.search(_LINE_WITH_INDENT, line)
+                api, line = self._call_keeping_prefix(api_method, line, match)
+                width = get_east_asian_width(line) - 1  # -1 is linebreak
+            results.append(line)
+
+        lines = []
+        for num, line in enumerate(results):
+            if re.search(r'[#*=\-^"]{2,}\s+', line):
+                line = u"{0}\n".format(line[0] * width)
+            lines.append(line)
+        return api, lines
+
     def _concatenate_paragraph_line(self, lines):
         _lines, prev_indent = [], None
         for line in lines:
@@ -503,6 +549,9 @@ class reSTFileHandler(BaseHandler):
                     lines = ret[1]
                 elif btype == self.block_type["tableblock"]:
                     ret = self._call_for_tableblock(api_method, block_lines)
+                    lines = ret[1]
+                elif btype == self.block_type["section"]:
+                    ret = self._call_for_section(api_method, block_lines)
                     lines = ret[1]
                 elif btype == self.block_type["paragraph"]:
                     ret = self._call_for_paragraph(api_method, block_lines)
