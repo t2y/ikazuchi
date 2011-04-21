@@ -89,8 +89,8 @@ _EMPTY_LINE = re.compile(r"^\s*$", re.U)
 _LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^([\S\.]+)(.*?)$", re.U)
 _END_OF_SENTENCE = {
-    "en": re.compile(unicode(r"[\.\?!]", "utf-8"), re.M | re.U),
-    "ja": re.compile(unicode(r"[\.\?!。．？！]", "utf-8"), re.M | re.U),
+    "en": re.compile(unicode(r".*?[\.\?!]", "utf-8"), re.M | re.U),
+    "ja": re.compile(unicode(r".*?[\.\?!。．？！]", "utf-8"), re.M | re.U),
 }
 
 class reSTFileHandler(BaseHandler):
@@ -255,35 +255,12 @@ class reSTFileHandler(BaseHandler):
         return indent, text
 
     def split_text_into_multiline(self, text):
-        def _add_linebreak(lines):
-            # FIXME: more simple!
-            _section_ptrn = re.compile(r"""
-                ([#|*|=|\-|^|"]{2,})?  # section bar or None
-                (.*?)                  # section title
-                ([#|*|=|\-|^|"]{2,})   # section bar
-            """, re.X)
-            _lines = []
-            indent, lines[0] = self.get_indent_and_text(lines[0])
-            for line in lines:
-                m = re.findall(_section_ptrn, line)
-                if m and isinstance(m[0], tuple):
-                    # for section
-                    line = "\n".join(m[0]) if m[0][0] else "\n".join(m[0][1:])
-                _lines.append(u"{0}{1}\n".format(indent, line))
-            return _lines
-
-        lines = [text]
         eos_ptrn = _END_OF_SENTENCE.get(self.lang_to) or _END_OF_SENTENCE["en"]
-        sentence_num = len(re.findall(eos_ptrn, text))
-        if sentence_num > 0:
-            ptrn = u"(.*?{0})".format(eos_ptrn.pattern) * sentence_num
-            match = re.findall(ptrn, text)
-            if match:
-                if isinstance(match[0], tuple):
-                    lines = list(match[0])
-                else:
-                    lines = [match[0]]
-        return _add_linebreak(lines)
+        _lines = re.findall(eos_ptrn, text)
+        if not _lines:
+            _lines = [text]
+        indent, _ = self.get_indent_and_text(_lines[0])
+        return [u"{0}{1}\n".format(indent, line) for line in _lines]
 
     def _call_and_split(self, api_method, line):
         _text = self.markup_paragraph_notranslate(line)
