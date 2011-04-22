@@ -32,12 +32,10 @@ def get_sequential_block(lines, compare_func):
     (2, ['a', 'b', 'c'])
     """
     num = 0
-    break_flag = False
     for num, mline in enumerate(get_multiline(lines, 2)):
         if compare_func(mline[1]):
-            break_flag = True
             break
-    if lines and not break_flag:
+    else:
         # maybe read out to EOF
         num += 1
     return num, lines[0:num + 1]

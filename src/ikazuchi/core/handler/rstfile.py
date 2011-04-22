@@ -64,13 +64,13 @@ _TABLEBLOCK = re.compile(r"""(
     | (?P<simple_rows>^\s*.*?(\s+.*?){2,}\s*)   # simple table rows
 )$""", re.U | re.X)
 
-_DIRECTIVE = [
-    "^\s*::\s*$",           # source code
-    "^\.\..*(?<!::)$",      # comment
-    "^\.\.\s+.+::.*$",      # .. xxx:: or .. xxx:: yyy
-]
+_SOURCE_CODE = re.compile(r"^.*?::\s*$", re.U)
 
-_DIRECTIVE_PTRN = re.compile(r"({0})".format("|".join(_DIRECTIVE)), re.U)
+_DIRECTIVE = re.compile(r"""(
+      {0}               # source code
+    | ^\.\..*(?<!::)    # comment
+    | ^\.\.\s+.+::.*    # .. xxx:: or .. xxx:: yyy
+)$""".format(_SOURCE_CODE), re.U | re.X)
 
 _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
       ^\.\.\s+note::        # .. note::
@@ -106,7 +106,8 @@ class reSTFileHandler(BaseHandler):
         "paragraph": "p",
         "indent_paragraph": "i",
         "tableblock": "t",
-        "section": "s",
+        "section": "se",
+        "source": "so",
     }
 
     def __init__(self, opts):
@@ -128,6 +129,8 @@ class reSTFileHandler(BaseHandler):
                 continue
             info, skip_num = self.get_directive(num, lines)
             if not info[0]:
+                info, skip_num = self.get_sourceblock(num, lines)
+            if not info[0]:
                 info, skip_num = self.get_lineblock(num, lines)
             if not info[0]:
                 info, skip_num = self.get_listblock(num, lines)
@@ -147,25 +150,41 @@ class reSTFileHandler(BaseHandler):
     def get_directive(self, line_num, lines):
         def _get_code_block(_lines):
             num = 0
-            for num, line in enumerate(_lines[1:]):
-                if line[0:2] == "..":  # directive for single line
+            for num, mline in enumerate(get_multiline(_lines[1:], 2)):
+                if mline[0][0:2] == ".." or \
+                   re.search(_PARAGRAPH_START, mline[1]):
                     break
-                elif re.search(_PARAGRAPH_START, line):
-                    # end of directive block is previous line of current
-                    num -= 1
-                    break
-            if num + 2 == len(_lines):
-                # reaching to EOF might not be found _PARAGRAPH_START
-                num += 1
+            else:
+                # maybe read out to EOF
+                num += 2
             return num, _lines[0:num + 1]
 
-        btype, block, directive, end = None, [], None, 0
-        match = re.search(_DIRECTIVE_PTRN, lines[line_num])
+        btype, block, directive, bnum = None, [], u"", 0
+        match = re.search(_DIRECTIVE, lines[line_num])
         if match:
             btype = self.block_type["directive"]
             directive = match.groups()[0]
-            end, block = _get_code_block(lines[line_num:])
-        return (btype, block, directive), end
+            bnum, block = _get_code_block(lines[line_num:])
+        return (btype, block, directive), bnum
+
+    def get_sourceblock(self, line_num, lines):
+        def _get_code_block(_lines):
+            btype, directive, num = None, u"", 0
+            for num, mline in enumerate(get_multiline(_lines, 2)):
+                if not btype and re.search(_SOURCE_CODE, mline[0]) and \
+                   (re.search(_EMPTY_LINE, mline[1]) or \
+                    re.search(_LINE_WITH_INDENT, mline[1])):
+                    btype = self.block_type["source"]
+                    directive = u"".join(_lines[0:num])
+                elif re.search(_EMPTY_LINE, mline[0]) and \
+                     not re.search(_LINE_WITH_INDENT, mline[1]):
+                    break
+            else:
+                # maybe read out to EOF
+                num += 1
+            return (btype, _lines[0:num + 1], directive), num
+
+        return _get_code_block(lines[line_num:])
 
     def get_lineblock(self, line_num, lines):
         btype, block, bnum = None, [], 0
@@ -173,7 +192,7 @@ class reSTFileHandler(BaseHandler):
             btype = self.block_type["lineblock"]
             _cmp = lambda line: not re.search(_LINEBLOCK, line)
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
-        return (btype, block, []), bnum
+        return (btype, block, u""), bnum
 
     def get_listblock(self, line_num, lines):
         def _get_code_block(_lines):
@@ -208,7 +227,7 @@ class reSTFileHandler(BaseHandler):
             btype = self.block_type["tableblock"]
             _cmp = lambda line: not re.search(_TABLEBLOCK, line)
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
-        return (btype, block, []), bnum
+        return (btype, block, u""), bnum
 
     def get_section(self, line_num, lines):
         def _get_code_block(_lines):
@@ -229,7 +248,7 @@ class reSTFileHandler(BaseHandler):
         bnum, block = _get_code_block(lines[line_num:])
         if bnum > 0:
             btype = self.block_type["section"]
-        return (btype, block, []), bnum
+        return (btype, block, u""), bnum
 
     def get_paragraph(self, line_num, lines):
         btype, block, bnum = None, [], 0
@@ -238,7 +257,7 @@ class reSTFileHandler(BaseHandler):
             btype = self.block_type["paragraph"]
             _cmp = lambda line: re.search(_EMPTY_LINE, line)
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
-        return (btype, block, []), bnum
+        return (btype, block, u""), bnum
 
     def get_indent_paragraph(self, line_num, lines):
         btype, block, bnum = None, [], 0
@@ -246,7 +265,7 @@ class reSTFileHandler(BaseHandler):
             btype = self.block_type["indent_paragraph"]
             _cmp = lambda line: re.search(_EMPTY_LINE, line)
             bnum, block = get_sequential_block(lines[line_num:], _cmp)
-        return (btype, block, []), bnum
+        return (btype, block, u""), bnum
 
     def get_indent_and_text(self, line):
         indent, text = "", line
@@ -526,6 +545,10 @@ class reSTFileHandler(BaseHandler):
                         ret = self._call_for_directive(
                                 api_method, block_lines)
                         lines = ret[1]
+                elif btype == self.block_type["source"]:
+                    _src = first.split("\n")
+                    ret = self._call_for_paragraph(api_method, _src)
+                    lines = ret[1] + block_lines[len(_src):]
                 elif btype == self.block_type["lineblock"]:
                     ret = self._call_for_lineblock(api_method, block_lines)
                     lines = ret[1]
