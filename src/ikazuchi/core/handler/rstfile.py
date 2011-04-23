@@ -236,7 +236,8 @@ class reSTFileHandler(BaseHandler):
             num, section = 0, []
             for mline in get_multiline(_lines, 3):
                 match = re.search(_SECTION, "".join(mline))
-                if re.search(_EMPTY_LINE, mline[0]):
+                if re.search(_EMPTY_LINE, mline[0]) or \
+                   re.search(_EMPTY_LINE, mline[1]):
                     break
                 elif match:
                     d = match.groupdict()
