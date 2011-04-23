@@ -48,7 +48,7 @@ _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
 _SECTION = re.compile(r"""
     (?P<over_line>[#*=\-^"]{2,}\s+)?    # =======
     (?P<section>.*?\s+)                 # section
-    (?P<under_line>[#*=\-^"]{2,}\s+)    # =======
+    (?P<under_line>[#*=\-^"]{2,}\s+)$   # =======
 """, re.U | re.X)
 
 _SECTION_LINE = re.compile(r'^[#*=\-^"]{2,}\s+', re.U)
@@ -346,18 +346,27 @@ class reSTFileHandler(BaseHandler):
 
     def _call_for_listblock(self, api_method, block_lines):
         def _concatenate_lines(lines):
+            # FIXME: need more simple!
             _lines, _text = [], u""
-            for line in lines:
-                if re.search(_LISTBLOCK, line):
-                    _text = line.rstrip()
-                elif re.search(_EMPTY_LINE, line):
-                    _lines.append(u"{0}\n".format(_text))
-                    _lines.append(line)
+            for mline in get_multiline(lines, 2):
+                if re.search(_LISTBLOCK, mline[0]):
+                    if re.search(_LINE_WITH_INDENT, mline[1]):
+                        _text = mline[0]
+                    else:
+                        _lines.append(mline[0])
+                elif re.search(_EMPTY_LINE, mline[0]):
+                    _lines.append(u"{0}".format(_text))
+                    _lines.append(mline[0])
                     _text = u""
                 else:
-                    _text = u"{0} {1}".format(_text, line.strip())
-            if _text:
-                _lines.append(u"{0}\n".format(_text))  # just in case
+                    _text = u"{0} {1}".format(_text.rstrip(),
+                                              mline[0].lstrip())
+            else:
+                if _text:
+                    _lines.append(u"{0}".format(_text))
+                if re.search(_LISTBLOCK, mline[1]) or \
+                   re.search(_EMPTY_LINE, mline[1]):
+                    _lines.append(mline[1])
             return _lines
 
         api, lines = None, []
@@ -388,7 +397,7 @@ class reSTFileHandler(BaseHandler):
             if d.get("grid_rule"):
                 items = line.split("+")[1:-1]
             elif d.get("grid_rows"):
-                _items = [i.strip().rstrip() for i in line.split("|")]
+                _items = [i.strip() for i in line.split("|")]
                 _items = map(self.markup_paragraph_notranslate, _items[1:-1])
                 items = call_api_with_multithread(api_method, _items)
                 api = items[0][0]
