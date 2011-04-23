@@ -36,7 +36,11 @@ _REFFERENCE = [
     "^\.\.\s*\[(?!#).*?\].*$",  # .. [ref] description
 ]
 
-_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFFERENCE
+_SOURCE = [
+    "::\s*",    # source::
+]
+
+_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFFERENCE + _SOURCE
 _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
 
@@ -169,20 +173,20 @@ class reSTFileHandler(BaseHandler):
 
     def get_sourceblock(self, line_num, lines):
         def _get_code_block(_lines):
-            btype, directive, num = None, u"", 0
+            btype, first, num = None, u"", 0
             for num, mline in enumerate(get_multiline(_lines, 2)):
                 if not btype and re.search(_SOURCE_CODE, mline[0]) and \
                    (re.search(_EMPTY_LINE, mline[1]) or \
                     re.search(_LINE_WITH_INDENT, mline[1])):
                     btype = self.block_type["source"]
-                    directive = u"".join(_lines[0:num])
+                    first = u"".join(_lines[0:num + 1])
                 elif re.search(_EMPTY_LINE, mline[0]) and \
                      not re.search(_LINE_WITH_INDENT, mline[1]):
                     break
             else:
                 # maybe read out to EOF
                 num += 1
-            return (btype, _lines[0:num + 1], directive), num
+            return (btype, _lines[0:num + 1], first), num
 
         return _get_code_block(lines[line_num:])
 
@@ -280,6 +284,10 @@ class reSTFileHandler(BaseHandler):
             _lines = re.findall(eos_ptrn, text)
             if not _lines:
                 _lines = [text]
+            else:
+                extra_text = text[len(u"".join(_lines)):]
+                if extra_text:
+                    _lines.append(extra_text)
             indent, _ = self.get_indent_and_text(_lines[0])
             return [u"{0}{1}\n".format(indent, line) for line in _lines]
         else:
@@ -548,6 +556,7 @@ class reSTFileHandler(BaseHandler):
                 elif btype == self.block_type["source"]:
                     _src = first.split("\n")
                     ret = self._call_for_paragraph(api_method, _src)
+                    ret[1].append("\n")
                     lines = ret[1] + block_lines[len(_src):]
                 elif btype == self.block_type["lineblock"]:
                     ret = self._call_for_lineblock(api_method, block_lines)
