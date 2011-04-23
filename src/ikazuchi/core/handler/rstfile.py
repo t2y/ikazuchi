@@ -37,6 +37,7 @@ _REFFERENCE = [
 ]
 
 _SOURCE = [
+    ":\s+",     # collon:
     "::\s*",    # source::
 ]
 
@@ -201,28 +202,25 @@ class reSTFileHandler(BaseHandler):
     def get_listblock(self, line_num, lines):
         def _get_code_block(_lines):
             num = 0
-            empty = False
-            for num, line in enumerate(_lines[1:]):
-                if re.search(_EMPTY_LINE, line) and not empty:
-                    empty = True
-                elif re.search(_LISTBLOCK, line):
-                    empty = False
+            for num, mline in enumerate(get_multiline(_lines, 2)):
+                if re.search(_LISTBLOCK, mline[0]) or \
+                   re.search(_LINE_WITH_INDENT, mline[0]) or \
+                   (re.search(_EMPTY_LINE, mline[0]) and \
+                    re.search(_LISTBLOCK, mline[1])):
+                    pass
                 else:
-                    # end of list block is previous line of current
-                    num -= 1
                     break
-            if num + 2 == len(_lines):
-                # reaching to EOF might not be found _LISTBLOCK
+            else:
+                # maybe read out to EOF
                 num += 1
             return num, _lines[0:num + 1]
 
-        btype, block, listblock, end = None, [], None, 0
+        btype, block, bnum = None, [], 0
         match = re.search(_LISTBLOCK, lines[line_num])
         if match:
             btype = self.block_type["listblock"]
-            listblock = match.groups()[0]
-            end, block = _get_code_block(lines[line_num:])
-        return (btype, block, listblock), end
+            bnum, block = _get_code_block(lines[line_num:])
+        return (btype, block, u""), bnum
 
     def get_tableblock(self, line_num, lines):
         btype, block, bnum = None, [], 0
@@ -347,8 +345,23 @@ class reSTFileHandler(BaseHandler):
         return api, lines
 
     def _call_for_listblock(self, api_method, block_lines):
+        def _concatenate_lines(lines):
+            _lines, _text = [], u""
+            for line in lines:
+                if re.search(_LISTBLOCK, line):
+                    _text = line.rstrip()
+                elif re.search(_EMPTY_LINE, line):
+                    _lines.append(u"{0}\n".format(_text))
+                    _lines.append(line)
+                    _text = u""
+                else:
+                    _text = u"{0} {1}".format(_text, line.strip())
+            if _text:
+                _lines.append(u"{0}\n".format(_text))  # just in case
+            return _lines
+
         api, lines = None, []
-        for line in block_lines:
+        for line in _concatenate_lines(block_lines):
             match = re.match(_LISTBLOCK, line)
             if match and not re.search(_EMPTY_LINE, line):
                 api, line = self._call_keeping_prefix(api_method, line, match)
