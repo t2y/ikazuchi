@@ -21,7 +21,7 @@ _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 # just for alias
 _translate_api = izuchi.translator.TRANSLATE_API
 _call_api_with_multithread = izuchi.translator.utils.call_api_with_multithread
-_rest_handler = izuchi.handler.rstfile.reSTFileHandler
+_rest_caller = izuchi.handler.rstfile.reSTApiCaller
 
 def remove_imcomplete_line(lines, start, enc):
     prev = vim.current.buffer[start - 1:start]
@@ -59,7 +59,7 @@ def get_target_lines(start, end, enc):
     if not lines:
         # with lines "as is"
         lines = to_unicode(vim.current.buffer[start:end], enc)
-    return map(_rest_handler.markup_paragraph_notranslate, lines)
+    return map(_rest_caller.markup_paragraph_notranslate, lines)
 
 _MAX_TARGET_RANGE = 100
 
