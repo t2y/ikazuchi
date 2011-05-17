@@ -58,9 +58,10 @@ _LISTBLOCK = re.compile(r"""(
     | ^\s+[*\-\d#]\.*\s+    #   * nested list
 )(.*?)$""", re.U | re.X)
 
-_LINEBLOCK = re.compile(r"""(
-    ^\|\s+  # | line block
-)(.*?)$""", re.U | re.X)
+_LINEBLOCK = re.compile(r"""
+      (^\|\s+)(.+?)$    # | line block
+    | (^\|\s*)$         # |
+""", re.U | re.X)
 
 _TABLEBLOCK = re.compile(r"""(
       (?P<grid_rule>^\s*\+([\-=]+\+)+\s*)       # grid table rule
@@ -146,21 +147,22 @@ class reSTParser(object):
             if skip_num > 0:
                 skip_num -= 1
                 continue
-            info, skip_num = self.get_directive(lines[num:])
+            _lines = lines[num:]
+            info, skip_num = self.get_directive(_lines)
             if not info[0]:
-                info, skip_num = self.get_sourceblock(lines[num:])
+                info, skip_num = self.get_sourceblock(_lines)
             if not info[0]:
-                info, skip_num = self.get_lineblock(lines[num:])
+                info, skip_num = self.get_lineblock(_lines)
             if not info[0]:
-                info, skip_num = self.get_listblock(lines[num:])
+                info, skip_num = self.get_listblock(_lines)
             if not info[0]:
-                info, skip_num = self.get_tableblock(lines[num:])
+                info, skip_num = self.get_tableblock(_lines)
             if not info[0]:
-                info, skip_num = self.get_section(lines[num:])
+                info, skip_num = self.get_section(_lines)
             if not info[0]:
-                info, skip_num = self.get_paragraph(lines[num:])
+                info, skip_num = self.get_paragraph(_lines)
             if not info[0]:
-                info, skip_num = self.get_indent_paragraph(lines[num:])
+                info, skip_num = self.get_indent_paragraph(_lines)
             if not info[0]:  # others
                 info = (None, [line], None)
             blocks.append(info)
@@ -171,23 +173,15 @@ class reSTParser(object):
 
     @classmethod
     def get_directive(self, lines):
-        def _get_code_block(_lines):
-            num = 0
-            for num, mline in enumerate(get_multiline(_lines[1:], 2)):
-                if mline[0][0:2] == ".." or \
-                   re.search(_PARAGRAPH_START, mline[1]):
-                    break
-            else:
-                # maybe read out to EOF
-                num += 2
-            return num, _lines[0:num + 1]
-
         btype, block, directive, bnum = None, [], u"", 0
         match = re.search(_DIRECTIVE, lines[0])
         if match:
             btype = REST_BLOCK_TYPE["directive"]
             directive = match.groups()[0]
-            bnum, block = _get_code_block(lines)
+            bnum, block = 0, lines[0:1]
+            if not lines[1][0:2] == "..":
+                _cmp = lambda line: re.search(_PARAGRAPH_START, line)
+                bnum, block = get_sequential_block(lines, _cmp)
         return (btype, block, directive), bnum
 
     @classmethod
@@ -264,10 +258,10 @@ class reSTParser(object):
                     break
                 elif match:
                     d = match.groupdict()
-                    if (d.get("over_line") and d.get("section")) or \
-                       (d.get("under_line") and d.get("section")):
-                        num, section = 2, mline
-                        break
+                    if d.get("section"):
+                        if d.get("over_line") or d.get("under_line"):
+                            num, section = 2, mline
+                            break
             return num, section
 
         btype = None
