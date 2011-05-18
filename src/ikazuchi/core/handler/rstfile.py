@@ -49,7 +49,7 @@ _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
 
 _SECTION = re.compile(r"""
     (?P<over_line>[#*=\-^"]{2,}\s+)?    # =======
-    (?P<section>.*?\s+)                 # section
+    (?P<section>[^#*=\-^"]+?\s+)        # section
     (?P<under_line>[#*=\-^"]{2,}\s+)$   # =======
 """, re.U | re.X)
 
@@ -68,8 +68,8 @@ _LINEBLOCK = re.compile(r"""
 _TABLEBLOCK = re.compile(r"""(
       (?P<grid_rule>^\s*\+([\-=]+\+)+\s*)       # grid table rule
     | (?P<grid_rows>^\s*\|(.*?\|)+\s*)          # grid table rows
-    | (?P<simple_rule>^\s*=+(\s+=+){2,}\s*)     # simple table rule
-    | (?P<simple_rows>^\s*.*?(\s+.*?){2,}\s*)   # simple table rows
+    | (?P<simple_rule>^\s*=+(\s+=+){1,}\s*)     # simple table rule
+    | (?P<simple_rows>^\s*.*?(\s+.*?){1,}\s*)   # simple table rows
 )$""", re.U | re.X)
 
 _SOURCE_CODE = re.compile(r"^.*?::\s*$", re.U)
