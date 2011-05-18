@@ -181,7 +181,7 @@ class reSTParser(object):
             btype = REST_BLOCK_TYPE["directive"]
             directive = match.groups()[0]
             bnum, block = 0, lines[0:1]
-            if not lines[1][0:2] == "..":
+            if not lines[1:2][0:2] == "..":
                 _cmp = lambda line: re.search(_PARAGRAPH_START, line)
                 bnum, block = get_sequential_block(lines, _cmp)
         return (btype, block, directive), bnum
