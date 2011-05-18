@@ -22,8 +22,10 @@ _ROLE = [
 ]
 
 _HYPER_LINK = [
-    "`.*?\s*`_",    # `link <http://xxx>`_ or `link`_
-    "^\.\.\s*_.*?:\s*http.*$",  # .. _link: http://xxx
+    "https?://[^ ]+",               # http://xxx
+    "`.*?\s*`__?",                  # `link <http://>`_ , `link`_ or `name`__
+    "^\.\.\s*_.*?:\s*https?://[^ ]+$",  # .. _link: http://xxx
+    "^__\s*https?://[^ ]+$",        # __ http://xxx
 ]
 
 _RUBRIC = [
@@ -31,9 +33,9 @@ _RUBRIC = [
     "^\.\.\s*\[#.*\].*$",       # .. [#f1] description
 ]
 
-_REFFERENCE = [
-    "\[(?!#).*?\]_",            # [ref]_
-    "^\.\.\s*\[(?!#).*?\].*$",  # .. [ref] description
+_REFERENCE = [
+    "\[[^#].*?\]_",             # [ref]_
+    "^\.\.\s*\[[^#]*?\].*$",    # .. [ref] description
 ]
 
 _SOURCE = [
@@ -41,7 +43,7 @@ _SOURCE = [
     "::\s*",    # source::
 ]
 
-_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFFERENCE + _SOURCE
+_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFERENCE + _SOURCE
 _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
 
