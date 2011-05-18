@@ -61,8 +61,7 @@ _LISTBLOCK = re.compile(r"""(
 )(.*?)$""", re.U | re.X)
 
 _LINEBLOCK = re.compile(r"""
-      (^\|\s+)(.+?)$    # | line block
-    | (^\|\s*)$         # |
+      (^\|\s*)(.*?)$    # "| line block" or "|"
 """, re.U | re.X)
 
 _TABLEBLOCK = re.compile(r"""(
@@ -190,18 +189,19 @@ class reSTParser(object):
     def get_sourceblock(self, lines):
         def _get_code_block(_lines):
             btype, first, num = None, u"", 0
-            for num, mline in enumerate(get_multiline(_lines, 2)):
-                if not btype and re.search(_SOURCE_CODE, mline[0]) and \
-                   (re.search(_EMPTY_LINE, mline[1]) or \
-                    re.search(_LINE_WITH_INDENT, mline[1])):
-                    btype = REST_BLOCK_TYPE["source"]
-                    first = u"".join(_lines[0:num + 1])
-                elif re.search(_EMPTY_LINE, mline[0]) and \
-                     not re.search(_LINE_WITH_INDENT, mline[1]):
-                    break
-            else:
-                # maybe read out to EOF
-                num += 1
+            if len(_lines) >= 2:
+                for num, mline in enumerate(get_multiline(_lines, 2)):
+                    if not btype and re.search(_SOURCE_CODE, mline[0]) and \
+                       (re.search(_EMPTY_LINE, mline[1]) or \
+                        re.search(_LINE_WITH_INDENT, mline[1])):
+                        btype = REST_BLOCK_TYPE["source"]
+                        first = u"".join(_lines[0:num + 1])
+                    elif re.search(_EMPTY_LINE, mline[0]) and \
+                         not re.search(_LINE_WITH_INDENT, mline[1]):
+                        break
+                else:
+                    # maybe read out to EOF
+                    num += 1
             return (btype, _lines[0:num + 1], first), num
 
         return _get_code_block(lines)
@@ -245,7 +245,7 @@ class reSTParser(object):
         match = re.search(_TABLEBLOCK, lines[0])
         if match and not match.groupdict().get("simple_rows"):
             btype = REST_BLOCK_TYPE["tableblock"]
-            _cmp = lambda line: not re.search(_TABLEBLOCK, line)
+            _cmp = lambda line: re.search(_EMPTY_LINE, line)
             bnum, block = get_sequential_block(lines, _cmp)
         return (btype, block, u""), bnum
 

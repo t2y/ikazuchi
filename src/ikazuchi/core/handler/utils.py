@@ -75,6 +75,8 @@ def zip_with_flatlist(list1, list2):
     """
     >>> zip_with_flatlist(range(3), range(3,6))
     [0, 3, 1, 4, 2, 5]
+    >>> zip_with_flatlist(range(1), range(2,5))
+    [0, 2]
     """
     _list = []
     for i, j in zip(list1, list2):
