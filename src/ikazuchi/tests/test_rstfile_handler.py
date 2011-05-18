@@ -46,3 +46,11 @@ class TestreSTParser(object):
     def test_get_indent_paragraph(self):
         from data.rst.parse_indent_paragraph import DATA_SET
         self._test_func(DATA_SET, reSTParser.get_indent_paragraph)
+
+class TestreSTApiCaller(object):
+
+    def test_markup_paragraph_notranslate(self):
+        from data.rst.api_call_markup_notranslate import DATA_SET
+        for data, expected in DATA_SET:
+            actual = reSTApiCaller.markup_paragraph_notranslate(data)
+            assert_equal(expected, actual)
