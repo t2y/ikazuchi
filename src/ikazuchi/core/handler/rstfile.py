@@ -94,7 +94,7 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 ).*$""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
-_LINE_WITH_INDENT = re.compile(r"(^\s+)(.*?)$", re.U)
+_LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^([\S\.]+)(.*?)$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r".*?[\.\?!]", "utf-8"), re.M | re.U),
@@ -370,27 +370,38 @@ class reSTApiCaller(object):
 
     def _call_for_listblock(self, api_method, block_lines):
         def _concatenate_lines(lines):
+            if len(lines) < 2:
+                return lines
+
             # FIXME: need more simple!
             _lines, _text = [], u""
             for mline in get_multiline(lines, 2):
                 if re.search(_LISTBLOCK, mline[0]):
-                    if re.search(_LINE_WITH_INDENT, mline[1]):
+                    if not re.search(_LISTBLOCK, mline[1]) and \
+                       re.search(_LINE_WITH_INDENT, mline[1]):
+                        if _text:
+                            _lines.append(_text)
                         _text = mline[0]
                     else:
+                        if _text:
+                            _lines.append(_text)
+                            _text = u""
                         _lines.append(mline[0])
                 elif re.search(_EMPTY_LINE, mline[0]):
-                    _lines.append(u"{0}".format(_text))
+                    if _text:
+                        _lines.append(_text)
+                        _text = u""
                     _lines.append(mline[0])
-                    _text = u""
                 else:
+                    # concatenate prev line and current line
                     _text = u"{0} {1}".format(_text.rstrip(),
                                               mline[0].lstrip())
-            else:
-                if _text:
-                    _lines.append(u"{0}".format(_text))
-                if re.search(_LISTBLOCK, mline[1]) or \
-                   re.search(_EMPTY_LINE, mline[1]):
-                    _lines.append(mline[1])
+            # post process
+            if _text:
+                _lines.append(_text)
+            if re.search(_LISTBLOCK, mline[1]) or \
+               re.search(_EMPTY_LINE, mline[1]):
+                _lines.append(mline[1])
             return _lines
 
         api, lines = None, []

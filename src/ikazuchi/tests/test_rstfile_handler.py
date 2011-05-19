@@ -8,9 +8,7 @@ from ikazuchi.core.handler.rstfile import *
 class TestreSTParser(object):
 
     def _test_func(self, data_set, func):
-        """
-        common assert function for each test
-        """
+        # common assert function for each test
         for data, expected in data_set:
             info, num = func(data)
             assert_equal(expected, [info, num])
@@ -53,11 +51,19 @@ class TestreSTApiCaller(object):
         self.caller = reSTApiCaller(None, None)
 
     def _test_func(self, data_set, func):
-        """
-        common assert function for each test
-        """
+        # common assert function for each test
         for data, expected in data_set:
             actual = func(data)
+            assert_equal(expected, actual)
+
+    def _test_call_func(self, data_set, func):
+        # common assert function for each test calling api method
+        def dummy(text):
+            # return given text as is
+            return None, text
+
+        for data, expected in data_set:
+            _, actual = func(dummy, data)
             assert_equal(expected, actual)
 
     def test_get_indent_and_text(self):
@@ -67,3 +73,7 @@ class TestreSTApiCaller(object):
     def test_markup_paragraph_notranslate(self):
         from data.rst.api_call_markup_notranslate import DATA_SET
         self._test_func(DATA_SET, reSTApiCaller.markup_paragraph_notranslate)
+
+    def test_call_for_listblock(self):
+        from data.rst.api_call_listblock import DATA_SET
+        self._test_call_func(DATA_SET, self.caller._call_for_listblock)

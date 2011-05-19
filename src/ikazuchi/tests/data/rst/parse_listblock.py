@@ -3,6 +3,22 @@
 DATA_SET = [
     (
         [u"* first line",
+         u""],
+        [("ls",
+          [u"* first line",
+           u""],
+          u""),
+         1]
+    ),
+    (
+        [u"* first line"],
+        [("ls",
+          [u"* first line"],
+          u""),
+         1]
+    ),
+    (
+        [u"* first line",
          u"* second line",
          u""],
         [("ls",
