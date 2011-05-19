@@ -94,7 +94,7 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 ).*$""", re.U | re.X)
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
-_LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
+_LINE_WITH_INDENT = re.compile(r"(^\s+)(.*?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^([\S\.]+)(.*?)$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r".*?[\.\?!]", "utf-8"), re.M | re.U),
@@ -299,13 +299,6 @@ class reSTApiCaller(object):
     def __init__(self, blocks, lang_to):
         self.blocks = blocks
         self.lang_to = lang_to
-
-    def get_indent_and_text(self, line):
-        indent, text = "", line
-        match = re.search(_LINE_WITH_INDENT, line)
-        if match:
-            indent, text = match.groups()
-        return indent, text
 
     def split_text_into_multiline(self, text):
         if self.lang_to in ("ja"):
@@ -631,6 +624,14 @@ class reSTApiCaller(object):
             else:
                 lines = block_lines
             yield lines
+
+    @classmethod
+    def get_indent_and_text(self, line):
+        indent, text = "", line
+        match = re.search(_LINE_WITH_INDENT, line)
+        if match:
+            indent, text = match.groups()
+        return indent, text
 
     @classmethod
     def markup_paragraph_notranslate(self, text):

@@ -49,8 +49,21 @@ class TestreSTParser(object):
 
 class TestreSTApiCaller(object):
 
+    def setup(self):
+        self.caller = reSTApiCaller(None, None)
+
+    def _test_func(self, data_set, func):
+        """
+        common assert function for each test
+        """
+        for data, expected in data_set:
+            actual = func(data)
+            assert_equal(expected, actual)
+
+    def test_get_indent_and_text(self):
+        from data.rst.api_call_text_with_indent import DATA_SET
+        self._test_func(DATA_SET, reSTApiCaller.get_indent_and_text)
+
     def test_markup_paragraph_notranslate(self):
         from data.rst.api_call_markup_notranslate import DATA_SET
-        for data, expected in DATA_SET:
-            actual = reSTApiCaller.markup_paragraph_notranslate(data)
-            assert_equal(expected, actual)
+        self._test_func(DATA_SET, reSTApiCaller.markup_paragraph_notranslate)
