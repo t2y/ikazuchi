@@ -15,6 +15,12 @@ DATA_SET = [
     ),
     (
         [u"* first line",
+         u"  sub line"],
+
+        [u"* first line sub line\n"]
+    ),
+    (
+        [u"* first line",
          u"* second line",
          u""],
 

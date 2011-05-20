@@ -370,38 +370,37 @@ class reSTApiCaller(object):
 
     def _call_for_listblock(self, api_method, block_lines):
         def _concatenate_lines(lines):
+            def _extend(lines, line, prev):
+                _lines = [line]
+                if prev:
+                    _lines.insert(0, prev)
+                lines.extend(_lines)
+
             if len(lines) < 2:
                 return lines
 
-            # FIXME: need more simple!
-            _lines, _text = [], u""
+            # FIXME: help to be more simple!
+            _lines, _prev = [], u""
+            lines.append("")  # add dummy line to check last line as mline[0]
             for mline in get_multiline(lines, 2):
                 if re.search(_LISTBLOCK, mline[0]):
                     if not re.search(_LISTBLOCK, mline[1]) and \
                        re.search(_LINE_WITH_INDENT, mline[1]):
-                        if _text:
-                            _lines.append(_text)
-                        _text = mline[0]
+                        if _prev:
+                            _lines.append(_prev)
+                        _prev = mline[0]
                     else:
-                        if _text:
-                            _lines.append(_text)
-                            _text = u""
-                        _lines.append(mline[0])
+                        _extend(_lines, mline[0], _prev)
+                        _prev = u""
                 elif re.search(_EMPTY_LINE, mline[0]):
-                    if _text:
-                        _lines.append(_text)
-                        _text = u""
-                    _lines.append(mline[0])
+                    _extend(_lines, mline[0], _prev)
+                    _prev = u""
                 else:
-                    # concatenate prev line and current line
-                    _text = u"{0} {1}".format(_text.rstrip(),
+                    _prev = u"{0} {1}".format(_prev.rstrip(),
                                               mline[0].lstrip())
-            # post process
-            if _text:
-                _lines.append(_text)
-            if re.search(_LISTBLOCK, mline[1]) or \
-               re.search(_EMPTY_LINE, mline[1]):
-                _lines.append(mline[1])
+            else:
+                if _prev:
+                    _lines.append(_prev)
             return _lines
 
         api, lines = None, []
