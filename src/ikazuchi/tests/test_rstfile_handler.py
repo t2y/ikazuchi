@@ -112,7 +112,7 @@ class TestreSTApiCaller(object):
             yield r
 
     def test_call_for_sourceblock(self):
-        from data.rst.api_call_directive import DATA_SET
+        from data.rst.api_call_sourceblock import DATA_SET
         for r in self._call_func(DATA_SET, self.caller._call_for_sourceblock):
             yield r
 

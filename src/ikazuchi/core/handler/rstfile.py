@@ -350,13 +350,11 @@ class reSTApiCaller(object):
         return api, lines
 
     def _call_for_sourceblock(self, api_method, block_lines, first):
-        api = None
-        _src = first.split("\n")
-        if re.search(r"^::\s*", _src[0]):
-            lines = block_lines
+        if re.search(r"^::\s*$", first):
+            api, lines = None, block_lines
         else:
-            api, lines = self._call_for_paragraph(api_method, _src)
-            lines.extend(block_lines[len(_src) - 1:])
+            api, lines = self._call_for_paragraph(api_method, [first])
+            lines.extend(block_lines[len(first.split("\n")) - 1:])
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
