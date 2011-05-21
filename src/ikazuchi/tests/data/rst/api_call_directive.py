@@ -12,6 +12,7 @@ DATA_SET = [
          u"    :ref:`ikazuchi-samples`",
          u"        ikazuchi has lots of samples.",
          u""],
+        u".. seealso::",
 
         [u".. seealso::",
          u"",

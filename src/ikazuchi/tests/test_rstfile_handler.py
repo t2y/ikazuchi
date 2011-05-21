@@ -70,16 +70,17 @@ class TestreSTApiCaller(object):
             _assert.description = name
             yield _assert, expected, func(data)
 
-    def _test_call_func(self, data_set, func):
+    def _call_func(self, data_set, func):
         # common assert function for each test calling api method
         def dummy(text):
             # return given text as is
             return None, text
 
         _func = func.func_name
-        for num, (data, expected) in enumerate(data_set):
+        for num, data in enumerate(data_set):
+            args, expected = data[:-1], data[-1]
             name = self._fmt.format(self._class, _func, num, str(data)[:10])
-            _, actual = func(dummy, data)
+            _, actual = func(dummy, *args)
             _assert = lambda e, a: assert_equal(e, a)
             _assert.description = name
             yield _assert, expected, actual
@@ -107,36 +108,35 @@ class TestreSTApiCaller(object):
 
     def test_call_for_directive(self):
         from data.rst.api_call_directive import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_directive):
+        for r in self._call_func(DATA_SET, self.caller._call_for_directive):
+            yield r
+
+    def test_call_for_sourceblock(self):
+        from data.rst.api_call_directive import DATA_SET
+        for r in self._call_func(DATA_SET, self.caller._call_for_sourceblock):
             yield r
 
     def test_call_for_lineblock(self):
         from data.rst.api_call_lineblock import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_lineblock):
+        for r in self._call_func(DATA_SET, self.caller._call_for_lineblock):
             yield r
 
     def test_call_for_listblock(self):
         from data.rst.api_call_listblock import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_listblock):
+        for r in self._call_func(DATA_SET, self.caller._call_for_listblock):
             yield r
 
     def test_call_for_tableblock(self):
         from data.rst.api_call_tableblock import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_tableblock):
+        for r in self._call_func(DATA_SET, self.caller._call_for_tableblock):
             yield r
 
     def test_call_for_section(self):
         from data.rst.api_call_section import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_section):
+        for r in self._call_func(DATA_SET, self.caller._call_for_section):
             yield r
 
     def test_call_for_paragraph(self):
         from data.rst.api_call_paragraph import DATA_SET
-        for r in self._test_call_func(DATA_SET,
-                    self.caller._call_for_paragraph):
+        for r in self._call_func(DATA_SET, self.caller._call_for_paragraph):
             yield r

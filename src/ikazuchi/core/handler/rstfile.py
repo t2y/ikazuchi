@@ -319,7 +319,7 @@ class reSTApiCaller(object):
         api, result = api_method(_text)
         return api, u"{0}{1}\n".format(prefix, result)
 
-    def _call_for_directive(self, api_method, block_lines):
+    def _call_for_directive(self, api_method, block_lines, first):
         def _concatenate_lines(lines):
             _lines, prev_indent = [], None
             for line in lines:
@@ -338,12 +338,25 @@ class reSTApiCaller(object):
                     prev_indent = None
             return _lines
 
+        if not re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
+            return None, block_lines
+
         api, lines = None, block_lines[:1]
         for line in _concatenate_lines(block_lines[1:]):
             match = re.search(_LINE_WITH_INDENT, line)
             if match and not re.search(_EMPTY_LINE, line):
                 api, line = self._call_keeping_prefix(api_method, line, match)
             lines.append(line)
+        return api, lines
+
+    def _call_for_sourceblock(self, api_method, block_lines, first):
+        api = None
+        _src = first.split("\n")
+        if re.search(r"^::\s*", _src[0]):
+            lines = block_lines
+        else:
+            api, lines = self._call_for_paragraph(api_method, _src)
+            lines.extend(block_lines[len(_src) - 1:])
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
@@ -567,35 +580,22 @@ class reSTApiCaller(object):
         for btype, block_lines, first in self.blocks:
             print btype, block_lines
             if btype == REST_BLOCK_TYPE["directive"]:
-                lines = block_lines
-                if re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
-                    ret = self._call_for_directive(
-                            api_method, block_lines)
-                    lines = ret[1]
+                r = self._call_for_directive(api_method, block_lines, first)
             elif btype == REST_BLOCK_TYPE["source"]:
-                _src = first.split("\n")
-                if re.search(r"^::\s*", _src[0]):
-                    lines = block_lines
-                else:
-                    ret = self._call_for_paragraph(api_method, _src)
-                    lines = ret[1] + block_lines[len(_src) - 1:]
+                r = self._call_for_sourceblock(api_method, block_lines, first)
             elif btype == REST_BLOCK_TYPE["lineblock"]:
-                ret = self._call_for_lineblock(api_method, block_lines)
-                lines = ret[1]
+                r = self._call_for_lineblock(api_method, block_lines)
             elif btype == REST_BLOCK_TYPE["listblock"]:
-                ret = self._call_for_listblock(api_method, block_lines)
-                lines = ret[1]
+                r = self._call_for_listblock(api_method, block_lines)
             elif btype == REST_BLOCK_TYPE["tableblock"]:
-                ret = self._call_for_tableblock(api_method, block_lines)
-                lines = ret[1]
+                r = self._call_for_tableblock(api_method, block_lines)
             elif btype == REST_BLOCK_TYPE["section"]:
-                ret = self._call_for_section(api_method, block_lines)
-                lines = ret[1]
+                r = self._call_for_section(api_method, block_lines)
             elif btype == REST_BLOCK_TYPE["paragraph"]:
-                ret = self._call_for_paragraph(api_method, block_lines)
-                lines = ret[1]
+                r = self._call_for_paragraph(api_method, block_lines)
             else:
-                lines = block_lines
+                r = (None, block_lines)
+            lines = r[1]
             yield lines
 
     @classmethod
