@@ -110,7 +110,6 @@ REST_BLOCK_TYPE = {
     "lineblock": "ln",
     "listblock": "ls",
     "paragraph": "p",
-    "indent_paragraph": "i",
     "tableblock": "t",
     "section": "se",
     "source": "so",
@@ -166,8 +165,6 @@ class reSTParser(object):
                 info, skip_num = self.get_section(_lines)
             if not info[0]:
                 info, skip_num = self.get_paragraph(_lines)
-            if not info[0]:
-                info, skip_num = self.get_indent_paragraph(_lines)
             if not info[0]:  # others
                 info = (None, [line], None)
             blocks.append(info)
@@ -278,18 +275,9 @@ class reSTParser(object):
     @classmethod
     def get_paragraph(self, lines):
         btype, block, bnum = None, [], 0
-        match = re.search(_PARAGRAPH_START, lines[0])
-        if match:
+        if re.search(_PARAGRAPH_START, lines[0]) or \
+           re.search(_LINE_WITH_INDENT, lines[0]):
             btype = REST_BLOCK_TYPE["paragraph"]
-            _cmp = lambda line: re.search(_EMPTY_LINE, line)
-            bnum, block = get_sequential_block(lines, _cmp)
-        return (btype, block, u""), bnum
-
-    @classmethod
-    def get_indent_paragraph(self, lines):
-        btype, block, bnum = None, [], 0
-        if re.search(_LINE_WITH_INDENT, lines[0]):
-            btype = REST_BLOCK_TYPE["indent_paragraph"]
             _cmp = lambda line: re.search(_EMPTY_LINE, line)
             bnum, block = get_sequential_block(lines, _cmp)
         return (btype, block, u""), bnum
@@ -310,7 +298,7 @@ class reSTApiCaller(object):
             if not _lines:
                 _lines = [text]
             else:
-                extra_text = text[len(u"".join(_lines)):]
+                extra_text = text[len(u"".join(_lines)) + 1:]
                 if extra_text:
                     _lines.append(extra_text)
             indent, _ = self.get_indent_and_text(_lines[0])
@@ -344,7 +332,7 @@ class reSTApiCaller(object):
                 if match:
                     indent, text = match.groups()
                     if prev_indent == indent:
-                        # FIXME: need to check list/line block,,, 
+                        # FIXME: need to check list/line block ...
                         _prev = _lines[-1].rstrip()
                         _lines[-1] = u"{0} {1}".format(_prev, text)
                     else:
@@ -572,28 +560,12 @@ class reSTApiCaller(object):
     def _call_for_paragraph(self, api_method, block_lines):
         api, lines = None, []
         for line in self._concatenate_paragraph_line(block_lines):
-            match = re.search(_LINE_WITH_INDENT, line)
             if re.search(_EMPTY_LINE, line):
                 lines.append(line)
             else:
-                if match:
-                    api, line = self._call_keeping_prefix(
-                                    api_method, line, match)
-                    split_lines = self.split_text_into_multiline(line)
-                else:
-                    api, split_lines = self._call_and_split(api_method, line)
-                lines.extend(split_lines)
-        return api, lines
-
-    def _call_for_indent_paragraph(self, api_method, block_lines):
-        api, lines = None, []
-        for line in self._concatenate_paragraph_line(block_lines):
-            match = re.search(_LINE_WITH_INDENT, line)
-            if match:
-                api, line = self._call_keeping_prefix(api_method, line, match)
-                lines.extend(self.split_text_into_multiline(line))
-            else:
-                lines.append(line)
+                match = re.search(_LINE_WITH_INDENT, line)
+                api, _line = self._call_keeping_prefix(api_method, line, match)
+                lines.extend(self.split_text_into_multiline(_line))
         return api, lines
 
     def call(self, api_method):
@@ -624,10 +596,6 @@ class reSTApiCaller(object):
                 lines = ret[1]
             elif btype == REST_BLOCK_TYPE["paragraph"]:
                 ret = self._call_for_paragraph(api_method, block_lines)
-                lines = ret[1]
-            elif btype == REST_BLOCK_TYPE["indent_paragraph"]:
-                ret = self._call_for_indent_paragraph(
-                                api_method, block_lines)
                 lines = ret[1]
             else:
                 lines = block_lines

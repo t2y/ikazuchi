@@ -53,15 +53,11 @@ class TestreSTParser(object):
         for r in self._test_func(DATA_SET, reSTParser.get_paragraph):
             yield r
 
-    def test_get_indent_paragraph(self):
-        from data.rst.parse_indent_paragraph import DATA_SET
-        for r in self._test_func(DATA_SET, reSTParser.get_indent_paragraph):
-            yield r
 
 class TestreSTApiCaller(object):
 
     def __init__(self):
-        self.caller = reSTApiCaller(None, None)
+        self.caller = reSTApiCaller(None, "en")
         self._class = self.__class__.__name__
         self._fmt = u"{0}.{1}_{2} ({3} ...)"
 
@@ -137,4 +133,10 @@ class TestreSTApiCaller(object):
         from data.rst.api_call_section import DATA_SET
         for r in self._test_call_func(DATA_SET,
                     self.caller._call_for_section):
+            yield r
+
+    def test_call_for_paragraph(self):
+        from data.rst.api_call_paragraph import DATA_SET
+        for r in self._test_call_func(DATA_SET,
+                    self.caller._call_for_paragraph):
             yield r
