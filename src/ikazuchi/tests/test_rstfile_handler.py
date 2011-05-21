@@ -9,14 +9,12 @@ class TestreSTParser(object):
 
     def _test_func(self, data_set, func):
         # common assert function for each test
-        def _assert(expected, actual):
-            assert_equal(expected, actual)
-
         _class = self.__class__.__name__
         _func = func.func_name
         _fmt = u"{0}.{1}_{2} ({3} ...)"
         for num, (data, expected) in enumerate(data_set):
             name = _fmt.format(_class, _func, num, str(data)[:10])
+            _assert = lambda e, a: assert_equal(e, a)
             _assert.description = name
             yield _assert, expected, list(func(data))
 
@@ -67,16 +65,14 @@ class TestreSTApiCaller(object):
         self._class = self.__class__.__name__
         self._fmt = u"{0}.{1}_{2} ({3} ...)"
 
-    def _assert(self, expected, actual):
-        assert_equal(expected, actual)
-
     def _test_func(self, data_set, func):
         # common assert function for each test
         _func = func.func_name
         for num, (data, expected) in enumerate(data_set):
             name = self._fmt.format(self._class, _func, num, str(data)[:10])
-            self._assert.im_func.description = name
-            yield self._assert, expected, func(data)
+            _assert = lambda e, a: assert_equal(e, a)
+            _assert.description = name
+            yield _assert, expected, func(data)
 
     def _test_call_func(self, data_set, func):
         # common assert function for each test calling api method
@@ -88,8 +84,9 @@ class TestreSTApiCaller(object):
         for num, (data, expected) in enumerate(data_set):
             name = self._fmt.format(self._class, _func, num, str(data)[:10])
             _, actual = func(dummy, data)
-            self._assert.im_func.description = name
-            yield self._assert, expected, actual
+            _assert = lambda e, a: assert_equal(e, a)
+            _assert.description = name
+            yield _assert, expected, actual
 
     def test_get_indent_and_text(self):
         from data.rst.api_call_text_with_indent import DATA_SET
