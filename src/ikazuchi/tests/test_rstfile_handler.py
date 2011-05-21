@@ -109,6 +109,18 @@ class TestreSTApiCaller(object):
                     reSTApiCaller.markup_paragraph_notranslate):
             yield r
 
+    def test_call_for_directive(self):
+        from data.rst.api_call_directive import DATA_SET
+        for r in self._test_call_func(DATA_SET,
+                    self.caller._call_for_directive):
+            yield r
+
+    def test_call_for_lineblock(self):
+        from data.rst.api_call_lineblock import DATA_SET
+        for r in self._test_call_func(DATA_SET,
+                    self.caller._call_for_lineblock):
+            yield r
+
     def test_call_for_listblock(self):
         from data.rst.api_call_listblock import DATA_SET
         for r in self._test_call_func(DATA_SET,
@@ -119,4 +131,10 @@ class TestreSTApiCaller(object):
         from data.rst.api_call_tableblock import DATA_SET
         for r in self._test_call_func(DATA_SET,
                     self.caller._call_for_tableblock):
+            yield r
+
+    def test_call_for_section(self):
+        from data.rst.api_call_section import DATA_SET
+        for r in self._test_call_func(DATA_SET,
+                    self.caller._call_for_section):
             yield r

@@ -259,8 +259,7 @@ class reSTParser(object):
             num, section = 0, []
             for mline in get_multiline(_lines, 3):
                 match = re.search(_SECTION, "".join(mline))
-                if re.search(_EMPTY_LINE, mline[0]) or \
-                   re.search(_EMPTY_LINE, mline[1]):
+                if re.search(_EMPTY_LINE, mline[0]):
                     break
                 elif match:
                     d = match.groupdict()
@@ -342,17 +341,18 @@ class reSTApiCaller(object):
             _lines, prev_indent = [], None
             for line in lines:
                 match = re.search(_LINE_WITH_INDENT, line)
-                if re.search(_EMPTY_LINE, line) or not match:
-                    _lines.append(line)
-                    prev_indent = None
-                else:
+                if match:
                     indent, text = match.groups()
                     if prev_indent == indent:
+                        # FIXME: need to check list/line block,,, 
                         _prev = _lines[-1].rstrip()
                         _lines[-1] = u"{0} {1}".format(_prev, text)
                     else:
                         _lines.append(line)
                     prev_indent = indent
+                else:
+                    _lines.append(line)
+                    prev_indent = None
             return _lines
 
         api, lines = None, block_lines[:1]
@@ -528,13 +528,16 @@ class reSTApiCaller(object):
         return ret
 
     def _call_for_section(self, api_method, block_lines):
-        api, results, width = None, [], 0
+        api, results, width, indent = None, [], 0, ""
         for line in block_lines:
             if not re.search(_EMPTY_LINE, line) and \
                not re.search(_SECTION_LINE, line):
                 match = re.search(_LINE_WITH_INDENT, line)
                 api, line = self._call_keeping_prefix(api_method, line, match)
                 width = get_east_asian_width(line) - 1  # -1 is linebreak
+                if match:
+                    indent, _ = match.groups()
+                    width += len(indent)
             results.append(line)
 
         lines = []
