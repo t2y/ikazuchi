@@ -293,12 +293,13 @@ class reSTApiCaller(object):
 
     def split_text_into_multiline(self, text):
         if self.lang_to in ("ja"):
+            text = text.rstrip()
             eos_ptrn = _END_OF_SENTENCE.get(self.lang_to)
             _lines = re.findall(eos_ptrn, text)
             if not _lines:
                 _lines = [text]
             else:
-                extra_text = text[len(u"".join(_lines)) + 1:]
+                extra_text = text[len(u"".join(_lines)):]
                 if extra_text:
                     _lines.append(extra_text)
             indent, _ = self.get_indent_and_text(_lines[0])
@@ -309,12 +310,6 @@ class reSTApiCaller(object):
             indented = textwrap.fill(dedented_text, initial_indent=indent,
                                         subsequent_indent=indent)
             return [indented]
-
-    def _call_and_split(self, api_method, line):
-        _text = self.markup_paragraph_notranslate(line)
-        api, result = api_method(_text)
-        split_lines = self.split_text_into_multiline(result)
-        return api, split_lines
 
     def _call_keeping_prefix(self, api_method, line, match):
         prefix, text = "", line
@@ -579,9 +574,11 @@ class reSTApiCaller(object):
                     lines = ret[1]
             elif btype == REST_BLOCK_TYPE["source"]:
                 _src = first.split("\n")
-                ret = self._call_for_paragraph(api_method, _src)
-                ret[1].append("\n")
-                lines = ret[1] + block_lines[len(_src):]
+                if re.search(r"^::\s*", _src[0]):
+                    lines = block_lines
+                else:
+                    ret = self._call_for_paragraph(api_method, _src)
+                    lines = ret[1] + block_lines[len(_src) - 1:]
             elif btype == REST_BLOCK_TYPE["lineblock"]:
                 ret = self._call_for_lineblock(api_method, block_lines)
                 lines = ret[1]
