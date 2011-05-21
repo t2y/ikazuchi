@@ -353,8 +353,9 @@ class reSTApiCaller(object):
         if re.search(r"^::\s*$", first):
             api, lines = None, block_lines
         else:
-            api, lines = self._call_for_paragraph(api_method, [first])
-            lines.extend(block_lines[len(first.split("\n")) - 1:])
+            _lines = first.split("\n")
+            api, lines = self._call_for_paragraph(api_method, _lines)
+            lines.extend(block_lines[len(_lines) - 1:])
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
