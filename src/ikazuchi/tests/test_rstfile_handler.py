@@ -88,6 +88,16 @@ class TestreSTApiCaller(object):
             _assert.description = name
             yield _assert, expected, actual
 
+    def test_get_table_column_width(self):
+        from data.rst.api_call_get_table_column_width import DATA_SET
+        _func = u"test_get_table_column_width"
+        for num, (items, width, expected) in enumerate(DATA_SET):
+            actual = reSTApiCaller.get_table_column_width(items, width)
+            name = self._fmt.format(self._class, _func, num, str(items)[:10])
+            _assert = lambda e, a: assert_equal(e, a)
+            _assert.description = name
+            yield _assert, expected, actual
+
     def test_get_indent_and_text(self):
         from data.rst.api_call_text_with_indent import DATA_SET
         for r in self._test_func(DATA_SET, reSTApiCaller.get_indent_and_text):
@@ -103,4 +113,10 @@ class TestreSTApiCaller(object):
         from data.rst.api_call_listblock import DATA_SET
         for r in self._test_call_func(DATA_SET,
                     self.caller._call_for_listblock):
+            yield r
+
+    def test_call_for_tableblock(self):
+        from data.rst.api_call_tableblock import DATA_SET
+        for r in self._test_call_func(DATA_SET,
+                    self.caller._call_for_tableblock):
             yield r

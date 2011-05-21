@@ -7,6 +7,10 @@ from base import BaseHandler
 from ikazuchi.core.translator.utils import call_api_with_multithread
 from utils import *
 
+# for Debug
+import logging
+log = logging.getLogger(__name__)
+
 try:
     from ikazuchi.locale import _
 except ImportError:
@@ -411,44 +415,34 @@ class reSTApiCaller(object):
             lines.append(line)
         return api, lines
 
-    def _get_table_column_width(self, max_width, east_asian_width, items):
-        _columns = []
-        for num, text in enumerate(items):
-            text_width = get_east_asian_width(text)
-            if max_width[num] < text_width:
-                max_width[num] = text_width
-            _columns.append(text_width)
-        east_asian_width.append(_columns)
-
     def _call_for_gridtable(self, api_method, block_lines, column_length):
         api, results = None, []
-        # remove first/last column since it is empty column
-        max_width = [0] * (column_length - 2)
-        east_asian_width = []
+        east_asian_width, max_width = [], []
         for line in block_lines:
             indent, line = self.get_indent_and_text(line)
             d = re.search(_TABLEBLOCK, line).groupdict()
             if d.get("grid_rule"):
                 items = line.split("+")[1:-1]
-            elif d.get("grid_rows"):
+                _east = []  # dummy
+            else:  # it means d.get("grid_rows"):
                 _items = [i.strip() for i in line.split("|")]
                 _items = map(self.markup_paragraph_notranslate, _items[1:-1])
                 items = call_api_with_multithread(api_method, _items)
                 api = items[0][0]
                 items = [text for _, text in items]
-            else:
-                items = [line]
-            self._get_table_column_width(max_width, east_asian_width, items)
+                _east, max_width = self.get_table_column_width(
+                                            items, max_width)
+            east_asian_width.append(_east)
             results.append(items)
 
         # format table block considering its width
         lines = []
         rule_fmt = u"#+#".join(u"{%s:{%s}}" % (num, num + 1)
                             for num in range(0, len(max_width) * 2, 2))
-        rule_fmt = u"+#{0}{1}#+\n".format(indent, rule_fmt)
+        rule_fmt = u"{0}+#{1}#+\n".format(indent, rule_fmt)
         row_fmt = u" | ".join(u"{%s:{%s}}" % (num, num + 1)
                             for num in range(0, len(max_width) * 2, 2))
-        row_fmt = u"| {0}{1} |\n".format(indent, row_fmt)
+        row_fmt = u"{0}| {1} |\n".format(indent, row_fmt)
         for rnum, row in enumerate(results):
             _width = list(max_width)  # copy
             len_width = map(len, row)
@@ -471,15 +465,15 @@ class reSTApiCaller(object):
 
     def _call_for_simpletable(self, api_method, block_lines, column_length):
         api, results = None, []
-        max_width = [0] * column_length
-        east_asian_width = []
+        east_asian_width, max_width = [], []
         for line in block_lines:
             indent, line = self.get_indent_and_text(line)
             d = re.search(_TABLEBLOCK, line).groupdict()
             if d.get("simple_rule"):
                 items = line.split()
                 simple_rule_width = map(len, items)
-            elif d.get("simple_rows"):
+                _east = []  # dummy
+            else:  # it measn d.get("simple_rows"):
                 _items = []
                 for column_width in simple_rule_width:
                     _text = line[0:column_width].strip()
@@ -488,9 +482,9 @@ class reSTApiCaller(object):
                 items = call_api_with_multithread(api_method, _items)
                 api = items[0][0]
                 items = [text for _, text in items]
-            else:
-                items = [line]
-            self._get_table_column_width(max_width, east_asian_width, items)
+                _east, max_width = self.get_table_column_width(
+                                            items, max_width)
+            east_asian_width.append(_east)
             results.append(items)
 
         # format table block considering its width
@@ -524,6 +518,7 @@ class reSTApiCaller(object):
                     length = len(line.split())
             return table_type, length
 
+        ret = [None, u""]
         table_type, col_len = _get_column_length(block_lines[0])
         max_width = [0] * col_len
         if table_type == "grid":
@@ -634,6 +629,11 @@ class reSTApiCaller(object):
             else:
                 lines = block_lines
             yield lines
+
+    @classmethod
+    def get_table_column_width(self, items, max_width, initial=None):
+        width = [get_east_asian_width(text) for text in items]
+        return width, [max(i) for i in map(initial, width, max_width)]
 
     @classmethod
     def get_indent_and_text(self, line):

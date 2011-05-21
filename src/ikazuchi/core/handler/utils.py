@@ -62,6 +62,8 @@ def get_east_asian_width(unicode_str):
     13
     >>> get_east_asian_width(unicode("ﾊﾝｶｸｶﾅはどうかな？", "utf-8"))
     18
+    >>> get_east_asian_width(unicode("スペース   全角　　　", "utf-8"))
+    21
     """
     from unicodedata import east_asian_width
     width = 0
