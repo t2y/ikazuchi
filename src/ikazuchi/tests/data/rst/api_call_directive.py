@@ -15,13 +15,13 @@ DATA_SET = [
         u".. seealso::",
 
         [u".. seealso::",
-         u"",
-         u"    Module <span class=notranslate>:mod:`ikazuchi`</span>\n",
-         u"        ikazuchi is a tool to call api. it helps translation.\n",
-         u"",
-         u"    <span class=notranslate>:ref:`ikazuchi-samples`</span>\n",
-         u"        ikazuchi has lots of samples.\n",
-         u""]
+         "",
+         u"    Module <span class=notranslate>:mod:`ikazuchi`</span>",
+         u"        ikazuchi is a tool to call api. it helps translation.",
+         "",
+         u"    <span class=notranslate>:ref:`ikazuchi-samples`</span>",
+         u"        ikazuchi has lots of samples.",
+         ""]
     ),
     #(
     #    [u".. seealso::",

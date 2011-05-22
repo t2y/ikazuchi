@@ -305,8 +305,7 @@ class reSTApiCaller(object):
                 extra_text = text[len(u"".join(_lines)):]
                 if extra_text:
                     _lines.append(extra_text)
-            indent, _ = self.get_indent_and_text(_lines[0])
-            return [u"{0}{1}\n".format(indent, line) for line in _lines]
+            return [u"{0}\n".format(line) for line in _lines]
         else:
             indent, _ = self.get_indent_and_text(text)
             dedented_text = textwrap.dedent(text).strip()
@@ -365,13 +364,15 @@ class reSTApiCaller(object):
         if not re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
             return None, block_lines
 
-        api, lines = None, block_lines[:1]
+        api, indents, lines = None, [], []
         for line in _concatenate_lines(block_lines[1:]):
             match = re.search(_LINE_WITH_INDENT, line)
-            if match and not re.search(_EMPTY_LINE, line):
-                api, line = self._call_keeping_prefix(api_method, line, match)
+            indent, line = self._markup_notranslate(line, match)
+            indents.append(indent)
             lines.append(line)
-        return api, lines
+        api, trans = self._call_keeping_prefix_with_array(
+                                api_method, indents, lines)
+        return api, block_lines[:1] + trans
 
     def _call_for_sourceblock(self, api_method, block_lines, first):
         if re.search(r"^::\s*$", first):
