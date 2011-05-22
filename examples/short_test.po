@@ -1,10 +1,19 @@
+# xxx.py:yy
+msgid "ikazuchi translation"
+msgstr ""
+
+# xxx.py:yy
 msgid "forest book"
 msgstr ""
 
 # xxx.py:yy
-msgid "Python Module Of The Week"
+msgid "the limit are %d."
 msgstr ""
 
 # xxx.py:yy
-msgid "ikazuchi translation"
+msgid "replaced '%s' with something"
+msgstr ""
+
+# xxx.py:yy
+msgid "format string: \"%(name)r\""
 msgstr ""
