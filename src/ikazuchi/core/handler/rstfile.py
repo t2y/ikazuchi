@@ -4,7 +4,6 @@ import codecs
 import re
 import textwrap
 from base import BaseHandler
-from ikazuchi.core.translator.utils import call_api_with_multithread
 from utils import *
 
 # for Debug
@@ -121,6 +120,8 @@ class reSTFileHandler(BaseHandler):
     Handler class for translating reST file
     """
     def __init__(self, opts):
+        if opts.api == "microsoft":
+            self.method_name = "translate_array"
         self.rst_file = opts.rst_file[0]
         self.encoding = opts.encoding
         with codecs.open(self.rst_file, mode="r",
@@ -316,8 +317,8 @@ class reSTApiCaller(object):
         if match:
             prefix, text = match.groups()
         _text = self.markup_paragraph_notranslate(text)
-        api, result = api_method(_text)
-        return api, u"{0}{1}\n".format(prefix, result)
+        api, result = api_method([_text])
+        return api, u"{0}{1}\n".format(prefix, result[0])
 
     def _call_for_directive(self, api_method, block_lines, first):
         def _concatenate_lines(lines):
@@ -422,9 +423,7 @@ class reSTApiCaller(object):
             else:  # it means d.get("grid_rows"):
                 _items = [i.strip() for i in line.split("|")]
                 _items = map(self.markup_paragraph_notranslate, _items[1:-1])
-                items = call_api_with_multithread(api_method, _items)
-                api = items[0][0]
-                items = [text for _, text in items]
+                api, items = api_method(_items)
                 _east, max_width = self.get_table_column_width(
                                             items, max_width)
             east_asian_width.append(_east)
@@ -474,9 +473,7 @@ class reSTApiCaller(object):
                     _text = line[0:column_width].strip()
                     _items.append(self.markup_paragraph_notranslate(_text))
                     line = line[column_width:].strip()  # overwrite line
-                items = call_api_with_multithread(api_method, _items)
-                api = items[0][0]
-                items = [text for _, text in items]
+                api, items = api_method(_items)
                 _east, max_width = self.get_table_column_width(
                                             items, max_width)
             east_asian_width.append(_east)
