@@ -383,13 +383,13 @@ class reSTApiCaller(object):
         return api, lines
 
     def _call_for_lineblock(self, api_method, block_lines):
-        api, lines = None, []
+        api, indents, lines = None, [], []
         for line in block_lines:
             match = re.match(_LINEBLOCK, line)
-            if match:
-                api, line = self._call_keeping_prefix(api_method, line, match)
+            indent, line = self._markup_notranslate(line, match)
+            indents.append(indent)
             lines.append(line)
-        return api, lines
+        return self._call_keeping_prefix_with_array(api_method, indents, lines)
 
     def _call_for_listblock(self, api_method, block_lines):
         def _concatenate_lines(lines):
