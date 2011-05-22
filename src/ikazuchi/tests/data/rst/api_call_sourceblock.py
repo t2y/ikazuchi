@@ -75,7 +75,6 @@ DATA_SET = [
         u"that is::\n",
 
         [u"that is<span class=notranslate>::</span>",
-         u"",
          u"    first code",
          u"    second code",
          u""]
@@ -88,7 +87,6 @@ DATA_SET = [
         u"that is::\n",
 
         [u"that is<span class=notranslate>::</span>",
-         u"",
          u"    first code",
          u"    second code"]
     ),
@@ -101,7 +99,6 @@ DATA_SET = [
         u"that is::\n",
 
         [u"that is<span class=notranslate>::</span>",
-         u"",
          u"",
          u"    first code",
          u"    second code"]
@@ -115,7 +112,6 @@ DATA_SET = [
         u"that is::  \n",
 
         [u"that is<span class=notranslate>::  </span>",
-         u"",
          u"    first code",
          u"    second code",
          u""]
@@ -128,7 +124,6 @@ DATA_SET = [
         u"that is::\n",
 
         [u"that is<span class=notranslate>::</span>",
-         u"",
          u"    first code",
          u"    second code",
          u""]

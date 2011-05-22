@@ -288,6 +288,8 @@ class reSTApiCaller(object):
     """
     Caller class for converting reST block calling api method
     """
+    max_query = 100
+
     def __init__(self, blocks, lang_to):
         self.blocks = blocks
         self.lang_to = lang_to
@@ -312,6 +314,18 @@ class reSTApiCaller(object):
                                         subsequent_indent=indent)
             return [indented]
 
+    def split_lines_with_eos(self, lines):
+        _lines = []
+        for line in lines:
+            _lines.extend(self.split_text_into_multiline(line))
+        return _lines
+
+    def _markup_notranslate(self, line, match):
+        prefix, text = "", line
+        if match:
+            prefix, text = match.groups()
+        return prefix, self.markup_paragraph_notranslate(text)
+
     def _call_keeping_prefix(self, api_method, line, match):
         prefix, text = "", line
         if match:
@@ -319,6 +333,15 @@ class reSTApiCaller(object):
         _text = self.markup_paragraph_notranslate(text)
         api, result = api_method([_text])
         return api, u"{0}{1}\n".format(prefix, result[0])
+
+    def _call_keeping_prefix_with_array(self, api_method, indents, lines):
+        _texts = []
+        for pos in range(0, len(indents), self.max_query):
+            _idns = indents[pos:pos + self.max_query]
+            _lines = lines[pos:pos + self.max_query]
+            api, trans = api_method(_lines)
+            _texts.extend([u"{0}{1}\n".format(*i) for i in zip(_idns, trans)])
+        return api, self.split_lines_with_eos(_texts)
 
     def _call_for_directive(self, api_method, block_lines, first):
         def _concatenate_lines(lines):
@@ -355,7 +378,7 @@ class reSTApiCaller(object):
             api, lines = None, block_lines
         else:
             _lines = first.split("\n")
-            api, lines = self._call_for_paragraph(api_method, _lines)
+            api, lines = self._call_for_paragraph(api_method, _lines[:-1])
             lines.extend(block_lines[len(_lines) - 1:])
         return api, lines
 
@@ -562,15 +585,13 @@ class reSTApiCaller(object):
         return _lines
 
     def _call_for_paragraph(self, api_method, block_lines):
-        api, lines = None, []
+        api, indents, lines = None, [], []
         for line in self._concatenate_paragraph_line(block_lines):
-            if re.search(_EMPTY_LINE, line):
-                lines.append(line)
-            else:
-                match = re.search(_LINE_WITH_INDENT, line)
-                api, _line = self._call_keeping_prefix(api_method, line, match)
-                lines.extend(self.split_text_into_multiline(_line))
-        return api, lines
+            match = re.search(_LINE_WITH_INDENT, line)
+            indent, line = self._markup_notranslate(line, match)
+            indents.append(indent)
+            lines.append(line)
+        return self._call_keeping_prefix_with_array(api_method, indents, lines)
 
     def call(self, api_method):
         for btype, block_lines, first in self.blocks:

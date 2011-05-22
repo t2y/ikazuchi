@@ -16,7 +16,7 @@ def get_handler(opts):
     if opts.lang:
         h = LanguageHandler(opts.api, opts.encoding)
     elif opts.po_file:
-        h = POFileHandler(opts.po_file[0], opts.encoding)
+        h = POFileHandler(opts.api, opts.po_file[0], opts.encoding)
     elif opts.rst_file:
         h = reSTFileHandler(opts)
     elif opts.sentences:

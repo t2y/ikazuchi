@@ -31,7 +31,7 @@ class TestPOFileHandler(object):
             (["ref", "cur", "ent"], "ent"),
             (["ref", "", "ent"], "ent"),
         ]
-        h = POFileHandler(self.po_file.name, ["utf-8", "utf-8"])
+        h = POFileHandler("google", self.po_file.name, ["utf-8", "utf-8"])
         for d in data:
             assert_equals(d[1], h._select_translation(*d[0]))
 
