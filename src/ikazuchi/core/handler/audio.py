@@ -17,31 +17,38 @@ class AudioHandler(BaseHandler):
             self.sentences = opts.sentences[:-1]
             self.lang = opts.lang_to
             self.is_translate = True
+        self.api = opts.api
         self.encoding = opts.encoding
         self.quiet = opts.quiet
         self.translator = API[opts.api](opts.lang_from, opts.lang_to, None)
-        if opts.api == "google":
+        if self.api == "google":
             self.method_name = "translate_tts"
-        elif opts.api == "microsoft":
+        elif self.api == "microsoft":
             self.method_name = "speak"
 
     def _encode(self, text):
         return text.encode(self.encoding[1])
 
-    def _translate(self, text):
-        if not self.quiet:
-            print self._encode(u"{0:25}{1}".format("sentence:", text))
-        api, translated = self.translator.translate(text)
-        _method = u"{0}({1}):".format("translate", api)
-        print self._encode(u"{0:25}{1}".format(_method, translated))
+    def _translate(self, texts):
+        if self.api == "google":
+            api, translated = self.translator.translate(texts)
+        elif self.api == "microsoft":
+            api, translated = self.translator.translate_array(texts)
         return translated
 
     def _call_method(self, api_method):
-        for target in self.sentences:
+        texts = self.sentences
+        if self.is_translate:
+            texts = self._translate(self.sentences)
+        _trans = u"{0}({1}):".format("translate", self.api.title())
+        for num, text in enumerate(texts):
+            if not self.quiet:
+                print self._encode(u"{0:25}{1}".format(
+                            "sentence:", self.sentences[num]))
             if self.is_translate:
-                target = self._translate(target)
+                print self._encode(u"{0:25}{1}".format(_trans, text))
             with NamedTemporaryFile(mode="wb") as tmp:
-                api = api_method(target, self.lang, tmp)
+                api = api_method(text, self.lang, tmp)
                 _method = u"{0}({1}):".format(self.method_name, api)
                 print self._encode(u"{0:25}".format(_method))
                 self.play_audio(tmp.name)

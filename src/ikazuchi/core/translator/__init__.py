@@ -53,10 +53,9 @@ class Translator(object):
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
-class TranslatingYahoo(YahooTranslator, Translator): pass
+class TranslatingYahoo(YahooTranslator, Translator): pass  # is obsoleted
 
 TRANSLATE_API = {
     "google": TranslatingGoogle,
     "microsoft": TranslatingMicrosoft,
-    "yahoo": TranslatingYahoo,
 }

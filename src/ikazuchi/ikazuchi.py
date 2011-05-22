@@ -14,29 +14,31 @@ __version__ = "0.3.0"
 def get_args():
     _ver = "%(prog)s {0}".format(__version__)
     parser = argparse.ArgumentParser(version=_ver)
-    parser.set_defaults(api="google", detect=False,
+    parser.set_defaults(api="google", detect=False, lang=False,
                         lang_from="en", lang_to=get_lang(),
-                        po_file=None, sentence=None, encoding=None,
-                        quiet=False, verbose=False)
+                        po_file=None, rst_file=None, sentence=None,
+                        encoding=None, quiet=False, verbose=False)
     parser.add_argument("-a", "--api", dest="api", metavar="API",
                         help=u"APIs are {0}".format(TRANSLATE_API.keys()))
     parser.add_argument("-d", "--detect", dest="detect", action="store_true",
                         help=u"detect language for target sentence")
-    parser.add_argument("-f", "--from", dest="lang_from", metavar="LANG",
-                        help=u"original language")
-    parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
-                        help=u"target language to translate")
-    parser.add_argument("-p", "--pofile", dest="po_file", nargs=1,
-                        metavar="POFILE", help=u"target po file")
-    parser.add_argument("-r", "--rstfile", dest="rst_file", nargs=1,
-                        metavar="RSTFILE", help=u"target reST file")
-    parser.add_argument("-s", "--sentence", dest="sentences", nargs="+",
-                        metavar="SENTENCE", help=u"target sentence")
     parser.add_argument("-e", "--encoding", dest="encoding",
                         action=EncodingAction, metavar="ENCODING",
                         help=u"input/output encoding")
+    parser.add_argument("-f", "--from", dest="lang_from", metavar="LANG",
+                        help=u"original language")
+    parser.add_argument("-l", "--languages", dest="lang", action="store_true",
+                        help=u"show supported languages")
+    parser.add_argument("-p", "--pofile", dest="po_file", nargs=1,
+                        metavar="POFILE", help=u"target po file")
     parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                         help=u"not to show original sentence to stdout")
+    parser.add_argument("-r", "--rstfile", dest="rst_file", nargs=1,
+                        metavar="RSTFILE", help=u"target reST file")
+    parser.add_argument("-s", "--sentences", dest="sentences", nargs="+",
+                        metavar="SENTENCE", help=u"target sentences")
+    parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
+                        help=u"target language to translate")
 
     opts = parser.parse_args()
     if not opts.lang_to:

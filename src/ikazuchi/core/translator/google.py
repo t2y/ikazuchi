@@ -12,6 +12,101 @@ __all__ = [
 
 class GoogleTranslator(object):
     """
+    Translator with Google Translate API with version 2
+    http://code.google.com/intl/ja/apis/language/translate/overview.html
+    http://code.google.com/intl/ja/apis/language/translate/v2/using_rest.html
+    see also
+    Google Translate API Terms of Use
+    http://code.google.com/intl/ja/apis/language/translate/terms.html
+    """
+    domain = "www.googleapis.com"
+    common_path = "/language/translate/"
+    key = "AIzaSyDDCHHwbfHLIsHWEhxAu41UmrRCg_Xmvm8"
+    q_format = "html"
+
+    def __init__(self, lang_from, lang_to, handler):
+        self.lang_from = lang_from
+        self.lang_to = lang_to
+        self.handler = handler
+        self._url = "https://{0}{1}".format(self.domain, self.common_path)
+
+    def get_url(self, query, func=None):
+        q = urlencode(query, doseq=True)
+        if func:
+            url = "{0}v2/{1}?{2}".format(self._url, func.func_name, q)
+        else:
+            url = "{0}v2?{1}".format(self._url, q)
+        return url
+
+    def request(self, url):
+        req = urllib2.Request(url)
+        with closing(urllib2.urlopen(req)) as res:
+            res_json = json.loads(res.read())
+        return res_json["data"]
+
+    def call_api(self, query, key, func=None):
+        """high-level method to make url and request"""
+        url = self.get_url(query, func)
+        response = self.request(url)
+        return self.api(), response[key]
+
+    def detect(self, texts):
+        """ Detect Language
+        http://code.google.com/intl/ja/apis/language/translate/v2/\
+        using_rest.html#detect-language
+        """
+        query = {
+            "key": self.key,
+            "q": [t.encode("utf-8") for t in texts],
+        }
+        return self.call_api(query, u"detections", func=self.detect)
+
+    def languages(self):
+        """ Discover Supported Languages
+        http://code.google.com/intl/ja/apis/language/translate/v2/\
+        using_rest.html#supported-languages
+        """
+        query = {
+            "key": self.key,
+            "target": self.lang_to,
+        }
+        return self.call_api(query, u"languages", func=self.languages)
+
+    def translate(self, texts):
+        """ Translate Text
+        http://code.google.com/intl/ja/apis/language/translate/v2/\
+        using_rest.html#Translate
+        """
+        query = {
+            "format": self.q_format,
+            "key": self.key,
+            "q": [t.encode("utf-8") for t in texts],
+            "source": self.lang_from,
+            "target": self.lang_to,
+        }
+        api, response = self.call_api(query, u"translations")
+        return api, [r[u"translatedText"] for r in response]
+
+    def translate_tts(self, text, lang, f):
+        """ Unofficial Google Text To Speech API
+        http://weston.ruter.net/projects/google-tts/
+        """
+        headers = {"User-Agent":
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-US) "
+            "AppleWebKit/534.16 (KHTML, like Gecko) "
+            "Chrome/10.0.648.204 Safari/534.16"
+        }
+        query = {"tl": lang, "q": text.encode("utf-8")}
+        url = "http://translate.google.com/translate_tts?{0}".format(
+                urlencode(query))
+        req = urllib2.Request(url, None, headers)
+        with closing(urllib2.urlopen(req)) as res:
+            f.write(res.read())
+            f.flush()
+        return self.api()
+
+class GoogleTranslatorV1(object):
+    """
     Translator with Google Translate API
     http://code.google.com/intl/ja/apis/language/translate/overview.html
     see also
@@ -85,21 +180,3 @@ class GoogleTranslator(object):
         _key = "translatedText"
         api, response = self.call_api(self.translate, query, _key)
         return api, self.parse_html(response)
-
-    def translate_tts(self, text, lang, f):
-        """ Unofficial Google Text To Speech API
-        http://weston.ruter.net/projects/google-tts/
-        """
-        headers = {"User-Agent":
-            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-US) "
-            "AppleWebKit/534.16 (KHTML, like Gecko) "
-            "Chrome/10.0.648.204 Safari/534.16"
-        }
-        query = {"tl": lang, "q": text.encode("utf-8")}
-        url = "http://translate.google.com/translate_tts?{0}".format(
-                urlencode(query))
-        req = urllib2.Request(url, None, headers)
-        with closing(urllib2.urlopen(req)) as res:
-            f.write(res.read())
-            f.flush()
-        return self.api()
