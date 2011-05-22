@@ -10,13 +10,11 @@ class TestGoogleTranslator(object):
     def setup(self):
         self.t = TranslatingGoogle("ja", "en", None)
 
-    def test_get_api_path(self):
+    def test_get_url(self):
         def detect(): pass
 
-        expected = "https://www.googleapis.com/language/translate/"\
-                   "v2/detect?q=query&key=key"
-        q = {"key": "key", "q": ["query"]}
-        assert_equal(expected, self.t.get_url(q, detect))
+        expected = "https://www.googleapis.com/language/translate/v2/detect"
+        assert_equal(expected, self.t.get_url(detect))
 
     def test_detect(self):
         res = self.t.detect([unicode("テスト", "utf-8")])

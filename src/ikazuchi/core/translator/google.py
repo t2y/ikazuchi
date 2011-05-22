@@ -30,24 +30,25 @@ class GoogleTranslator(object):
         self.handler = handler
         self._url = "https://{0}{1}".format(self.domain, self.common_path)
 
-    def get_url(self, query, func=None):
-        q = urlencode(query, doseq=True)
+    def get_url(self, func=None):
         if func:
-            url = "{0}v2/{1}?{2}".format(self._url, func.func_name, q)
+            url = "{0}v2/{1}".format(self._url, func.func_name)
         else:
-            url = "{0}v2?{1}".format(self._url, q)
+            url = "{0}v2".format(self._url)
         return url
 
-    def request(self, url):
+    def request(self, url, data):
         req = urllib2.Request(url)
+        req.add_header("X-HTTP-Method-Override", "GET")
+        req.add_data(data)
         with closing(urllib2.urlopen(req)) as res:
             res_json = json.loads(res.read())
         return res_json["data"]
 
     def call_api(self, query, key, func=None):
         """high-level method to make url and request"""
-        url = self.get_url(query, func)
-        response = self.request(url)
+        url = self.get_url(func)
+        response = self.request(url, urlencode(query, doseq=True))
         return self.api(), response[key]
 
     def detect(self, texts):
