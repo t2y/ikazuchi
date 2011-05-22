@@ -9,7 +9,7 @@ from core.translator import TRANSLATE_API
 from locale import _
 from utils import *
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 def get_args():
     _ver = "%(prog)s {0}".format(__version__)

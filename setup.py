@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
 
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
@@ -15,7 +15,7 @@ CLASSIFIERS = [
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: Python Software Foundation License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
@@ -39,7 +39,7 @@ setup(
      author="Tetsuya Morimoto",
      author_email="tetsuya dot morimoto at gmail dot com",
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
-     license="PSL",
+     license="Apache License 2.0",
      py_modules=["izuchi", "raimei", "enrai"],
      packages=find_packages("src"),
      package_dir={"": "src"},
