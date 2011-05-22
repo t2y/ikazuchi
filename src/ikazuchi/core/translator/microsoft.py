@@ -307,5 +307,6 @@ class MicrosoftTranslator(object):
         }
         api, items = self.call_api(self.translate_array, query, None, data)
         step = 7
-        trans = [items[i] for i in xrange(5, len(texts) * step, step)]
+        trans = [self.parse_html(items[i]) for i in
+                        xrange(5, len(texts) * step, step)]
         return api, trans

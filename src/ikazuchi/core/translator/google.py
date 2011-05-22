@@ -85,7 +85,7 @@ class GoogleTranslator(object):
             "target": self.lang_to,
         }
         api, response = self.call_api(query, u"translations")
-        return api, [r[u"translatedText"] for r in response]
+        return api, [self.parse_html(r[u"translatedText"]) for r in response]
 
     def translate_tts(self, text, lang, f):
         """ Unofficial Google Text To Speech API
