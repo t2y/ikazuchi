@@ -64,8 +64,12 @@ def get_east_asian_width(unicode_str):
     18
     >>> get_east_asian_width(unicode("スペース   全角　　　", "utf-8"))
     21
+    >>> get_east_asian_width("string")
+    6
     """
     from unicodedata import east_asian_width
+    if type(unicode_str) is not unicode:
+        unicode_str = unicode(unicode_str, "utf-8")
     width = 0
     for i in unicode_str:
         width += 1
