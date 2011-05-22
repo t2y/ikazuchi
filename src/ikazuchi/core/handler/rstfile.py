@@ -295,6 +295,10 @@ class reSTApiCaller(object):
         self.lang_to = lang_to
 
     def split_text_into_multiline(self, text):
+        if re.search(_LISTBLOCK, text):
+            # FIXME: need to check indent when a list line is split
+            return [text]
+
         if self.lang_to in ("ja"):
             text = text.rstrip()
             eos_ptrn = _END_OF_SENTENCE.get(self.lang_to)
