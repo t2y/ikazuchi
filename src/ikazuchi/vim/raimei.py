@@ -18,8 +18,13 @@ _SENTENCE_PATTERN = {
 
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 
+# use old API temporally
+_v1 = izuchi.translator.google.GoogleTranslatorV1
+class TranslatingGoogle(_v1, izuchi.translator.Translator): pass
+
 # just for alias
 _translate_api = izuchi.translator.TRANSLATE_API
+_translate_api["google"] = TranslatingGoogle
 _call_api_with_multithread = izuchi.translator.utils.call_api_with_multithread
 _rest_caller = izuchi.handler.rstfile.reSTApiCaller
 
