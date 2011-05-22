@@ -2,6 +2,7 @@
 
 import codecs
 import re
+import sys
 import textwrap
 from base import BaseHandler
 from utils import *
@@ -131,11 +132,17 @@ class reSTFileHandler(BaseHandler):
         self.caller = reSTApiCaller(blocks, opts.lang_to)
         self.output = "output.rst"
 
+    def _show_progress(self, lines):
+        sys.stdout.write("." * len(lines))
+        sys.stdout.flush()
+
     def _call_method(self, api_method):
         in_enc, out_enc = self.encoding
         with codecs.open(self.output, mode="w", encoding=out_enc) as f:
             for lines in self.caller.call(api_method):
                 f.writelines(lines)
+                self._show_progress(lines)
+        sys.stdout.write("\n")
 
 
 class reSTParser(object):
@@ -600,7 +607,6 @@ class reSTApiCaller(object):
 
     def call(self, api_method):
         for btype, block_lines, first in self.blocks:
-            print btype, block_lines
             if btype == REST_BLOCK_TYPE["directive"]:
                 r = self._call_for_directive(api_method, block_lines, first)
             elif btype == REST_BLOCK_TYPE["source"]:
