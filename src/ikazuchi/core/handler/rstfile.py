@@ -43,7 +43,8 @@ _REFERENCE = [
 ]
 
 _SOURCE = [
-    ":\s+",     # collon:
+    ":\s*$",    # collon:
+    ":\s+",     # collon: [space]
     "::\s*",    # source::
 ]
 

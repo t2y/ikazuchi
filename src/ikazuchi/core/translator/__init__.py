@@ -21,6 +21,7 @@ class Translator(object):
         r"<span class=[\"']?notranslate[\"']?>(.*?)</span>", re.IGNORECASE)
     whitespaces = re.compile(r"\s+", re.UNICODE)
     zerowidth = re.compile(u"\u200b|\u200c|\u200d|\ufeff", re.UNICODE)
+    colon = re.compile(u"\s+(:+)$", re.UNICODE)
 
     @abc.abstractmethod
     def __init__(self, lang_from, lang_to, handler):
@@ -46,9 +47,11 @@ class Translator(object):
         buf = StringIO()
         p = HTMLParser(AbstractFormatter(DumbWriter(buf)))
         p.feed(_html)
-        _ret = re.sub(self.whitespaces, " ", buf.getvalue())
+        _sub = re.sub(self.whitespaces, " ", buf.getvalue())
         # FIXME: how can zerowidth be removed more simply?
-        return re.sub(self.zerowidth, "", _ret)
+        _sub = re.sub(self.zerowidth, "", _sub)
+        _sub = re.sub(self.colon, r"\1", _sub)
+        return _sub
 
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass
