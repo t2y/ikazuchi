@@ -99,6 +99,7 @@ _DIRECTIVE_WITH_PARAGRAPH = re.compile(r"""(
 
 _EMPTY_LINE = re.compile(r"^\s*$", re.U)
 _LINE_WITH_INDENT = re.compile(r"(^\s+)(.+?)$", re.U)
+_LINE_WITH_INDENT_OR_NONE = re.compile(r"(^\s*)(.+?)$", re.U)
 _PARAGRAPH_START = re.compile(r"^([\S\.]+)(.*?)$", re.U)
 _END_OF_SENTENCE = {
     "en": re.compile(unicode(r".*?[\.\?!]", "utf-8"), re.M | re.U),
@@ -354,29 +355,12 @@ class reSTApiCaller(object):
         return api, self.split_lines_with_eos(_texts)
 
     def _call_for_directive(self, api_method, block_lines, first):
-        def _concatenate_lines(lines):
-            _lines, prev_indent = [], None
-            for line in lines:
-                match = re.search(_LINE_WITH_INDENT, line)
-                if match:
-                    indent, text = match.groups()
-                    if prev_indent == indent:
-                        # FIXME: need to check list/line block ...
-                        _prev = _lines[-1].rstrip()
-                        _lines[-1] = u"{0} {1}".format(_prev, text)
-                    else:
-                        _lines.append(line)
-                    prev_indent = indent
-                else:
-                    _lines.append(line)
-                    prev_indent = None
-            return _lines
-
         if not re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
             return None, block_lines
 
+        # FIXME: need to check list/line block concatenating ...
         api, indents, lines = None, [], []
-        for line in _concatenate_lines(block_lines[1:]):
+        for line in concatenate_lines(block_lines[1:], _LINE_WITH_INDENT):
             match = re.search(_LINE_WITH_INDENT, line)
             indent, line = self._markup_notranslate(line, match)
             indents.append(indent)
@@ -574,31 +558,9 @@ class reSTApiCaller(object):
             lines.append(line)
         return api, lines
 
-    def _concatenate_paragraph_line(self, lines):
-        _lines, prev_indent = [], None
-        for line in lines:
-            match = re.search(_LINE_WITH_INDENT, line)
-            if re.search(_EMPTY_LINE, line):
-                _lines.append(line)
-                prev_indent = None
-            elif match:
-                indent, text = match.groups()
-                if prev_indent == indent:
-                    _prev = _lines[-1].rstrip()
-                    _lines[-1] = u"{0} {1}".format(_prev, text)
-                else:
-                    _lines.append(line)
-                prev_indent = indent
-            elif _lines[-1:]:
-                _lines[-1] = u"{0} {1}".format(_lines[-1].rstrip(), line)
-                prev_indent = None
-            else:
-                _lines.append(line)
-        return _lines
-
     def _call_for_paragraph(self, api_method, block_lines):
         api, indents, lines = None, [], []
-        for line in self._concatenate_paragraph_line(block_lines):
+        for line in concatenate_lines(block_lines, _LINE_WITH_INDENT_OR_NONE):
             match = re.search(_LINE_WITH_INDENT, line)
             indent, line = self._markup_notranslate(line, match)
             indents.append(indent)

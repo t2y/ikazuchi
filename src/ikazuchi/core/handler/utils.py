@@ -1,5 +1,46 @@
 # -*- coding: utf-8 -*-
 
+import re
+
+def concatenate_lines(lines, pattern):
+    """ concatenate lines
+    >>> import re
+    >>> pattern = re.compile(r"(^\s+)(.+?)")
+    >>> lines = [u"a", u" b", u" c", u" d", u"e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a', u' b c d', u'e']
+    >>> lines = [u"a", u" b", u"  c", u"  d", u"e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a', u' b', u'  c d', u'e']
+    >>> lines = [u"a", u" b", u"  c", u" d", u"e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a', u' b', u'  c', u' d', u'e']
+    >>> lines = [u"a", u" b", u"c", u" d", u" e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a', u' b', u'c', u' d e']
+    >>> lines = [u"a", u" b", u" c", u" d", u"  e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a', u' b c d', u'  e']
+    >>> pattern = re.compile(r"(^\s*)(.+?)")
+    >>> lines = [u"a", u"b", u"c", u" d", u"e"]
+    >>> concatenate_lines(lines, pattern)
+    [u'a b c', u' d', u'e']
+    """
+    _lines, prev_prefix = [], None
+    for line in lines:
+        match = re.search(pattern, line)
+        if match:
+            prefix, text = match.groups()
+            if prev_prefix == prefix:
+                _lines[-1] = u"{0} {1}".format(_lines[-1].rstrip(), text)
+            else:
+                _lines.append(line)
+            prev_prefix = prefix
+        else:
+            _lines.append(line)
+            prev_prefix = None
+    return _lines
+
 def get_multiline(lines, range_num):
     """ read lines every range_num
     >>> list(get_multiline(["a", "b", "c"], 2))
