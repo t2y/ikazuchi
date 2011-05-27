@@ -1,5 +1,6 @@
 include buildout.cfg
 include bootstrap.py
 include MANIFEST.in
-recursive-include examples *.po
+include LICENSE
+recursive-include examples *.po *.rst
 recursive-include src *.py *.txt
