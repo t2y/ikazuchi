@@ -12,8 +12,7 @@ from utils import *
 __version__ = "0.4.0"
 
 def get_args():
-    _ver = "%(prog)s {0}".format(__version__)
-    parser = argparse.ArgumentParser(version=_ver)
+    parser = argparse.ArgumentParser()
     parser.set_defaults(api="google", detect=False, lang=False,
                         lang_from="en", lang_to=get_lang(),
                         po_file=None, rst_file=None, sentence=None,
@@ -39,6 +38,8 @@ def get_args():
                         metavar="SENTENCE", help=u"target sentences")
     parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
                         help=u"target language to translate")
+    parser.add_argument("--version", action="version",
+                        version="%(prog)s {0}".format(__version__))
 
     opts = parser.parse_args()
     if not opts.lang_to:
