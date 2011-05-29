@@ -21,7 +21,7 @@ class GoogleTranslator(object):
     """
     domain = "www.googleapis.com"
     common_path = "/language/translate/"
-    key = "AIzaSyDDCHHwbfHLIsHWEhxAu41UmrRCg_Xmvm8"
+    apikey = "AIzaSyDDCHHwbfHLIsHWEhxAu41UmrRCg_Xmvm8"
     q_format = "html"
 
     def __init__(self, lang_from, lang_to, handler):
@@ -57,7 +57,7 @@ class GoogleTranslator(object):
         using_rest.html#detect-language
         """
         query = {
-            "key": self.key,
+            "key": self.apikey,
             "q": [t.encode("utf-8") for t in texts],
         }
         return self.call_api(query, u"detections", func=self.detect)
@@ -68,7 +68,7 @@ class GoogleTranslator(object):
         using_rest.html#supported-languages
         """
         query = {
-            "key": self.key,
+            "key": self.apikey,
             "target": self.lang_to,
         }
         return self.call_api(query, u"languages", func=self.languages)
@@ -80,7 +80,7 @@ class GoogleTranslator(object):
         """
         query = {
             "format": self.q_format,
-            "key": self.key,
+            "key": self.apikey,
             "q": [t.encode("utf-8") for t in texts],
             "source": self.lang_from,
             "target": self.lang_to,
@@ -116,8 +116,8 @@ class GoogleTranslatorV1(object):
     """
     domain = "ajax.googleapis.com"
     common_path = "/ajax/services/language/"
-    key = "ABQIAAAAK6kpHnylgmAYtO7ZX01XXRSvW2ISZ2KI4wU-F"\
-          "k6WlRk77d73EhTtYeI1LUl3BfkKv-17KKEWzdRTMw"
+    apikey = "ABQIAAAAK6kpHnylgmAYtO7ZX01XXRSvW2ISZ2KI4wU-F"\
+             "k6WlRk77d73EhTtYeI1LUl3BfkKv-17KKEWzdRTMw"
     userip = get_ip_address()
     q_format = "html"
 
@@ -160,7 +160,7 @@ class GoogleTranslatorV1(object):
         query = {
             "v": "1.0",
             "q": text.encode("utf-8"),
-            "key": self.key,
+            "key": self.apikey,
             "userip": self.userip,
         }
         return self.call_api(self.detect, query, "language")
@@ -174,7 +174,7 @@ class GoogleTranslatorV1(object):
             "v": "1.0",
             "q": text.encode("utf-8"),
             "langpair": "{0}|{1}".format(self.lang_from, self.lang_to),
-            "key": self.key,
+            "key": self.apikey,
             "userip": self.userip,
             "format": self.q_format,
         }

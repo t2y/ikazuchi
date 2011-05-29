@@ -5,6 +5,7 @@ import argparse
 import os
 import sys
 
+from conf import (get_conf, get_conf_path)
 from core.translator import TRANSLATE_API
 from locale import _
 from utils import *
@@ -68,11 +69,15 @@ def get_args():
     return opts
 
 def main():
+    # pre process
+    check_python_version()
+    conf = get_conf(get_conf_path())
+    # main process
     opts = get_args()
     handler = get_handler(opts)
     t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
+    t.set_apikey_from_conf(conf)
     t.call_method_with_handler()
 
 if __name__ == "__main__":
-    check_python_version()
     main()

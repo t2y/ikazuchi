@@ -6,6 +6,7 @@ import utils
 from google import GoogleTranslator
 from microsoft import MicrosoftTranslator
 from yahoo import YahooTranslator
+from ikazuchi.conf import show_how_to_get_apikey
 
 __all__ = [
     "TRANSLATE_API",
@@ -52,6 +53,16 @@ class Translator(object):
         _sub = re.sub(self.zerowidth, "", _sub)
         _sub = re.sub(self.colon, r"\1", _sub)
         return _sub
+
+    def set_apikey(self, key):
+        self.apikey = key
+
+    def set_apikey_from_conf(self, conf):
+        _key = conf.get(self.api().lower(), "apikey")
+        if _key:
+            self.apikey = _key
+        else:
+            show_how_to_get_apikey()
 
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, Translator): pass

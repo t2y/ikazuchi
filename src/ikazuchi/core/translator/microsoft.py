@@ -19,7 +19,7 @@ class MicrosoftTranslator(object):
     """
     domain = "api.microsofttranslator.com"
     common_path = "/V2/Http.svc/"
-    app_id = "D9D0E326A70EA4E66218F43130890052808A0142"
+    apikey = "D9D0E326A70EA4E66218F43130890052808A0142"
     max_trans = "5"
     schema = {
         "base": "http://schemas.microsoft.com/2003/10/Serialization/",
@@ -142,7 +142,7 @@ class MicrosoftTranslator(object):
         http://msdn.microsoft.com/en-us/library/ff512410.aspx
         """
         query = {
-            "appId": self.app_id,
+            "appId": self.apikey,
             "text": text.encode("utf-8"),
             "language": self.lang_from,
         }
@@ -153,7 +153,7 @@ class MicrosoftTranslator(object):
         """ Detect Method
         http://msdn.microsoft.com/en-us/library/ff512411.aspx
         """
-        query = {"appId": self.app_id, "text": text.encode("utf-8")}
+        query = {"appId": self.apikey, "text": text.encode("utf-8")}
         api, items = self.call_api(self.detect, query,
                                    self.xml_tag["base"]["str"])
         return api, items[0]
@@ -162,7 +162,7 @@ class MicrosoftTranslator(object):
         """ DetectArray Method
         http://msdn.microsoft.com/en-us/library/ff512412.aspx
         """
-        query = {"appId": self.app_id}
+        query = {"appId": self.apikey}
         data = {
             "type": self.content_type["xml"],
             "data": self.serialize_array(texts, *self.xml_type["str"]),
@@ -174,7 +174,7 @@ class MicrosoftTranslator(object):
         """ GetLanguageNames Method
         http://msdn.microsoft.com/en-us/library/ff512414.aspx
         """
-        query = {"appId": self.app_id, "locale": self.lang_to}
+        query = {"appId": self.apikey, "locale": self.lang_to}
         data = {
             "type": self.content_type["xml"],
             "data": self.serialize_array(lang_codes, *self.xml_type["str"]),
@@ -186,7 +186,7 @@ class MicrosoftTranslator(object):
         """ GetLanguagesForSpeak Method
         http://msdn.microsoft.com/en-us/library/ff512415.aspx
         """
-        query = {"appId": self.app_id}
+        query = {"appId": self.apikey}
         return self.call_api(self.get_languages_for_speak, query,
                              self.xml_tag["array"]["str"])
 
@@ -194,7 +194,7 @@ class MicrosoftTranslator(object):
         """ GetLanguagesForTranslate Method
         http://msdn.microsoft.com/en-us/library/ff512416.aspx
         """
-        query = {"appId": self.app_id}
+        query = {"appId": self.apikey}
         return self.call_api(self.get_languages_for_translate, query,
                              self.xml_tag["array"]["str"])
 
@@ -203,7 +203,7 @@ class MicrosoftTranslator(object):
         http://msdn.microsoft.com/en-us/library/ff512417.aspx
         """
         query = {
-            "appId": self.app_id,
+            "appId": self.apikey,
             "text": text.encode("utf-8"),
             "from": self.lang_from,
             "to": self.lang_to,
@@ -226,9 +226,9 @@ class MicrosoftTranslator(object):
         """ GetTranslationsArray Method
         http://msdn.microsoft.com/en-us/library/ff512418.aspx
         """
-        query = {"appId": self.app_id}
+        query = {"appId": self.apikey}
         params = [
-            ("AppId", self.app_id),
+            ("AppId", self.apikey),
             ("From", self.lang_from),
             ("Options", [
                 ("Category", "general"),
@@ -254,7 +254,7 @@ class MicrosoftTranslator(object):
         """
         # FIXME: consider later
         query = {
-            "appId": self.app_id,
+            "appId": self.apikey,
             "text": text.encode("utf-8"),
             "language": lang,
             "format": "audio/wav",
@@ -271,7 +271,7 @@ class MicrosoftTranslator(object):
         http://msdn.microsoft.com/en-us/library/ff512421.aspx
         """
         query = {
-            "appId": self.app_id,
+            "appId": self.apikey,
             "text": text.encode("utf-8"),
             "from": self.lang_from,
             "to": self.lang_to,
@@ -286,9 +286,9 @@ class MicrosoftTranslator(object):
         """ TranslateArray Method
         http://msdn.microsoft.com/en-us/library/ff512422.aspx
         """
-        query = {"appId": self.app_id}
+        query = {"appId": self.apikey}
         params = [
-            ("AppId", self.app_id),
+            ("AppId", self.apikey),
             ("From", self.lang_from),
             ("Options", [
                 ("Category", "general"),
