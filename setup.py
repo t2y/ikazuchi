@@ -25,8 +25,7 @@ CLASSIFIERS = [
 ]
 
 INSTALL_REQUIRES = ["setuptools", "polib"]
-_ver = sys.version_info
-if _ver[0] == 2 and _ver[1] < 7:
+if sys.version_info < (2, 7):
     INSTALL_REQUIRES.append("argparse")
 
 setup(

@@ -55,7 +55,6 @@ def convert_str_to_unicode(opts):
 _UNSUPPORTED_VERSION = _("Unsupported Python version, use 2.6 above")
 
 def check_python_version():
-    ver = sys.version_info
-    if ver[0] == 2 and ver[1] < 6:
+    if sys.version_info < (2, 6):
         print _UNSUPPORTED_VERSION
         sys.exit(0)
