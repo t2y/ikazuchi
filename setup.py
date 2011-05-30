@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
 
-VERSION = '0.4.0'
+VERSION = "0.4.1"
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
@@ -52,8 +52,8 @@ setup(
              "pep8",
          ],
      ),
-     test_suite='nose.collector',
-     tests_require=['Nose','minimock','pep8'],
+     test_suite="nose.collector",
+     tests_require=["Nose","minimock","pep8"],
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main

@@ -32,7 +32,7 @@ Make environment::
 
    $ hg clone https://t2y@bitbucket.org/t2y/ikazuchi
    $ cd ikazuchi
-   $ python bootstrap.py
+   $ python bootstrap.py -d
    $ bin/buildout
 
 
@@ -91,6 +91,13 @@ Apache License 2.0
 
 History
 =======
+
+0.4.1 (2011-05-31)
+------------------
+* upgrade enrai/raimei scripts with updated Translate API
+* add setting apikey feature for Translator with configuration file
+* add LICENSE file for distribution
+* fixed some minor bugs
 
 0.4.0 (2011-05-23)
 ------------------

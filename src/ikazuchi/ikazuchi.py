@@ -10,7 +10,7 @@ from core.translator import TRANSLATE_API
 from locale import _
 from utils import *
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 def get_args():
     parser = argparse.ArgumentParser()
