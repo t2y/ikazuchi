@@ -56,7 +56,9 @@ def get_args():
     elif opts.encoding:
         err_encoding = check_encoding(opts.encoding)
         if err_encoding:
-            err_msg = _(u"unknown encodings: {0}").format(err_encoding)
+            err_msg = _(u"Unknown encodings: {0}").format(err_encoding)
+    elif not (opts.lang or opts.po_file or opts.rst_file or opts.sentences):
+        err_msg = _(u"Need to specify optional arguments")
 
     if err_msg:
         parser.print_help()
