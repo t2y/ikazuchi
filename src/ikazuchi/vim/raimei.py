@@ -5,9 +5,11 @@ try:
 except ImportError:
     print "call ':pyfile raimei' from vim"
 
-import izuchi
 import re
 import sys
+from ikazuchi.core.handler.rstfile import reSTApiCaller
+from ikazuchi.core.translator import (Translator, TRANSLATE_API)
+from ikazuchi.core.translator.utils import call_api_with_multithread
 from os.path import splitext
 from utils import (to_unicode, to_encode, get_vim_variables)
 
@@ -19,14 +21,9 @@ _SENTENCE_PATTERN = {
 _END_OF_SENTENCE = unicode(r"[\.|\?|:|!|。|．|？|！]$", "utf-8")
 
 # use old API temporally
-_v1 = izuchi.translator.google.GoogleTranslatorV1
-class TranslatingGoogle(_v1, izuchi.translator.Translator): pass
-
-# just for alias
-_translate_api = izuchi.translator.TRANSLATE_API
-_translate_api["google"] = TranslatingGoogle
-_call_api_with_multithread = izuchi.translator.utils.call_api_with_multithread
-_rest_caller = izuchi.handler.rstfile.reSTApiCaller
+from ikazuchi.core.translator.google import GoogleTranslatorV1
+class TranslatingGoogle(GoogleTranslatorV1, Translator): pass
+TRANSLATE_API["google"] = TranslatingGoogle
 
 def remove_imcomplete_line(lines, start, enc):
     prev = vim.current.buffer[start - 1:start]
@@ -64,7 +61,7 @@ def get_target_lines(start, end, enc):
     if not lines:
         # with lines "as is"
         lines = to_unicode(vim.current.buffer[start:end], enc)
-    return map(_rest_caller.markup_paragraph_notranslate, lines)
+    return map(reSTApiCaller.markup_paragraph_notranslate, lines)
 
 _MAX_TARGET_RANGE = 100
 
@@ -84,7 +81,7 @@ def translate_with_range(translator, enc):
     start, end = get_target_range()
     target_lines = get_target_lines(start, end, enc)
     # call translate API with multithread
-    ret = _call_api_with_multithread(translator.translate, target_lines)
+    ret = call_api_with_multithread(translator.translate, target_lines)
     api = ret[0][0]
     # previous and last empty lines are just for look and feel
     translated = ["", ] + [r.encode(enc) for _, r in ret] + ["", ]
@@ -95,7 +92,7 @@ def translate_with_range(translator, enc):
     print "Translated by {0}".format(api.encode(enc))
 
 def translate(api_name, lang_from, lang_to, enc):
-    translator = _translate_api[api_name](lang_from, lang_to, None)
+    translator = TRANSLATE_API[api_name](lang_from, lang_to, None)
     return translate_with_range(translator, enc)
 
 def comment_out_original_lines():

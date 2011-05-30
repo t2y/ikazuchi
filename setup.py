@@ -39,7 +39,7 @@ setup(
      author_email="tetsuya dot morimoto at gmail dot com",
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
      license="Apache License 2.0",
-     py_modules=["izuchi", "raimei", "enrai"],
+     py_modules=["raimei", "enrai"],
      packages=find_packages("src"),
      package_dir={"": "src"},
      package_data = {"": ["buildout.cfg"]},

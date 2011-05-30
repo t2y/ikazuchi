@@ -5,8 +5,8 @@ try:
 except ImportError:
     print "call ':pyfile enrai' from vim"
 
-import izuchi
 import sys
+from ikazuchi.core.translator import TRANSLATE_API
 from utils import (to_unicode, to_encode, get_vim_variables)
 
 def get_word_on_cursor(enc):
@@ -28,7 +28,7 @@ def translate_with_word(t, enc):
         print "Translated by {0}: {1}".format(*to_encode(ret, enc))
 
 def translate(api_name, lang_from, lang_to, enc):
-    t = izuchi.translator.TRANSLATE_API[api_name](lang_from, lang_to, None)
+    t = TRANSLATE_API[api_name](lang_from, lang_to, None)
     return translate_with_word(t, enc)
 
 def main():
