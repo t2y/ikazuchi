@@ -23,9 +23,9 @@ def get_word_on_cursor(enc):
 def translate_with_word(t, enc):
     word = get_word_on_cursor(enc)
     if word:
-        ret = t.translate(word)
+        api, trans = t.translate([word])
         vim.command("let enrai_target_word='{0}'".format(word.encode(enc)))
-        print "Translated by {0}: {1}".format(*to_encode(ret, enc))
+        print "Translated by {0}: {1}".format(api, trans[0].encode(enc))
 
 def translate(api_name, lang_from, lang_to, enc):
     t = TRANSLATE_API[api_name](lang_from, lang_to, None)
