@@ -59,13 +59,13 @@ class TestreSTApiCaller(object):
     def __init__(self):
         self.caller = reSTApiCaller(None, "en")
         self._class = self.__class__.__name__
-        self._fmt = u"{0}.{1}_{2} ({3} ...)"
+        self._fmt = u"{0}.{1}_{2}"
 
     def _test_func(self, data_set, func):
         # common assert function for each test
         _func = func.func_name
         for num, (data, expected) in enumerate(data_set):
-            name = self._fmt.format(self._class, _func, num, str(data)[:10])
+            name = self._fmt.format(self._class, _func, num)
             _assert = lambda e, a: assert_equal(e, a)
             _assert.description = name
             yield _assert, expected, func(data)
@@ -104,6 +104,20 @@ class TestreSTApiCaller(object):
         from data.rst.api_call_markup_notranslate import DATA_SET
         for r in self._test_func(DATA_SET,
                     reSTApiCaller.markup_paragraph_notranslate):
+            yield r
+
+    def test_split_text_into_multiline(self):
+        self.caller.lang_to = "en"
+        from data.rst.api_call_split_text import DATA_SET
+        _func = self.caller.split_text_into_multiline
+        for r in self._test_func(DATA_SET, _func):
+            yield r
+
+    def test_split_text_into_multiline_ja(self):
+        self.caller.lang_to = "ja"
+        from data.rst.api_call_split_text_ja import DATA_SET
+        _func = self.caller.split_text_into_multiline
+        for r in self._test_func(DATA_SET, _func):
             yield r
 
     def test_call_for_directive(self):
