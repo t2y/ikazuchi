@@ -309,16 +309,25 @@ class reSTApiCaller(object):
     def split_text_into_multiline(self, text):
         # FIXME: only valid for paragraph, need for other blocks
         if self.lang_to in ("ja"):
+            def set_indent(lines):
+                indent, _text = self.get_indent_and_text(lines[0])
+                lines[0] = _text  # replace first line with text removed indent
+                _lines = []
+                for line in lines:
+                    line = line[1:] if line[:1] == " " else line
+                    _lines.append(u"{0}{1}\n".format(indent, line))
+                return _lines
+
             text = text.rstrip()
             eos_ptrn = _END_OF_SENTENCE.get(self.lang_to)
-            _lines = re.findall(eos_ptrn, text)
-            if not _lines:
-                _lines = [text]
+            lines = re.findall(eos_ptrn, text)
+            if not lines:
+                lines = [text]
             else:
-                extra_text = text[len(u"".join(_lines)):]
+                extra_text = text[len(u"".join(lines)):]
                 if extra_text:
-                    _lines.append(extra_text)
-            return [u"{0}\n".format(line) for line in _lines]
+                    lines.append(extra_text)
+            return set_indent(lines)
         else:
             indent, _ = self.get_indent_and_text(text)
             dedented_text = textwrap.dedent(text).strip()
