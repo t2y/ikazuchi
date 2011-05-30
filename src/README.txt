@@ -97,7 +97,7 @@ History
 * upgrade enrai/raimei scripts with updated Translate API
 * add setting apikey feature for Translator with configuration file
 * add LICENSE file for distribution
-* fixed some minor bugs
+* fix some minor bugs
 
 0.4.0 (2011-05-23)
 ------------------
