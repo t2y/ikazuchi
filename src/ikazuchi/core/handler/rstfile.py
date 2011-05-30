@@ -307,10 +307,7 @@ class reSTApiCaller(object):
         self.lang_to = lang_to
 
     def split_text_into_multiline(self, text):
-        if re.search(_LISTBLOCK, text):
-            # FIXME: need to check indent when a list line is split
-            return [text]
-
+        # FIXME: only valid for paragraph, need for other blocks
         if self.lang_to in ("ja"):
             text = text.rstrip()
             eos_ptrn = _END_OF_SENTENCE.get(self.lang_to)
@@ -350,13 +347,13 @@ class reSTApiCaller(object):
         return api, u"{0}{1}\n".format(prefix, result[0])
 
     def _call_keeping_prefix_with_array(self, api_method, indents, lines):
-        _texts = []
+        trans = []
         for pos in range(0, len(indents), self.max_query):
             _idns = indents[pos:pos + self.max_query]
             _lines = lines[pos:pos + self.max_query]
-            api, trans = api_method(_lines)
-            _texts.extend([u"{0}{1}\n".format(*i) for i in zip(_idns, trans)])
-        return api, self.split_lines_with_eos(_texts)
+            api, _trans = api_method(_lines)
+            trans.extend([u"{0}{1}\n".format(*i) for i in zip(_idns, _trans)])
+        return api, trans
 
     def _call_for_directive(self, api_method, block_lines, first):
         if not re.search(_DIRECTIVE_WITH_PARAGRAPH, first):
@@ -569,7 +566,9 @@ class reSTApiCaller(object):
             indent, line = self._markup_notranslate(line, match)
             indents.append(indent)
             lines.append(line)
-        return self._call_keeping_prefix_with_array(api_method, indents, lines)
+        api, trans = self._call_keeping_prefix_with_array(api_method,
+                                                          indents, lines)
+        return api, self.split_lines_with_eos(trans)
 
     def call(self, api_method):
         for btype, block_lines, first in self.blocks:

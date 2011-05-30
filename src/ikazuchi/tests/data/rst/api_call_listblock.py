@@ -6,7 +6,7 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line"],
@@ -26,7 +26,7 @@ DATA_SET = [
 
         [u"* first line\n",
          u"* second line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -42,7 +42,7 @@ DATA_SET = [
 
         [u"* first line\n",
          u"  * second line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -51,9 +51,9 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -64,7 +64,7 @@ DATA_SET = [
         [u"* first line\n",
          u"  * second line\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -76,7 +76,7 @@ DATA_SET = [
         [u"* first line sub line\n",
          u"  * second line\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -88,7 +88,7 @@ DATA_SET = [
         [u"* first line\n",
          u"  * second line sub line\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -100,7 +100,7 @@ DATA_SET = [
         [u"* first line\n",
          u"  * second line\n",
          u"    * third line sub line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -113,7 +113,7 @@ DATA_SET = [
         [u"* first line sub line and then\n",
          u"  * second line\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -126,7 +126,7 @@ DATA_SET = [
         [u"* first line\n",
          u"  * second line sub line and then\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -139,7 +139,7 @@ DATA_SET = [
         [u"* first line\n",
          u"  * second line\n",
          u"    * third line sub line and then\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -150,11 +150,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -166,11 +166,11 @@ DATA_SET = [
          u""],
 
         [u"* first line sub line\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -182,11 +182,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line sub line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -198,11 +198,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u"",
+         u"\n",
          u"    * third line sub line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -215,11 +215,11 @@ DATA_SET = [
          u""],
 
         [u"* first line sub line and then\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -232,11 +232,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line sub line and then\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -249,11 +249,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  * second line\n",
-         u"",
+         u"\n",
          u"    * third line sub line and then\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -263,10 +263,10 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
          u"  - third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -277,11 +277,11 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    - third line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -294,13 +294,13 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
-         u"",
+         u"\n",
          u"  - fourth line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -314,13 +314,13 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    * third line sub line\n",
-         u"",
+         u"\n",
          u"  - fourth line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -333,12 +333,12 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    * third line sub line\n",
          u"  - fourth line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -352,14 +352,14 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    * third line\n",
          u"    * fourth line\n",
-         u"",
+         u"\n",
          u"  - fifth line\n",
-         u""]
+         u"\n"]
     ),
     (
         [u"* first line",
@@ -375,13 +375,13 @@ DATA_SET = [
          u""],
 
         [u"* first line\n",
-         u"",
+         u"\n",
          u"  - second line\n",
-         u"",
+         u"\n",
          u"    * third line sub line\n",
          u"    * fourth line sub line\n",
-         u"",
+         u"\n",
          u"  - fifth line\n",
-         u""]
+         u"\n"]
     ),
 ]
