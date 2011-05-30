@@ -49,6 +49,18 @@ DATA_SET = [
          2]
     ),
     (
+        [u"previous sentence.\n",
+         u"\n",
+         u"*******\n",
+         u"feature\n",
+         u"*******\n",
+         u""],
+        [(None,
+          [],
+          u""),
+         0]
+    ),
+    (
         [u"subsection\n",
          u"----------\n",
          u""],
