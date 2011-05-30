@@ -18,7 +18,7 @@ except ImportError:
 
 _INLINE = [
     "\*+.*?\*+",    # italic or bold
-    "``.*?``",      # literal
+    "`+.*?`+",      # literal
 ]
 
 _ROLE = [
@@ -27,7 +27,7 @@ _ROLE = [
 
 _HYPER_LINK = [
     "https?://[^ ]+",               # http://xxx
-    "`.*?\s*`__?",                  # `link <http://>`_ , `link`_ or `name`__
+    "`.*?`__?",                     # `link <http://>`_ , `link`_ or `name`__
     "^\.\.\s*_.*?:\s*https?://[^ ]+$",  # .. _link: http://xxx
     "^__\s*https?://[^ ]+$",        # __ http://xxx
 ]
@@ -48,7 +48,9 @@ _SOURCE = [
     "::\s*",    # source::
 ]
 
-_NOTRANSLATE = _INLINE + _ROLE + _HYPER_LINK + _RUBRIC + _REFERENCE + _SOURCE
+# FIXME: it need to match first _HYPERLINK than _LILINE
+#      : because, `link`_ is matched in preference to `literal`
+_NOTRANSLATE = _ROLE + _HYPER_LINK + _INLINE + _RUBRIC + _REFERENCE + _SOURCE
 _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
 

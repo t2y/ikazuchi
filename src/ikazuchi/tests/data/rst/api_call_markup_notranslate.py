@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
 DATA_SET = [
-    (   # inline markup
+    (   # inline markup 1
         u"rest *inline* **markup** is very ``simple``.",
 
         u"rest <span class=notranslate>*inline*</span> "\
         u"<span class=notranslate>**markup**</span> is very "\
         u"<span class=notranslate>``simple``</span>."
+    ),
+    (   # inline markup 2
+        u"Now, `ikazuchi` is under development.",
+
+        u"Now, <span class=notranslate>`ikazuchi`</span> "\
+        u"is under development."
     ),
     (   # hyper link 1
         u"a link `ikazuchi <http://pypi.python.org/pypi/ikazuchi/>`_",
