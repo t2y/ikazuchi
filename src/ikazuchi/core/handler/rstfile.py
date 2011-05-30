@@ -269,7 +269,7 @@ class reSTParser(object):
             for mline in get_multiline(_lines, 3):
                 match = re.search(_SECTION, "".join(mline))
                 if re.search(_EMPTY_LINE, mline[0]) or (
-                   mline[1] and re.search(_EMPTY_LINE, mline[1])):
+                   mline[1:] and re.search(_EMPTY_LINE, mline[1])):
                     break
                 elif match:
                     d = match.groupdict()
@@ -347,7 +347,7 @@ class reSTApiCaller(object):
         return api, u"{0}{1}\n".format(prefix, result[0])
 
     def _call_keeping_prefix_with_array(self, api_method, indents, lines):
-        trans = []
+        api, trans = None, []
         for pos in range(0, len(indents), self.max_query):
             _idns = indents[pos:pos + self.max_query]
             _lines = lines[pos:pos + self.max_query]

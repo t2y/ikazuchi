@@ -16,7 +16,7 @@ class Translator(object):
     """Base class for Translator"""
 
     __metaclass__ = abc.ABCMeta
-    api = lambda klass: klass.__class__.__name__.replace('Translating', '')
+    api = lambda klass: klass.__class__.__name__.replace("Translating", "")
     # FIXME: span tag only, cannot match for minimal when html tag is nested
     notrans_tag = re.compile(
         r"<span class=[\"']?notranslate[\"']?>(.*?)</span>", re.IGNORECASE)
