@@ -5,7 +5,6 @@ try:
 except ImportError:
     print "call ':pyfile enrai' from vim"
 
-import sys
 from ikazuchi.core.translator import TRANSLATE_API
 from utils import (to_unicode, to_encode, get_vim_variables,
                    get_apikey, get_translate_method)
@@ -39,8 +38,7 @@ def main():
         vim_vars = get_vim_variables()
         translate(*vim_vars)
     except Exception as err:
-        print err.message
-        return
+        print "Got error: {0}".format(err.message)
 
 if __name__ == "__main__":
     main()
