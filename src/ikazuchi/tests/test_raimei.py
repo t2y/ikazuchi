@@ -46,13 +46,15 @@ class TestRaimei(object):
 
     def test_get_target_range(self):
         class Buffer(Mock):
+            buf = ["first line", "second line", "third line",
+                   "fourth line", "fifth line", ""]
+
+            def __len__(self):
+                return len(self.buf)
+
             def __getitem__(self, i):
-                return ["first line",
-                        "second line",
-                        "third line",
-                        "fourth line",
-                        "fifth line",
-                        ""][i]
+                return self.buf[i]
+
         raimei.vim.current.buffer = Buffer("buffer")
         raimei.vim.current.range.start = 2
         raimei.vim.current.range.end = 2
@@ -61,3 +63,25 @@ class TestRaimei(object):
         # other line on the cursor, only single line range is specified
         raimei.vim.current.window.cursor = (1, 0)
         assert_equal((2, 3), raimei.get_target_range())
+
+    def test_get_target_range_infinite(self):
+        class Buffer(Mock):
+            buf = ["first line", "second line", "third line"]
+
+            def __len__(self):
+                return len(self.buf)
+
+            def __getitem__(self, i):
+                return self.buf[i]
+
+        raimei.vim.current.buffer = Buffer("buffer")
+        # from 1st line
+        raimei.vim.current.range.start = 0
+        raimei.vim.current.range.end = 0
+        raimei.vim.current.window.cursor = (1, 0)
+        assert_equal((0, 3), raimei.get_target_range())
+        # from 2nd line
+        raimei.vim.current.range.start = 1
+        raimei.vim.current.range.end = 1
+        raimei.vim.current.window.cursor = (2, 0)
+        assert_equal((1, 3), raimei.get_target_range())

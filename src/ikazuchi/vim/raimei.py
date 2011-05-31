@@ -21,7 +21,8 @@ def get_target_range():
     start = vim.current.range.start
     end = vim.current.range.end + 1
     if cur_row == end and (start + 1) == end:
-        while vim.current.buffer[end:end + 1] != [""]:
+        max_row = len(vim.current.buffer)
+        while vim.current.buffer[end:end + 1] != [""] and end < max_row:
             end += 1
     return start, end
 
