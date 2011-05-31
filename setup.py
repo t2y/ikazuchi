@@ -39,7 +39,7 @@ setup(
      author_email="tetsuya dot morimoto at gmail dot com",
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
      license="Apache License 2.0",
-     py_modules=["raimei", "enrai"],
+     py_modules=[],
      packages=find_packages("src"),
      package_dir={"": "src"},
      package_data = {"": ["buildout.cfg"]},
@@ -57,7 +57,7 @@ setup(
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
-        raimei = raimei:main
-        enrai = enrai:main
+        raimei = ikazuchi.vim.raimei:main
+        enrai = ikazuchi.vim.enrai:main
      """,
 )
