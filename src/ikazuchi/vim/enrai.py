@@ -6,8 +6,8 @@ except ImportError:
     print "call ':pyfile enrai' from vim"
 
 from ikazuchi.core.translator import TRANSLATE_API
-from utils import (to_unicode, to_encode, get_vim_variables,
-                   get_apikey, get_translate_method)
+from ikazuchi.vim.utils import (to_unicode, get_vim_variables,
+                                get_apikey, get_translate_method)
 
 def get_word_on_cursor(enc):
     words = to_unicode(vim.current.line.split(" "), enc)

@@ -7,9 +7,9 @@ except ImportError:
 
 from ikazuchi.core.handler.rstfile import reSTParser, reSTApiCaller
 from ikazuchi.core.translator import TRANSLATE_API
+from ikazuchi.vim.utils import (to_encode, get_vim_variables,
+                                get_apikey, get_translate_method)
 from os.path import splitext
-from utils import (to_unicode, to_encode, get_vim_variables,
-                   get_apikey, get_translate_method)
 
 def get_target_lines(start, end, enc):
     _lines = vim.current.buffer[start:end]
