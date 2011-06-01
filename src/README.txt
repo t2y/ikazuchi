@@ -92,6 +92,11 @@ Apache License 2.0
 History
 =======
 
+0.4.2 (2011-06-01)
+------------------
+* change to call enrai/raimei scripts with portability
+* fix some minor bugs for enrai/raimei
+
 0.4.1 (2011-05-31)
 ------------------
 * upgrade enrai/raimei scripts with updated Translate API
