@@ -60,7 +60,7 @@ def main():
         if ext == "rst":
             comment_out_original_lines()
     except Exception as err:
-        print "Got error: {0}".format(err.message)
+        print "Got error: {0}".format(err)
 
 if __name__ == "__main__":
     main()

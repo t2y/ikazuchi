@@ -38,7 +38,7 @@ def main():
         vim_vars = get_vim_variables()
         translate(*vim_vars)
     except Exception as err:
-        print "Got error: {0}".format(err.message)
+        print "Got error: {0}".format(err)
 
 if __name__ == "__main__":
     main()
