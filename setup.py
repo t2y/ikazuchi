@@ -24,7 +24,7 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Internationalization",
 ]
 
-INSTALL_REQUIRES = ["setuptools", "polib"]
+INSTALL_REQUIRES = ["distribute", "polib"]
 if sys.version_info < (2, 7):
     INSTALL_REQUIRES.append("argparse")
 
@@ -40,9 +40,10 @@ setup(
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
      license="Apache License 2.0",
      py_modules=[],
+     scripts=["src/ikazuchi/vim/raimei", "src/ikazuchi/vim/enrai"],
      packages=find_packages("src"),
      package_dir={"": "src"},
-     package_data = {"": ["buildout.cfg"]},
+     package_data={"": ["buildout.cfg"]},
      include_package_data=True,
      install_requires=INSTALL_REQUIRES,
      extras_require=dict(
@@ -57,6 +58,8 @@ setup(
      entry_points="""
         [console_scripts]
         ikazuchi = ikazuchi:main
+        [ikazuchi]
+        main = ikazuchi:main
         raimei = ikazuchi.vim.raimei:main
         enrai = ikazuchi.vim.enrai:main
      """,
