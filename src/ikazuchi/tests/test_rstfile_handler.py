@@ -3,7 +3,7 @@
 from nose.tools import *
 
 # functions for test
-from ikazuchi.core.handler.rstfile import *
+from ikazuchi.plugins.rstfile import *
 
 class TestreSTParser(object):
 

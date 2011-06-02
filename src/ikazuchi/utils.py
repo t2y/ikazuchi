@@ -15,8 +15,6 @@ def get_handler(opts):
     h = NullHandler()
     if opts.lang:
         h = LanguageHandler(opts.api, opts.encoding)
-    elif opts.rst_file:
-        h = reSTFileHandler(opts)
     elif opts.sentences:
         # FIXME: consider later about audio handler
         if (opts.sentences[0] == "audio" or opts.sentences[-1] == "audio") \

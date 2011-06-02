@@ -4,8 +4,8 @@ import codecs
 import re
 import sys
 import textwrap
-from base import BaseHandler
-from utils import *
+from ikazuchi.core.handler.base import BaseHandler
+from ikazuchi.core.handler.utils import *
 
 # for Debug
 import logging
@@ -120,14 +120,14 @@ REST_BLOCK_TYPE = {
 }
 
 
-class reSTFileHandler(BaseHandler):
+class Handler(BaseHandler):
     """
     Handler class for translating reST file
     """
     def __init__(self, opts):
         if opts.api == "microsoft":
             self.method_name = "translate_array"
-        self.rst_file = opts.rst_file[0]
+        self.rst_file = get_file_from_args(opts.plugin[1:])[0]
         self.encoding = opts.encoding
         with codecs.open(self.rst_file, mode="r",
                          encoding=self.encoding[1]) as f:

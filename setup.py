@@ -65,5 +65,8 @@ setup(
             "raimei = ikazuchi.vim.raimei:main",
             "enrai = ikazuchi.vim.enrai:main",
         ],
+        "ikazuchi.plugins": [
+            "rstfile = ikazuchi.plugins.rstfile",
+        ],
      }
 )

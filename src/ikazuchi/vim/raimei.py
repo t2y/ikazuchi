@@ -5,8 +5,8 @@ try:
 except ImportError:
     print "call ':pyfile raimei' from vim"
 
-from ikazuchi.core.handler.rstfile import reSTParser, reSTApiCaller
 from ikazuchi.core.translator import TRANSLATE_API
+from ikazuchi.plugins.rstfile import reSTParser, reSTApiCaller
 from ikazuchi.vim.utils import (to_encode, get_vim_variables,
                                 get_apikey, get_translate_method)
 from os.path import splitext

@@ -17,7 +17,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.set_defaults(api="google", detect=False, lang=False,
                         lang_from="en", lang_to=get_lang(),
-                        plugin=[], rst_file=None, sentence=None,
+                        plugin=[], sentence=None,
                         encoding=None, quiet=False, verbose=False)
     parser.add_argument("-a", "--api", dest="api", metavar="API",
                         help=u"APIs are {0}".format(TRANSLATE_API.keys()))
@@ -35,8 +35,6 @@ def get_args():
                                 "show available plugins using \"help\"")
     parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                         help=u"not to show original sentence to stdout")
-    parser.add_argument("-r", "--rstfile", dest="rst_file", nargs=1,
-                        metavar="RSTFILE", help=u"target reST file")
     parser.add_argument("-s", "--sentences", dest="sentences", nargs="+",
                         metavar="SENTENCE", help=u"target sentences")
     parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
@@ -51,16 +49,14 @@ def get_args():
     err_msg = None
     if opts.api not in TRANSLATE_API.keys():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
-    elif opts.rst_file and not os.access(opts.rst_file[0], os.R_OK):
-        err_msg = _(u"Cannot access reST file: {0}").format(opts.rst_file[0])
     elif opts.encoding:
         err_encoding = check_encoding(opts.encoding)
         if err_encoding:
             err_msg = _(u"Unknown encodings: {0}").format(err_encoding)
     elif "help" in opts.plugin[0:1]:
-        _plugins = u"\n".join(get_plugin_name())
+        _plugins = u"\n".join(sorted(get_plugin_name()))
         err_msg = _(u"Available plugins are:\n{0}".format(_plugins))
-    elif not (opts.lang or opts.plugin or opts.rst_file or opts.sentences):
+    elif not (opts.lang or opts.plugin or opts.sentences):
         err_msg = _(u"Need to specify optional arguments")
 
     if err_msg:
