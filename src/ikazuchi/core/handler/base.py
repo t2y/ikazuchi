@@ -12,6 +12,10 @@ class BaseHandler(object):
     @abc.abstractmethod
     def _call_method(self, method): pass
 
+class NullHandler(BaseHandler):
+    """Handler class for Null object"""
+    def _call_method(self, method):
+        pass  # having nothing to do
 
 class LanguageHandler(BaseHandler):
     """Handler class for languages API"""

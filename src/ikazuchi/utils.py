@@ -12,7 +12,7 @@ def get_lang():
     return lang
 
 def get_handler(opts):
-    h = None
+    h = NullHandler()
     if opts.lang:
         h = LanguageHandler(opts.api, opts.encoding)
     elif opts.rst_file:
