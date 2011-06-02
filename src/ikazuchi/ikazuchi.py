@@ -11,7 +11,7 @@ from locale import _
 from plugins.utils import (get_plugin, get_plugin_name)
 from utils import *
 
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 
 def get_args():
     parser = argparse.ArgumentParser()

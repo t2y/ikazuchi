@@ -8,7 +8,6 @@ See the project `documentation <http://t2y.bitbucket.org/ikazuchi/build/html/ind
 Features
 ========
 
-* Translate GNU gettext catalog named PO file with good reference from web API
 * Translate reST document file keeping with the format
 * Translate any string passed from command line argument
 * Translate any string in Vim using ":pyfile" command
@@ -52,34 +51,32 @@ Execute ikazuchi command::
 All command option are::
 
     $ ikazuchi -h
-    usage: ikazuchi [-h] [-v] [-a API] [-d] [-e ENCODING] [-f LANG] [-l]
-                    [-p POFILE] [-q] [-r RSTFILE] [-s SENTENCE [SENTENCE ...]]
-                    [-t LANG]
+    usage: ikazuchi [-h] [-a API] [-d] [-e ENCODING] [-f LANG] [-l]
+                    [-p PLUGIN [PLUGIN ...]] [-q] [-s SENTENCE [SENTENCE ...]]
+                    [-t LANG] [--version]
 
     optional arguments:
       -h, --help            show this help message and exit
-      -v, --version         show program's version number and exit
       -a API, --api API     APIs are ['google', 'microsoft']
       -d, --detect          detect language for target sentence
       -e ENCODING, --encoding ENCODING
                             input/output encoding
       -f LANG, --from LANG  original language
       -l, --languages       show supported languages
-      -p POFILE, --pofile POFILE
-                            target po file
+      -p PLUGIN [PLUGIN ...], --plugin PLUGIN [PLUGIN ...]
+                            extend with plugin, show available plugins using
+                            "help"
       -q, --quiet           not to show original sentence to stdout
-      -r RSTFILE, --rstfile RSTFILE
-                            target reST file
       -s SENTENCE [SENTENCE ...], --sentences SENTENCE [SENTENCE ...]
                             target sentences
       -t LANG, --to LANG    target language to translate
+      --version             show program's version number and exit
 
 
 Requirements
 ============
 
 * Python 2.6 or later
-* polib 0.5.5 or later
 * setuptools or distriubte
 
 
@@ -91,6 +88,13 @@ Apache License 2.0
 
 History
 =======
+
+0.5.0 (2011-06-03)
+------------------
+* add plug-in feature
+* add -p(plug-in) option
+* remove -p(po file) and -r(rst file) option
+  (po/rst file is handled with plug-in option)
 
 0.4.2 (2011-06-01)
 ------------------

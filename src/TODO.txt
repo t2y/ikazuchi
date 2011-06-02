@@ -4,6 +4,7 @@ Todos
 Functionals
 ------------
 * Stop translating process
+* Show plugins's help
 
 Known Issues
 -------------
