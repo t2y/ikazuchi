@@ -12,6 +12,7 @@ Features
 * Translate any string passed from command line argument
 * Translate any string in Vim using ":pyfile" command
 * Detect language of any string passed from command line argument
+* Extend ``Handler`` with plug-in to your needs
 
 
 Setup
