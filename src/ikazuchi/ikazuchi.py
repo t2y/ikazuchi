@@ -8,6 +8,7 @@ import sys
 from conf import (get_conf, get_conf_path)
 from core.translator import TRANSLATE_API
 from locale import _
+from plugins.utils import (get_plugin, get_plugin_name)
 from utils import *
 
 __version__ = "0.4.2"
@@ -16,7 +17,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.set_defaults(api="google", detect=False, lang=False,
                         lang_from="en", lang_to=get_lang(),
-                        po_file=None, rst_file=None, sentence=None,
+                        plugin=[], rst_file=None, sentence=None,
                         encoding=None, quiet=False, verbose=False)
     parser.add_argument("-a", "--api", dest="api", metavar="API",
                         help=u"APIs are {0}".format(TRANSLATE_API.keys()))
@@ -29,8 +30,9 @@ def get_args():
                         help=u"original language")
     parser.add_argument("-l", "--languages", dest="lang", action="store_true",
                         help=u"show supported languages")
-    parser.add_argument("-p", "--pofile", dest="po_file", nargs=1,
-                        metavar="POFILE", help=u"target po file")
+    parser.add_argument("-p", "--plugin", dest="plugin", nargs="+",
+                        metavar="PLUGIN", help=u"extend with plugin, "\
+                                "show available plugins using \"help\"")
     parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                         help=u"not to show original sentence to stdout")
     parser.add_argument("-r", "--rstfile", dest="rst_file", nargs=1,
@@ -49,19 +51,22 @@ def get_args():
     err_msg = None
     if opts.api not in TRANSLATE_API.keys():
         err_msg = _(u"Unsupported API: {0}").format(opts.api)
-    elif opts.po_file and not os.access(opts.po_file[0], os.R_OK):
-        err_msg = _(u"Cannot access po file: {0}").format(opts.po_file[0])
     elif opts.rst_file and not os.access(opts.rst_file[0], os.R_OK):
         err_msg = _(u"Cannot access reST file: {0}").format(opts.rst_file[0])
     elif opts.encoding:
         err_encoding = check_encoding(opts.encoding)
         if err_encoding:
             err_msg = _(u"Unknown encodings: {0}").format(err_encoding)
-    elif not (opts.lang or opts.po_file or opts.rst_file or opts.sentences):
+    elif "help" in opts.plugin[0:1]:
+        _plugins = u"\n".join(get_plugin_name())
+        err_msg = _(u"Available plugins are:\n{0}".format(_plugins))
+    elif not (opts.lang or opts.plugin or opts.rst_file or opts.sentences):
         err_msg = _(u"Need to specify optional arguments")
 
     if err_msg:
-        parser.print_help()
+        if not opts.plugin:
+            # FIXME: show help for plugins
+            parser.print_help()
         print err_msg
         sys.exit(0)
 
@@ -77,8 +82,14 @@ def main():
     # main process
     opts = get_args()
     handler = get_handler(opts)
+    if opts.plugin:
+        plugin_translator, plugin_handler = get_plugin(opts)
+        TRANSLATE_API[opts.plugin[0]] = plugin_translator
+        if plugin_handler:
+            handler = plugin_handler
     t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
-    t.set_apikey_from_conf(conf)
+    if hasattr(t, "set_apikey_from_conf"):
+        t.set_apikey_from_conf(conf)
     t.call_method_with_handler()
 
 if __name__ == "__main__":

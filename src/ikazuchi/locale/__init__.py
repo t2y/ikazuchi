@@ -2,8 +2,9 @@
 
 import gettext
 from locale import *
+from os.path import (dirname, realpath)
 
-from ikazuchi import LOCALE_DIR
+LOCALE_DIR = dirname(realpath(__file__))
 
 t = gettext.translation("ikazuchi", localedir=LOCALE_DIR, fallback=True)
 _ = t.ugettext
