@@ -2,31 +2,31 @@
 
 import os
 import re
+from os.path import (dirname, realpath)
 
 try:
     from ikazuchi.locale import _
 except ImportError:
     def _(s): return s
 
-def get_file_from_args(args, start=0, end=1):
-    """ check file arguments and the existence
+def get_and_check_file_access(f, mode="r"):
+    """ check access permission and return the file
     >>> import tempfile
     >>> f = tempfile.NamedTemporaryFile()
-    >>> files = get_file_from_args([f.name])
-    >>> len(files)
-    1
-    >>> files = get_file_from_args([f.name, f.name], start=0, end=2)
-    >>> len(files)
-    2
-    >>> f.close()
+    >>> file_name = get_and_check_file_access(f.name)
+    >>> f.name == file_name
+    True
+    >>> file_name = get_and_check_file_access(f.name, "w")
+    >>> f.name == file_name
+    True
     """
-    files = args[start:end] if args[start:end] else None
-    if not files:
-        raise ValueError(_(u"Give file as \"-p plugin_name xxx\""))
-    for f in files:
+    if mode == "r":
         if not os.access(f, os.R_OK):
             raise  ValueError(_(u"Cannot access file: {0}").format(f))
-    return files
+    elif mode == "w":
+        if not os.access(realpath(dirname(f)), os.W_OK):
+            raise  ValueError(_(u"Cannot write file: {0}").format(f))
+    return f
 
 def concatenate_lines(lines, pattern):
     """ concatenate lines

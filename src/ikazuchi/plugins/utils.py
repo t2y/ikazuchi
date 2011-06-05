@@ -8,7 +8,7 @@ except ImportError:
     def _(s): return s
 
 def get_plugin(opts):
-    p = load_plugin(opts.plugin[0])
+    p = load_plugin(opts.plugin)
     translator = p.Translator if hasattr(p, "Translator") else None
     handler = p.Handler if hasattr(p, "Handler") else None
     handler_instance = None

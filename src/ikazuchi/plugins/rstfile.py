@@ -6,6 +6,7 @@ import sys
 import textwrap
 from ikazuchi.core.handler.base import BaseHandler
 from ikazuchi.core.handler.utils import *
+from ikazuchi.ikazuchi import (base_parser, subparsers)
 
 # for Debug
 import logging
@@ -120,21 +121,29 @@ REST_BLOCK_TYPE = {
 }
 
 
+# argument parser for rstfile
+rst_parser = subparsers.add_parser("rstfile", parents=[base_parser])
+rst_parser.set_defaults(rstfile=None, output="output.rst")
+rst_parser.add_argument(dest="rst_file")
+rst_parser.add_argument("-o", "--output", dest="output", metavar="OUTPUT",
+    help="translated output file name, default is 'output.rst'")
+
 class Handler(BaseHandler):
     """
     Handler class for translating reST file
     """
     def __init__(self, opts):
-        if opts.api == "microsoft":
+        self.api = opts.api
+        if self.api == "microsoft":
             self.method_name = "translate_array"
-        self.rst_file = get_file_from_args(opts.plugin[1:])[0]
+        self.rst_file = get_and_check_file_access(opts.rst_file)
+        self.output = get_and_check_file_access(opts.output, "w")
         self.encoding = opts.encoding
         with codecs.open(self.rst_file, mode="r",
                          encoding=self.encoding[1]) as f:
             lines = f.readlines()  # read out all lines
         blocks = reSTParser(lines).parse()
         self.caller = reSTApiCaller(blocks, opts.lang_to)
-        self.output = "output.rst"
 
     def _show_progress(self, lines):
         sys.stdout.write("." * len(lines))
@@ -147,6 +156,7 @@ class Handler(BaseHandler):
                 f.writelines(lines)
                 self._show_progress(lines)
         sys.stdout.write("\n")
+        sys.stdout.write("Translated by {0}\n".format(self.api.title()))
 
 
 class reSTParser(object):
