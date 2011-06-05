@@ -35,7 +35,7 @@ subparsers = parser.add_subparsers(dest="plugin", help="plugins")
 
 def get_args():
     normal_parser = subparsers.add_parser("normal", parents=[base_parser])
-    normal_parser.set_defaults(detect=False, lang=False, sentence=None)
+    normal_parser.set_defaults(detect=False, lang=False, sentences=[])
     normal_parser.add_argument("-d", "--detect", dest="detect",
         action="store_true", help=u"detect language for target sentence")
     normal_parser.add_argument("-l", "--languages", dest="lang",
