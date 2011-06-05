@@ -123,8 +123,8 @@ REST_BLOCK_TYPE = {
 
 # argument parser for rstfile
 rst_parser = subparsers.add_parser("rstfile", parents=[base_parser])
-rst_parser.set_defaults(rstfile=None, output="output.rst")
-rst_parser.add_argument(dest="rst_file")
+rst_parser.set_defaults(rst_file=None, output="output.rst")
+rst_parser.add_argument(dest="rst_file", help="target rst file")
 rst_parser.add_argument("-o", "--output", dest="output", metavar="OUTPUT",
     help="translated output file name, default is 'output.rst'")
 
