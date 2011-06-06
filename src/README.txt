@@ -49,29 +49,63 @@ Execute ikazuchi command::
     sentence:                hello
     detect(Google):          [{u'isReliable': False, u'confidence': 0.01737435, u'language': u'en'}]
 
-All command option are::
+Show which plugins are available::
 
     $ ikazuchi -h
-    usage: ikazuchi [-h] [-a API] [-d] [-e ENCODING] [-f LANG] [-l]
-                    [-p PLUGIN [PLUGIN ...]] [-q] [-s SENTENCE [SENTENCE ...]]
-                    [-t LANG] [--version]
+    usage: ikazuchi [-h] {rstfile,normal} ...
+
+    positional arguments:
+      {rstfile,normal}  available plugins. 'normal' means ikazuchi's standard
+                        feature so it can be abbreviated
+
+    optional arguments:
+      -h, --help        show this help message and exit
+
+Show normal feature help::
+
+    $ ikazuchi normal -h
+    usage: ikazuchi normal [-h] [-a API] [-e ENCODING] [-f LANG] [-q] [-t LANG]
+                           [-d] [-l] [-s SENTENCE [SENTENCE ...]] [--version]
 
     optional arguments:
       -h, --help            show this help message and exit
       -a API, --api API     APIs are ['google', 'microsoft']
-      -d, --detect          detect language for target sentence
       -e ENCODING, --encoding ENCODING
                             input/output encoding
       -f LANG, --from LANG  original language
-      -l, --languages       show supported languages
-      -p PLUGIN [PLUGIN ...], --plugin PLUGIN [PLUGIN ...]
-                            extend with plugin, show available plugins using
-                            "help"
       -q, --quiet           not to show original sentence to stdout
+      -t LANG, --to LANG    target language to translate
+      -d, --detect          detect language for target sentence
+      -l, --languages       show supported languages
       -s SENTENCE [SENTENCE ...], --sentences SENTENCE [SENTENCE ...]
                             target sentences
-      -t LANG, --to LANG    target language to translate
       --version             show program's version number and exit
+
+Show rstfile plugin help::
+
+    $ ikazuchi rstfile -h
+    usage: ikazuchi rstfile [-h] [-a API] [-e ENCODING] [-f LANG] [-q] [-t LANG]
+                            [-o OUTPUT]
+                            rst_file
+
+    positional arguments:
+      rst_file              target rst file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -a API, --api API     APIs are ['google', 'microsoft']
+      -e ENCODING, --encoding ENCODING
+                            input/output encoding
+      -f LANG, --from LANG  original language
+      -q, --quiet           not to show original sentence to stdout
+      -t LANG, --to LANG    target language to translate
+      -o OUTPUT, --output OUTPUT
+                            translated output file name, default is 'output.rst'
+
+.. note::
+
+    Notice the difference of command line option between
+    normal(standard feature) and rstfile.
 
 
 Requirements
@@ -89,6 +123,12 @@ Apache License 2.0
 
 History
 =======
+
+0.5.1 (2011-06-06)
+------------------
+* add subparser for plug-in
+* remove -p(plug-in) option
+  (plug-in feature is provided with subparsers)
 
 0.5.0 (2011-06-03)
 ------------------

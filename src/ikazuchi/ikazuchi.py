@@ -11,7 +11,7 @@ from locale import _
 from plugins.utils import (get_plugin, load_all_plugins)
 from utils import *
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 # base parser object for common option
 base_parser = argparse.ArgumentParser(add_help=False)
@@ -31,7 +31,9 @@ base_parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
 
 # actual object by using ikazuchi command
 parser = argparse.ArgumentParser()
-subparsers = parser.add_subparsers(dest="plugin", help="plugins")
+subparsers = parser.add_subparsers(dest="plugin",
+    help=u"available plugins. 'normal' means ikazuchi's standard feature "\
+         u"so it can be abbreviated")
 
 def get_args():
     normal_parser = subparsers.add_parser("normal", parents=[base_parser])
@@ -48,7 +50,7 @@ def get_args():
     # load subparsers from all plugins
     load_all_plugins()
 
-    # little tric to abbreviate 'normal' keyword as default
+    # little trick to abbreviate 'normal' keyword as default
     subparser_names = subparsers.choices.keys() + ["-h"]
     if not (len(sys.argv) >= 2 and sys.argv[1] in subparser_names):
         sys.argv[1:] = ["normal"] + sys.argv[1:]
