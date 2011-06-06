@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import os
 import sys
 
 from core.handler import *
@@ -47,6 +48,16 @@ def set_default_encoding(opts):
 def convert_str_to_unicode(opts):
     if opts.sentences:
         opts.sentences = [unicode(s, opts.encoding[0]) for s in opts.sentences]
+
+def get_command(cmd, var="PATH"):
+    import platform
+    os_name = platform.system()
+    delim = ";" if os_name == "Windows" else ":"
+    # like a which command
+    for path in os.getenv(var).split(delim):
+        path_cmd = os.path.join(path, cmd)
+        if os.access(path_cmd, os.X_OK):
+            yield path_cmd
 
 _UNSUPPORTED_VERSION = _("Unsupported Python version, use 2.6 above")
 

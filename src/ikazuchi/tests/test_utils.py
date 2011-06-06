@@ -28,6 +28,15 @@ def test_check_encoding():
     errs = ikazuchi.utils.check_encoding(["unknown", "notexist"])
     assert_equals(["unknown", "notexist"], errs)
 
+def test_get_command():
+    import platform
+    os_name = platform.system()
+    if os_name == "Windows":
+        # FIXME: tell me appropriate command
+        pass
+    else:
+        assert_equal(["/bin/ls"], list(ikazuchi.utils.get_command("ls")))
+
 def test_python_version():
     data = [(2, 6, 4, 'final', 0), (2, 5, 1, 'final', 0)]
     sys.stdout = StringIO()
