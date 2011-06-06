@@ -17,12 +17,7 @@ def get_handler(opts):
     if opts.lang:
         h = LanguageHandler(opts.api, opts.encoding)
     elif opts.sentences:
-        # FIXME: consider later about audio handler
-        if (opts.sentences[0] == "audio" or opts.sentences[-1] == "audio") \
-            and len(opts.sentences) >= 2:
-            h = AudioHandler(opts)
-        else:
-            h = SingleSentenceHandler(opts)
+        h = SingleSentenceHandler(opts)
     return h
 
 class EncodingAction(argparse.Action):
