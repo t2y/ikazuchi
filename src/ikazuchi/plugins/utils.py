@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pkg_resources import (iter_entry_points, load_entry_point)
+from ikazuchi.core.handler import NullHandler
 
 try:
     from ikazuchi.locale import _
@@ -11,10 +12,10 @@ def get_plugin(opts):
     p = load_plugin(opts.plugin)
     translator = p.Translator if hasattr(p, "Translator") else None
     handler = p.Handler if hasattr(p, "Handler") else None
-    handler_instance = None
     try:
         handler_instance = handler(opts)
     except Exception as err:
+        handler_instance = NullHandler()
         print _(u"Cannot instantiate Handler: {0}".format(err))
     return translator, handler_instance
 

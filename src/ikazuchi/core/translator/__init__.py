@@ -3,6 +3,8 @@
 import abc
 import re
 import utils
+from collections import defaultdict
+
 from google import GoogleTranslator
 from microsoft import MicrosoftTranslator
 from yahoo import YahooTranslator
@@ -12,7 +14,7 @@ __all__ = [
     "TRANSLATE_API",
 ]
 
-class Translator(object):
+class BaseTranslator(object):
     """Base class for Translator"""
 
     __metaclass__ = abc.ABCMeta
@@ -29,9 +31,6 @@ class Translator(object):
         """Overridden by MixIn class
         must be set "self.handler = handler"
         """
-
-    @abc.abstractmethod
-    def detect(self, text): pass
 
     @abc.abstractmethod
     def translate(self, text): pass
@@ -65,11 +64,13 @@ class Translator(object):
             show_how_to_get_apikey()
 
 # MixIn each implemented Translator
-class TranslatingGoogle(GoogleTranslator, Translator): pass
-class TranslatingMicrosoft(MicrosoftTranslator, Translator): pass
-class TranslatingYahoo(YahooTranslator, Translator): pass  # is obsoleted
+class TranslatingGoogle(GoogleTranslator, BaseTranslator): pass
+class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator): pass
+class TranslatingYahoo(YahooTranslator, BaseTranslator): pass  # is obsoleted
 
-TRANSLATE_API = {
-    "google": TranslatingGoogle,
-    "microsoft": TranslatingMicrosoft,
-}
+TRANSLATE_API = defaultdict(lambda: TranslatingGoogle,
+    {
+        "google": TranslatingGoogle,
+        "microsoft": TranslatingMicrosoft,
+    }
+)

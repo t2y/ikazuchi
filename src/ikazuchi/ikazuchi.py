@@ -5,7 +5,6 @@ import argparse
 import sys
 
 from conf import (get_conf, get_conf_path)
-from core.handler import NullHandler
 from core.translator import TRANSLATE_API
 from locale import _
 from plugins.utils import (get_plugin, load_all_plugins)
@@ -15,7 +14,7 @@ __version__ = "0.5.1"
 
 # base parser object for common option
 base_parser = argparse.ArgumentParser(add_help=False)
-base_parser.set_defaults(api="google", lang_from="en", lang_to=get_lang(),
+base_parser.set_defaults(api=None, lang_from="en", lang_to=get_lang(),
                          encoding=None, quiet=False, verbose=False)
 base_parser.add_argument("-a", "--api", dest="api", metavar="API",
                          help=u"APIs are {0}".format(TRANSLATE_API.keys()))
@@ -70,9 +69,7 @@ def get_args():
     # error check
     if not err_msg and opts.plugin == "normal":
         convert_str_to_unicode(opts)
-        if opts.api not in TRANSLATE_API.keys():
-            err_msg = _(u"Unsupported API: {0}").format(opts.api)
-        elif not (opts.lang or opts.sentences):
+        if not (opts.lang or opts.sentences):
             err_msg = _(u"Need to specify optional arguments")
 
     if err_msg:
@@ -87,14 +84,13 @@ def main():
     conf = get_conf(get_conf_path())
     # main process
     opts = get_args()
-    handler = NullHandler()
     if opts.plugin == "normal":
         handler = get_handler(opts)
     else:
-        plugin_translator, plugin_handler = get_plugin(opts)
-        TRANSLATE_API[opts.plugin] = plugin_translator
-        if plugin_handler:
-            handler = plugin_handler
+        plugin_translator, handler = get_plugin(opts)
+        if plugin_translator:
+            TRANSLATE_API[opts.plugin] = plugin_translator
+            opts.api = opts.api if opts.api else opts.plugin
     t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
     if hasattr(t, "set_apikey_from_conf"):
         t.set_apikey_from_conf(conf)

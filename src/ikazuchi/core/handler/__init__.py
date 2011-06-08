@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from base import LanguageHandler, NullHandler
+from base import BaseHandler, LanguageHandler, NullHandler
 from text import SingleSentenceHandler
 
 __all__ = [
