@@ -3,13 +3,13 @@
 from nose.tools import *
 
 # functions for test
-from ikazuchi.core.translator import Translator
+from ikazuchi.core.translator import BaseTranslator
 from ikazuchi.core.translator.utils import *
 
 class TestTranslator(object):
 
     def setup(self):
-        class DummyTranslator(Translator):
+        class DummyTranslator(BaseTranslator):
             def __init__(self, lang_from, lang_to, handler): pass
 
             def detect(self, text): pass
