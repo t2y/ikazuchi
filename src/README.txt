@@ -12,7 +12,7 @@ Features
 * Translate any string passed from command line argument
 * Translate any string in Vim using ":pyfile" command
 * Detect language of any string passed from command line argument
-* Extend ``Handler`` with plug-in to your needs
+* Extend ``Translator`` and ``Handler`` with plug-in to your needs
 
 
 Setup
@@ -123,6 +123,10 @@ Apache License 2.0
 
 History
 =======
+
+0.5.2 (2011-06-10)
+------------------
+* change extensible Translator
 
 0.5.1 (2011-06-06)
 ------------------
