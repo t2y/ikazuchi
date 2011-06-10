@@ -14,6 +14,12 @@ DATA_SET = [
         u"Now, <span class=notranslate>`ikazuchi`</span> "\
         u"is under development."
     ),
+    (   # inline markup 3
+        u"The relation ``Translator`` and ``Handler``.",
+
+        u"The relation <span class=notranslate>``Translator``</span> and "\
+        u"<span class=notranslate>``Handler``</span>."
+    ),
     (   # hyper link 1
         u"a link `ikazuchi <http://pypi.python.org/pypi/ikazuchi/>`_",
 
