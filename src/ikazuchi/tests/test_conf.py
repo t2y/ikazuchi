@@ -16,12 +16,16 @@ class TestExistingConfigFile(object):
     conf_file = pathjoin(dirname(__file__), "data/conf/ikazuchi.conf")
 
     def test_get_conf(self):
-        expected = {"google": {"apikey": "xxx"},
-                    "microsoft": {"apikey": "yyy"}}
+        expected = {
+            "general": {"http_proxy": "localhost:8080",
+                        "https_proxy": "localhost:8080"},
+            "google": {"apikey": "xxx"},
+            "microsoft": {"apikey": "yyy"},
+        }
         conf = get_conf(self.conf_file)
-        for sec in SECTIONS:
-            for opt in OPTIONS:
-                yield _assert, expected[sec][opt], conf.get(sec, opt)
+        for section, options in SECTIONS:
+            for opt in options:
+                yield _assert, expected[section][opt], conf.get(section, opt)
 
 
 class TestNotExistingConfigFile(object):
@@ -39,12 +43,15 @@ class TestNotExistingConfigFile(object):
             os.remove(self.conf_file)
 
     def test_get_conf(self):
-        expected = {"google": {"apikey": ""},
-                    "microsoft": {"apikey": ""}}
+        expected = {
+            "general": {"http_proxy": "", "https_proxy": ""},
+            "google": {"apikey": ""},
+            "microsoft": {"apikey": ""},
+        }
         conf = get_conf(self.conf_file)
-        for sec in SECTIONS:
-            for opt in OPTIONS:
-                yield _assert, expected[sec][opt], conf.get(sec, opt)
+        for section, options in SECTIONS:
+            for opt in options:
+                yield _assert, expected[section][opt], conf.get(section, opt)
 
     def test_create_conf_file(self):
         yield _assert, False, os.access(self.conf_file, os.R_OK)
@@ -54,13 +61,16 @@ class TestNotExistingConfigFile(object):
     def test_get_or_set_sections(self):
         conf = ConfigParser.SafeConfigParser()
         get_or_set_sections(conf)
-        _assert(SECTIONS, conf.sections())
+        _assert([s[0] for s in SECTIONS], conf.sections())
 
     def test_get_or_set_options(self):
         conf = ConfigParser.SafeConfigParser()
-        expected = {"google": [("apikey", "")],
-                    "microsoft": [("apikey", "")]}
+        expected = {
+            "general": [("http_proxy", ""), ("https_proxy", "")],
+            "google": [("apikey", "")],
+            "microsoft": [("apikey", "")],
+        }
         get_or_set_sections(conf)
-        for sec in SECTIONS:
-            get_or_set_options(conf, sec)
-            yield _assert, expected[sec], conf.items(sec)
+        for section, options in SECTIONS:
+            get_or_set_options(conf, section, options)
+            yield _assert, expected[section], conf.items(section)

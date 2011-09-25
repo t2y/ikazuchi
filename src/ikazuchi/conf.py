@@ -12,8 +12,11 @@ except ImportError:
 CONF_DIR = u".ikazuchi"
 CONF_FILE = u"ikazuchi.conf"
 CONF_PATH = pathjoin(CONF_DIR, CONF_FILE)
-SECTIONS = ["google", "microsoft"]
-OPTIONS = ["apikey"]
+SECTIONS = [
+    ("general", ["http_proxy", "https_proxy"]),
+    ("google", ["apikey"]),
+    ("microsoft", ["apikey"]),
+]
 
 GOOGLE_APIKEY_REGISTER = "https://code.google.com/apis/console/"
 MICROSOFT_APIKEY_REGISTER = "http://www.bing.com/developers"
@@ -46,13 +49,13 @@ def get_conf(conf_file):
     return conf
 
 def get_or_set_sections(conf):
-    for section in SECTIONS:
+    for section, options in SECTIONS:
         if not conf.has_section(section):
             conf.add_section(section)
-        get_or_set_options(conf, section)
+        get_or_set_options(conf, section, options)
 
-def get_or_set_options(conf, section):
-    for option in OPTIONS:
+def get_or_set_options(conf, section, options):
+    for option in options:
         try:
             conf.get(section, option)
         except ConfigParser.NoOptionError:

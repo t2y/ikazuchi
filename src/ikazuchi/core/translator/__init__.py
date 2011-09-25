@@ -63,6 +63,19 @@ class BaseTranslator(object):
         else:
             show_how_to_get_apikey()
 
+    def set_parameter_from_conf(self, conf):
+        import os
+        from functools import partial
+        general = partial(conf.get, "general")
+        # urllib2.build_opener() skips ProxyHandler for Python 2.6/2.7
+        # see also: http://bugs.python.org/issue7152#msg94150
+        # so, the proxy settings set environment variable as workaround
+        if general("http_proxy"):
+            os.environ["http_proxy"] = general("http_proxy")
+        if general("https_proxy"):
+            os.environ["https_proxy"] = general("https_proxy")
+        self.set_apikey_from_conf(conf)
+
 # MixIn each implemented Translator
 class TranslatingGoogle(GoogleTranslator, BaseTranslator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator): pass

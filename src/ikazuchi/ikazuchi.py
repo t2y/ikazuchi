@@ -92,8 +92,7 @@ def main():
             TRANSLATE_API[opts.plugin] = plugin_translator
             opts.api = opts.api if opts.api else opts.plugin
     t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
-    if hasattr(t, "set_apikey_from_conf"):
-        t.set_apikey_from_conf(conf)
+    t.set_parameter_from_conf(conf)
     t.call_method_with_handler()
 
 if __name__ == "__main__":
