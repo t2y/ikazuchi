@@ -10,7 +10,7 @@ from locale import _
 from plugins.utils import (get_plugin, load_all_plugins)
 from utils import *
 
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 
 # base parser object for common option
 base_parser = argparse.ArgumentParser(add_help=False)

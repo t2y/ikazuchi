@@ -124,6 +124,10 @@ Apache License 2.0
 History
 =======
 
+0.5.3 (2011-09-25)
+------------------
+* add proxy settings in [general] section for ikazuchi.conf
+
 0.5.2 (2011-06-10)
 ------------------
 * change extensible Translator
