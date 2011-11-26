@@ -124,6 +124,10 @@ Apache License 2.0
 History
 =======
 
+0.5.4 (2011-11-26)
+------------------
+* use Microsoft Translator as Default API
+
 0.5.3 (2011-09-25)
 ------------------
 * add proxy settings in [general] section for ikazuchi.conf
