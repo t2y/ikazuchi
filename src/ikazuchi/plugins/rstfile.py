@@ -133,7 +133,7 @@ class Handler(BaseHandler):
     Handler class for translating reST file
     """
     def __init__(self, opts):
-        self.api = opts.api or "google"
+        self.api = opts.api if opts.api else "microsoft"
         if self.api == "microsoft":
             self.method_name = "translate_array"
         self.rst_file = get_and_check_file_access(opts.rst_file)
