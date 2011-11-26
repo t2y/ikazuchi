@@ -81,7 +81,7 @@ class TranslatingGoogle(GoogleTranslator, BaseTranslator): pass
 class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator): pass
 class TranslatingYahoo(YahooTranslator, BaseTranslator): pass  # is obsoleted
 
-TRANSLATE_API = defaultdict(lambda: TranslatingGoogle,
+TRANSLATE_API = defaultdict(lambda: TranslatingMicrosoft,
     {
         "google": TranslatingGoogle,
         "microsoft": TranslatingMicrosoft,

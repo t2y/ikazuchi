@@ -10,11 +10,11 @@ class SingleSentenceHandler(BaseHandler):
         self.sentences = opts.sentences
         self.encoding = opts.encoding
         self.quiet = opts.quiet
-        if opts.api == "microsoft":
+        if not opts.api or opts.api == "microsoft":
             self.method_name = "translate_array"
         if opts.detect:
             self.method_name = "detect"
-            if opts.api == "microsoft":
+            if not opts.api or opts.api == "microsoft":
                 self.method_name = "detect_array"
 
     def _encode(self, text):

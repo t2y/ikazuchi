@@ -6,11 +6,12 @@ import sys
 
 from conf import (get_conf, get_conf_path)
 from core.translator import TRANSLATE_API
+from errors import *
 from locale import _
 from plugins.utils import (get_plugin, load_all_plugins)
 from utils import *
 
-__version__ = "0.5.3"
+__version__ = "0.5.4"
 
 # base parser object for common option
 base_parser = argparse.ArgumentParser(add_help=False)
@@ -82,6 +83,7 @@ def main():
     # pre process
     check_python_version()
     conf = get_conf(get_conf_path())
+
     # main process
     opts = get_args()
     if opts.plugin == "normal":
@@ -91,9 +93,13 @@ def main():
         if plugin_translator:
             TRANSLATE_API[opts.plugin] = plugin_translator
             opts.api = opts.api if opts.api else opts.plugin
-    t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
-    t.set_parameter_from_conf(conf)
-    t.call_method_with_handler()
+
+    try:
+        t = TRANSLATE_API[opts.api](opts.lang_from, opts.lang_to, handler)
+        t.set_parameter_from_conf(conf)
+        t.call_method_with_handler()
+    except IkazuchiError as err:
+        print err
 
 if __name__ == "__main__":
     main()
