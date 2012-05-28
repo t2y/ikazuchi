@@ -2,8 +2,10 @@
 
 import codecs
 import re
+import string
 import sys
 import textwrap
+
 from ikazuchi.core.handler.base import BaseHandler
 from ikazuchi.core.handler.utils import *
 from ikazuchi.ikazuchi import (base_parser, subparsers)
@@ -56,12 +58,12 @@ _NOTRANSLATE_PTRN = re.compile(r"({0})".format("|".join(_NOTRANSLATE)),
                                re.M | re.U)
 
 _SECTION = re.compile(r"""
-    (?P<over_line>[#*=\-^"]{2,}\s+)?    # =======
-    (?P<section>[^#*=\-^"]+?\s+)        # section
-    (?P<under_line>[#*=\-^"]{2,}\s+)$   # =======
-""", re.U | re.X)
+    (?P<over_line>[%(symbol)s]{2,}\s+)?    # =======
+    (?P<section>[^%(symbol)s]+?\s+)        # section
+    (?P<under_line>[%(symbol)s]{2,}\s+)$   # =======
+""" % {"symbol": string.punctuation}, re.U | re.X)
 
-_SECTION_LINE = re.compile(r'^[#*=\-^"]{2,}\s+', re.U)
+_SECTION_LINE = re.compile(r'^[%s]{2,}\s+' % string.punctuation, re.U)
 
 _LISTBLOCK = re.compile(r"""(
       ^[*\-\d#]\.*\s+       # * list
@@ -573,7 +575,7 @@ class reSTApiCaller(object):
 
         lines = []
         for num, line in enumerate(results):
-            if re.search(r'[#*=\-^"]{2,}\s+', line):
+            if re.search(r'[%s]{2,}\s+' % string.punctuation, line):
                 line = u"{0}\n".format(line[0] * width)
             lines.append(line)
         return api, lines
