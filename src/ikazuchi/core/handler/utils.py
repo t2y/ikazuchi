@@ -22,10 +22,10 @@ def get_and_check_file_access(f, mode="r"):
     """
     if mode == "r":
         if not os.access(f, os.R_OK):
-            raise  ValueError(_(u"Cannot access file: {0}").format(f))
+            raise ValueError(_(u"Cannot access file: {0}").format(f))
     elif mode == "w":
         if not os.access(realpath(dirname(f)), os.W_OK):
-            raise  ValueError(_(u"Cannot write file: {0}").format(f))
+            raise ValueError(_(u"Cannot write file: {0}").format(f))
     return f
 
 def concatenate_lines(lines, pattern):
