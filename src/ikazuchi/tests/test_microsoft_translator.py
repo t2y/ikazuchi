@@ -58,6 +58,7 @@ class TestMicrosoftTranslator(object):
         assert_equal(
             ('Microsoft', ['ar', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'cs', 'da',
                 'nl', 'en', 'et', 'fi', 'fr', 'de', 'el', 'ht', 'he', 'hi',
+                'mww',
                 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'pl', 'pt',
                 'ro', 'ru', 'sk', 'sl', 'es', 'sv', 'th', 'tr', 'uk', 'vi']),
             self.t.get_languages_for_translate())
