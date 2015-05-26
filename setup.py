@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
 
-VERSION = "0.5.4"
+VERSION = "0.5.5"
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
@@ -24,7 +24,7 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Internationalization",
 ]
 
-INSTALL_REQUIRES = ["distribute"]
+INSTALL_REQUIRES = ["setuptools"]
 if sys.version_info < (2, 7):
     INSTALL_REQUIRES.append("argparse")
 

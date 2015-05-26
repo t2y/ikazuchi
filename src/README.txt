@@ -124,6 +124,10 @@ Apache License 2.0
 History
 =======
 
+0.5.5 (2015-05-26)
+------------------
+* use setuptools instead of distribute
+
 0.5.4 (2011-11-26)
 ------------------
 * use Microsoft Translator as Default API
