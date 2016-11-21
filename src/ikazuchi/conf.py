@@ -21,6 +21,9 @@ SECTIONS = [
 GOOGLE_APIKEY_REGISTER = "https://code.google.com/apis/console/"
 MICROSOFT_APIKEY_REGISTER = "http://www.bing.com/developers"
 
+_UNIX_LIKE_SYSTEMS = ("Darwin", "Linux", "FreeBSD")
+
+
 def get_conf_path():
     """
     >>> get_conf_path().rsplit("/", 2)[-2:]
@@ -28,7 +31,7 @@ def get_conf_path():
     """
     import platform
     _os = platform.system()
-    if _os == "Darwin" or _os == "Linux":
+    if _os in _UNIX_LIKE_SYSTEMS:
         prefix = os.getenv(u"HOME")
     elif _os == "Windows":
         prefix = os.getenv(u"APPDATA")
