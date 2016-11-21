@@ -6,7 +6,8 @@ from ikazuchi.core.handler import NullHandler
 try:
     from ikazuchi.locale import _
 except ImportError:
-    def _(s): return s
+    def _(s):
+        return s
 
 def get_plugin(opts):
     p = load_plugin(opts.plugin)

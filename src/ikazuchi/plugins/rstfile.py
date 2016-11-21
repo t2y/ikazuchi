@@ -17,7 +17,8 @@ log = logging.getLogger(__name__)
 try:
     from ikazuchi.locale import _
 except ImportError:
-    def _(s): return s
+    def _(s):
+        return s
 
 _INLINE = [
     "\*+.*?\*+",    # italic or bold
@@ -216,9 +217,10 @@ class reSTParser(object):
             btype, first, num = None, u"", 0
             if len(_lines) >= 2:
                 for num, mline in enumerate(get_multiline(_lines, 2)):
-                    if not btype and re.search(_SOURCE_CODE, mline[0]) and \
-                       (re.search(_EMPTY_LINE, mline[1]) or \
-                        re.search(_LINE_WITH_INDENT, mline[1])):
+                    if not btype and re.search(_SOURCE_CODE, mline[0]) and (
+                        re.search(_EMPTY_LINE, mline[1]) or
+                        re.search(_LINE_WITH_INDENT, mline[1])
+                    ):
                         btype = REST_BLOCK_TYPE["source"]
                         first = u"".join(_lines[0:num + 1])
                     elif re.search(_EMPTY_LINE, mline[0]) and \
@@ -246,9 +248,10 @@ class reSTParser(object):
             num = 0
             for num, mline in enumerate(get_multiline(_lines, 2)):
                 if re.search(_LISTBLOCK, mline[0]) or \
-                   re.search(_LINE_WITH_INDENT, mline[0]) or \
-                   (re.search(_EMPTY_LINE, mline[0]) and \
-                    re.search(_LISTBLOCK, mline[1])):
+                   re.search(_LINE_WITH_INDENT, mline[0]) or (
+                    re.search(_EMPTY_LINE, mline[0]) and
+                    re.search(_LISTBLOCK, mline[1])
+                ):
                     pass
                 else:
                     break

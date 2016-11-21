@@ -11,7 +11,8 @@ class TestYahooTranslator(object):
         self.t = TranslatingYahoo("ja", "en", None)
 
     def test_get_api_path(self):
-        def translate(): pass
+        def translate():
+            pass
 
         assert_equal("ja2en_?", self.t.get_api_path(translate))
 

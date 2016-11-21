@@ -19,10 +19,12 @@ class TestRaimei(object):
         raimei.vim = None
         mock("raimei.vim")
         raimei.vim.current = Mock("current",
-            window=Mock("window",
+            window=Mock(
+                "window",
                 cursor=Mock("cursor"),
             ),
-            range=Mock("range",
+            range=Mock(
+                "range",
                 start=Mock("start"),
                 end=Mock("end"),
             ),

@@ -10,11 +10,14 @@ class TestTranslator(object):
 
     def setup(self):
         class DummyTranslator(BaseTranslator):
-            def __init__(self, lang_from, lang_to, handler): pass
+            def __init__(self, lang_from, lang_to, handler):
+                pass
 
-            def detect(self, text): pass
+            def detect(self, text):
+                pass
 
-            def translate(self, text): pass
+            def translate(self, text):
+                pass
 
         self.t = DummyTranslator("en", "ja", None)
 

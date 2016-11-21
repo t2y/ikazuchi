@@ -33,7 +33,8 @@ class BaseTranslator(object):
         """
 
     @abc.abstractmethod
-    def translate(self, text): pass
+    def translate(self, text):
+        pass
 
     def call_method_with_handler(self):
         method = getattr(self, self.handler.method_name)
@@ -77,9 +78,14 @@ class BaseTranslator(object):
         self.set_apikey_from_conf(conf)
 
 # MixIn each implemented Translator
-class TranslatingGoogle(GoogleTranslator, BaseTranslator): pass
-class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator): pass
-class TranslatingYahoo(YahooTranslator, BaseTranslator): pass  # is obsoleted
+class TranslatingGoogle(GoogleTranslator, BaseTranslator):
+    pass
+
+class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator):
+    pass
+
+class TranslatingYahoo(YahooTranslator, BaseTranslator):
+    pass  # is obsoleted
 
 TRANSLATE_API = defaultdict(lambda: TranslatingMicrosoft,
     {

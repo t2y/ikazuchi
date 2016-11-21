@@ -97,10 +97,11 @@ class GoogleTranslator(object):
         """ Unofficial Google Text To Speech API
         http://weston.ruter.net/projects/google-tts/
         """
-        headers = {"User-Agent":
-            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-US) "
-            "AppleWebKit/534.16 (KHTML, like Gecko) "
-            "Chrome/10.0.648.204 Safari/534.16"
+        headers = {
+            "User-Agent": "Mozilla/5.0 "
+                          "(Macintosh; U; Intel Mac OS X 10_6_7; en-US) "
+                          "AppleWebKit/534.16 (KHTML, like Gecko) "
+                          "Chrome/10.0.648.204 Safari/534.16"
         }
         query = {"tl": lang, "q": text.encode("utf-8")}
         url = "http://translate.google.com/translate_tts?{0}".format(

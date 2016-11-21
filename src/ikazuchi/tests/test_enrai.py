@@ -24,7 +24,8 @@ class TestEnrai(object):
         enrai.vim.eval = Mock("eval", returns_func=_eval_func)
         enrai.vim.current = Mock("current",
             window=Mock("window"),
-            line=Mock("line",
+            line=Mock(
+                "line",
                 split=Mock("split", returns=self.test_text.split(" ")),
             ),
         )

@@ -11,9 +11,11 @@ class TestMicrosoftTranslator(object):
         self.t = TranslatingMicrosoft("ja", "en", None)
 
     def test_get_api_path(self):
-        def break_sentences(): pass
+        def break_sentences():
+            pass
 
-        def get_language_names(): pass
+        def get_language_names():
+            pass
 
         assert_equal("BreakSentences?", self.t.get_api_path(break_sentences))
         assert_equal("GetLanguageNames?",
@@ -56,7 +58,7 @@ class TestMicrosoftTranslator(object):
 
     def test_get_languages_for_translate(self):
         assert_equal(
-            ('Microsoft', 
+            ('Microsoft',
                 ['af', 'ar', 'bs-Latn', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'yue',
                  'hr', 'cs', 'da', 'nl', 'en', 'et', 'fj', 'fil', 'fi', 'fr',
                  'de', 'el', 'ht', 'he', 'hi', 'mww', 'hu', 'id', 'it', 'ja',

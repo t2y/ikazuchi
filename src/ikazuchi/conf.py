@@ -7,7 +7,8 @@ from os.path import join as pathjoin
 try:
     from ikazuchi.locale import _
 except ImportError:
-    def _(s): return s
+    def _(s):
+        return s
 
 CONF_DIR = u".ikazuchi"
 CONF_FILE = u"ikazuchi.conf"

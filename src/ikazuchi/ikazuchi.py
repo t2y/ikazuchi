@@ -31,9 +31,11 @@ base_parser.add_argument("-t", "--to", dest="lang_to", metavar="LANG",
 
 # actual object by using ikazuchi command
 parser = argparse.ArgumentParser()
-subparsers = parser.add_subparsers(dest="plugin",
-    help=u"available plugins. 'normal' means ikazuchi's standard feature "\
-         u"so it can be abbreviated")
+subparsers = parser.add_subparsers(
+    dest="plugin",
+    help=u"available plugins. 'normal' means ikazuchi's standard feature "
+         u"so it can be abbreviated",
+)
 
 def get_args():
     normal_parser = subparsers.add_parser("normal", parents=[base_parser])

@@ -10,7 +10,8 @@ class BaseHandler(object):
     method_name = "translate"
 
     @abc.abstractmethod
-    def _call_method(self, method): pass
+    def _call_method(self, method):
+        pass
 
 class NullHandler(BaseHandler):
     """Handler class for Null object"""

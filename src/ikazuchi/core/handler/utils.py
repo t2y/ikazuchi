@@ -7,7 +7,8 @@ from os.path import (dirname, realpath)
 try:
     from ikazuchi.locale import _
 except ImportError:
-    def _(s): return s
+    def _(s):
+        return s
 
 def get_and_check_file_access(f, mode="r"):
     """ check access permission and return the file

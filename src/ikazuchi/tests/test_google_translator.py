@@ -15,7 +15,8 @@ class TestGoogleTranslator(object):
         self.t = TranslatingGoogle("ja", "en", None)
 
     def test_get_url(self):
-        def detect(): pass
+        def detect():
+            pass
 
         expected = "https://www.googleapis.com/language/translate/v2/detect"
         assert_equal(expected, self.t.get_url(detect))
