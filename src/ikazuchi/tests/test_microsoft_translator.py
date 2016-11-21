@@ -45,22 +45,25 @@ class TestMicrosoftTranslator(object):
 
     def test_get_languages_for_speak(self):
         assert_equal(
-            ('Microsoft', ['ca', 'ca-es', 'da', 'da-dk', 'de', 'de-de',
-                'en', 'en-au', 'en-ca', 'en-gb', 'en-in', 'en-us', 'es',
-                'es-es', 'es-mx', 'fi', 'fi-fi', 'fr', 'fr-ca', 'fr-fr',
-                'it', 'it-it', 'ja', 'ja-jp', 'ko', 'ko-kr', 'nb-no', 'nl',
-                'nl-nl', 'no', 'pl', 'pl-pl', 'pt', 'pt-br', 'pt-pt', 'ru',
-                'ru-ru', 'sv', 'sv-se', 'zh-chs', 'zh-cht', 'zh-cn',
-                'zh-hk', 'zh-tw']),
+            ('Microsoft', ['ar', 'ar-eg', 'ca', 'ca-es', 'da', 'da-dk', 'de',
+                'de-de', 'en', 'en-au', 'en-ca', 'en-gb', 'en-in', 'en-us',
+                'es', 'es-es', 'es-mx', 'fi', 'fi-fi', 'fr', 'fr-ca', 'fr-fr',
+                'hi', 'hi-in', 'it', 'it-it', 'ja', 'ja-jp', 'ko', 'ko-kr',
+                'nb-no', 'nl', 'nl-nl', 'no', 'pl', 'pl-pl', 'pt', 'pt-br',
+                'pt-pt', 'ru', 'ru-ru', 'sv', 'sv-se', 'yue', 'zh-chs',
+                'zh-cht', 'zh-cn', 'zh-hk', 'zh-tw']),
             self.t.get_languages_for_speak())
 
     def test_get_languages_for_translate(self):
         assert_equal(
-            ('Microsoft', ['ar', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'cs', 'da',
-                'nl', 'en', 'et', 'fi', 'fr', 'de', 'el', 'ht', 'he', 'hi',
-                'mww',
-                'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'pl', 'pt',
-                'ro', 'ru', 'sk', 'sl', 'es', 'sv', 'th', 'tr', 'uk', 'vi']),
+            ('Microsoft', 
+                ['af', 'ar', 'bs-Latn', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'yue',
+                 'hr', 'cs', 'da', 'nl', 'en', 'et', 'fj', 'fil', 'fi', 'fr',
+                 'de', 'el', 'ht', 'he', 'hi', 'mww', 'hu', 'id', 'it', 'ja',
+                 'sw', 'tlh', 'tlh-Qaak', 'ko', 'lv', 'lt', 'mg', 'ms', 'mt',
+                 'yua', 'no', 'otq', 'fa', 'pl', 'pt', 'ro', 'ru', 'sm',
+                 'sr-Cyrl', 'sr-Latn', 'sk', 'sl', 'es', 'sv', 'ty', 'th',
+                 'to', 'tr', 'uk', 'ur', 'vi', 'cy']),
             self.t.get_languages_for_translate())
 
     def test_translate(self):
