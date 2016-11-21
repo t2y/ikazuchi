@@ -7,7 +7,6 @@ from collections import defaultdict
 
 from google import GoogleTranslator
 from microsoft import MicrosoftTranslator
-from yahoo import YahooTranslator
 from ikazuchi.conf import show_how_to_get_apikey
 
 __all__ = [
@@ -84,8 +83,6 @@ class TranslatingGoogle(GoogleTranslator, BaseTranslator):
 class TranslatingMicrosoft(MicrosoftTranslator, BaseTranslator):
     pass
 
-class TranslatingYahoo(YahooTranslator, BaseTranslator):
-    pass  # is obsoleted
 
 TRANSLATE_API = defaultdict(lambda: TranslatingMicrosoft,
     {
