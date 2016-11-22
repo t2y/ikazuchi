@@ -348,7 +348,7 @@ class reSTApiCaller(object):
             dedented_text = textwrap.dedent(text).strip()
             indented = textwrap.fill(dedented_text, initial_indent=indent,
                                         subsequent_indent=indent)
-            return [indented]
+            return [u"{0}\n".format(indented)]
 
     def split_lines_with_eos(self, lines):
         _lines = []
