@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 
 DATA_SET = [
-    (   # no indent line
+    (   # 0 no indent line
          u"no indent line.",
 
-        [u"no indent line."],
+        [u"no indent line.\n"],
     ),
-    (   # indent line
+    (   # 1 indent line
          u"  indent line.",
 
-        [u"  indent line."],
+        [u"  indent line.\n"],
     ),
-    (   # no indent long line
+    (   # 2 no indent long line
          u"no indent long long long long long long long long long long "\
          u"long long long long long long long long long long long long "\
          u"long long long long line.",
 
         [u"no indent long long long long long long long long long long "\
          u"long long\nlong long long long long long long long long long "\
-         u"long long long long\nline."]
+         u"long long long long\nline.\n"]
     ),
-    (   # indent long line
+    (   # 3 indent long line
          u"  indent long long long long long long long long long long "\
          u"long long long long long long long long long long long long "\
          u"long long long long line.",
 
         [u"  indent long long long long long long long long long long "\
          u"long long\n  long long long long long long long long long long "\
-         u"long long long\n  long line."]
+         u"long long long\n  long line.\n"]
     ),
 ]

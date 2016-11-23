@@ -2,7 +2,7 @@
 
 DATA_SET = [
     # standalone sourceblock
-    (
+    (  # 0
         [u"::\n"
          u"",
          u"    first code",
@@ -15,7 +15,7 @@ DATA_SET = [
          u"    second code",
          u""]
     ),
-    (
+    (  # 1
         [u"::\n"
          u"",
          u"    first code",
@@ -26,7 +26,7 @@ DATA_SET = [
          u"    first code",
          u"    second code"]
     ),
-    (
+    (  # 2
         [u"::\n"
          u"",
          u"",
@@ -40,7 +40,7 @@ DATA_SET = [
          u"    first code",
          u"    second code"]
     ),
-    (
+    (  # 3
         [u"::  \n"
          u"",
          u"    first code",
@@ -53,7 +53,7 @@ DATA_SET = [
          u"    second code",
          u""]
     ),
-    (
+    (  # 4
         [u"::\n"
          u"    first code",
          u"    second code",
@@ -66,7 +66,7 @@ DATA_SET = [
     ),
 
     # given first line has "::" and test
-    (
+    (  # 5
         [u"that is::\n"
          u"",
          u"    first code",
@@ -74,23 +74,23 @@ DATA_SET = [
          u""],
         u"that is::\n",
 
-        [u"that is<span class=notranslate>::</span>",
+        [u"that is<span class=notranslate>::</span>\n",
          u"    first code",
          u"    second code",
          u""]
     ),
-    (
+    (  # 6
         [u"that is::\n"
          u"",
          u"    first code",
          u"    second code"],
         u"that is::\n",
 
-        [u"that is<span class=notranslate>::</span>",
+        [u"that is<span class=notranslate>::</span>\n",
          u"    first code",
          u"    second code"]
     ),
-    (
+    (  # 7
         [u"that is::\n"
          u"",
          u"",
@@ -98,12 +98,12 @@ DATA_SET = [
          u"    second code"],
         u"that is::\n",
 
-        [u"that is<span class=notranslate>::</span>",
+        [u"that is<span class=notranslate>::</span>\n",
          u"",
          u"    first code",
          u"    second code"]
     ),
-    (
+    (  # 8
         [u"that is::  \n"
          u"",
          u"    first code",
@@ -111,19 +111,19 @@ DATA_SET = [
          u""],
         u"that is::  \n",
 
-        [u"that is<span class=notranslate>::  </span>",
+        [u"that is<span class=notranslate>::  </span>\n",
          u"    first code",
          u"    second code",
          u""]
     ),
-    (
+    (  # 9
         [u"that is::\n",
          u"    first code",
          u"    second code",
          u""],
         u"that is::\n",
 
-        [u"that is<span class=notranslate>::</span>",
+        [u"that is<span class=notranslate>::</span>\n",
          u"    first code",
          u"    second code",
          u""]
