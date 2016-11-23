@@ -18,12 +18,12 @@ Features
 Setup
 =====
 
-by easy_install
+by pip
 ----------------
 
 Make environment::
 
-   $ easy_install ikazuchi
+   $ pip install ikazuchi
 
 by buildout
 -----------
@@ -112,7 +112,7 @@ Requirements
 ============
 
 * Python 2.6 or later
-* setuptools or distriubte
+* setuptools
 
 
 License
@@ -123,6 +123,12 @@ Apache License 2.0
 
 History
 =======
+
+0.5.6 (2016-11-23)
+------------------
+* support config path on FreeBSD
+* fix a bug with rstfile plugin when a text is translated from Japanese
+* drop unavailable YahooTranslator
 
 0.5.5 (2015-05-26)
 ------------------

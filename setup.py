@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 from os.path import join as pathjoin
 
-VERSION = "0.5.5"
+VERSION = "0.5.6"
 LONG_DESCRIPTION = "".join([
     open(pathjoin("src","README.txt")).read(),
     open(pathjoin("src","TODO.txt")).read()])
@@ -19,7 +19,9 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
-    "Programming Language :: Python",
+    "Programming Language :: Python :: 2.6",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 2 :: Only",
     "Topic :: Software Development",
     "Topic :: Software Development :: Internationalization",
 ]
@@ -36,7 +38,7 @@ setup(
      classifiers=CLASSIFIERS,
      keywords=["translate", "i18n", "internationalization"],
      author="Tetsuya Morimoto",
-     author_email="tetsuya dot morimoto at gmail dot com",
+     author_email="tetsuya.morimoto@gmail.com",
      url="http://t2y.bitbucket.org/ikazuchi/build/html/index.html",
      license="Apache License 2.0",
      py_modules=[],
